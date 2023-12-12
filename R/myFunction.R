@@ -13,8 +13,8 @@
 #'
 #' @examples
 #' myFunction(x = 1, y = 2)
-myFunction <- function(x, y) {
-  sumResult <- x + y
+myFunction <- function(x, z) {
+  sumResult <- x + z
 
   myHiddenFunction(sumResult)
 
