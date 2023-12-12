@@ -42,3 +42,17 @@ To install all the dependencies required for development, run:
 ``` r
 renv::install()
 ```
+
+### Testing
+
+To run packages tests, execute
+
+``` r
+devtools::test()
+```
+
+### Documentation Generation
+
+``` r
+pkgdown:::build_site_external()
+```
