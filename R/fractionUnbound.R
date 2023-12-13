@@ -23,7 +23,24 @@
 #'
 #' @examples
 #'
-calcFractionUnbound<-function(kLip,kPro,kPla,kAir,cCells,cSerum,microplateType,volMedium_mL){
+calcFractionUnbound<-function(kLip,kPro,kPla,kAir,cLip, cPro,saPlasticVolMedium){
+
+  #calculate the fraction unbound
+  fuInvitro=1/(1+kLip*cLip+kPro*cPro+kPla*saPlasticVolMedium)
+
+  #Warning for volatility
+  fuAir=fuInvitro*kAir*volAir_L
+  if (fuAir>0.1){
+    print("Probable evaporation")
+  }else {}
+
+  return(fuInvitro)
+}
+
+
+
+calcComposition<-function(cCells,cSerum,microplateType,volMedium_mL){
+
   #the units of the concentrations and surface of plastic are related to how the partitions coefficient were derived
 
   #calculate the concentration of lipids in the system
@@ -64,19 +81,11 @@ calcFractionUnbound<-function(kLip,kPro,kPla,kAir,cCells,cSerum,microplateType,v
   surfAreaP_mm2=2*pi*(diam_mm/2)*heighMedium_mm3
   surfAreaP_m2=surfAreaP_mm2/1E6
   volAir_L=(volWell_mm3-volMedium_mm3)/1E6
+  saPlasticVolMedium=surfAreaP_m2/volMedium_L
 
   if (volAir_L<0){
     print("error vol medium or microplate")
   }
 
-  #calculate the fraction unbound
-  fuInvitro=1/(1+kLip*cLip+kPro*cPro+kPla*(surfAreaP_m2/volMedium_L))
-
-  #Warning for volatility
-  fuAir=fuInvitro*kAir*volAir_L
-  if (fuAir>0.1){
-    print("Probable evaporation")
-  }else {}
-
-  return(fuInvitro)
+  return(cLip, cPro,saPlasticVolMedium)
 }
