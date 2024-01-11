@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @details
-#' \deqn{fu_{in vitro}=1/(1 + C_{cells} \times 10^{0.4 \times logP - 1.38} )}
+#' Hepatocytes Assays: \eqn{fu_{in vitro}=\frac{1}{1 + C_{cells} \times 10^{0.4 \times logP - 1.38}}}
 getInVitroFractionUnbound <- function(LogP, hlcAt, MW, pKa, ionization, assumptions, fu, BC) {
   # Calculate ionization
   if (ionization == "acid") {
