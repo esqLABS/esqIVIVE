@@ -66,7 +66,10 @@ determineInvitroCompartments<-function(cCells,cSerum,microplateType,volMedium_mL
   surfAreaP_m2=surfAreaP_mm2/1E6
   volAir_L=(volWell_mm3-volMedium_mm3)/1E6
   saPlasticVolMedium=surfAreaP_m2/volMedium_L
-return()
+
+return(cCellLipN,cCellLipNPL,cCellLipAPL,cCellPro,
+       cFBSLipN,cFBSLipNPL,cFBSLipAPL,cFBSPro,
+       SaPlasticVolMedium,volAir_L)
 }
 
 

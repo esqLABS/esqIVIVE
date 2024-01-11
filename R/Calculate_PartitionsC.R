@@ -9,6 +9,7 @@ calcPartitions<-function(LogP,hlcAt,MW,pKa,typeIonization,assumptions,fu,BC){
   fNeutral=1
   }
 
+  #Partitions to different components
   kOW=10**logP
 
   #Calculate air-water partition coefficient
@@ -20,6 +21,7 @@ calcPartitions<-function(LogP,hlcAt,MW,pKa,typeIonization,assumptions,fu,BC){
   kPlasticKramer=10**(logP*0.97-6.94)
   kPlastic=mean(kPlasticFischer,kPlasticKramer)*fNeutral
 
+  #QSPRs for calculating partitioning in in vitro
   if ("assumption"=="Poulin and Theil"){
     #Calculate protein partitioning
 
@@ -53,8 +55,21 @@ calcPartitions<-function(LogP,hlcAt,MW,pKa,typeIonization,assumptions,fu,BC){
       }
 
   }else if ("assumption"=="Schmitt"){
+    K1=F1*F2*F3
+    F1*F2*F3+ K2* base ^ CT0 + K3* base ^ CT1+K4 *base^CT2 + K5* base ^ (CT0+CT1) +K6* base ^ (CT0+CT2) +K7* base ^ (CT2+CT1) +K8* base ^ (CT0+CT1+CT2)
+
+    Kprot=(0.81 + 0.11 * 10^LogMA) / 24.92 * 5.0
+    KnPL=10**LogMA
+
+    K_a_PL=K_n_PL*K_a_PL_pH_Factor
+    fuInVitro=1/(1+KnL * f_nl + KnPL * f_np + KaPL * AP_T + KProt * f_proteins)
 
   }else if ("assumption"=="Berezhkovskiy"){
+
+    fuInvitro=1 / (10^LogP * (V_nlp + 0.3 * V_php) +  0.7 * V_php + V_wp / fu)
+
+  }else if ("assumption"=="Berezhkovskiy"){
+
 
   }else {}
 
