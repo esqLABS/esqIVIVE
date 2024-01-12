@@ -1,18 +1,18 @@
 #' getInVitroCompartments
 #'
 #' @description
-#' Generates in vitro compartment variables
+#' Generates a list of values describing an in vitro compartment
 #'
 #' @param cCells cells concentration (in million/ml)
 #' @param cSerum serum concentration (in ???)
-#' @param microplateWell number of wells in the microplate
-#' @param volMedium_mL volume of medium in the well (in mL)
+#' @param microplateWells number of wells in the microplate
+#' @param volMedium volume of medium in the well (in mL)
 #'
 #' @return a list of values representing
 #' @export
 #'
 #' @examples
-getInVitroCompartment <- function(cCells, cSerum, microplateType, volMedium_mL) {
+getInVitroCompartment <- function(cCells, cSerum, microplateType, volMedium) {
   # cCells do have to be in nmillion/ml?
   # the units of the concentrations and surface of plastic are related to how the partitions coefficient were derived
 
@@ -47,8 +47,8 @@ getInVitroCompartment <- function(cCells, cSerum, microplateType, volMedium_mL) 
 
   areaGrowth_mm2 <- pi * (diam_mm / 2)^2
   volWell_mm3 <- volWell_cm3 * 1000
-  volMedium_mm3 <- volMedium_mL * 1000
-  volMedium_L <- volMedium_mL / 1000
+  volMedium_mm3 <- volMedium * 1000
+  volMedium_L <- volMedium / 1000
   heighMedium_mm3 <- volMedium_mm3 / areaGrowth_mm2
   surfAreaP_mm2 <- 2 * pi * (diam_mm / 2) * heighMedium_mm3
   surfAreaP_m2 <- surfAreaP_mm2 / 1E6
@@ -60,15 +60,15 @@ getInVitroCompartment <- function(cCells, cSerum, microplateType, volMedium_mL) 
 
   inVitroCompartment <-
     list(
-      cCellLipN = cCellLipN,
-      cCellLipNPL = cCellLipNPL,
-      cCellLipAPL = cCellLipAPL,
-      cCellPro = cCellPro,
-      cFBSLipN = cFBSLipN,
-      cFBSLipNPL = cFBSLipNPL,
-      cFBSLipAPL = cFBSLipAPL,
-      cFBSPro = cFBSPro,
-      SaPlasticVolMedium = saPlasticVolMedium,
+      # cCellLipN = cCellLipN,
+      # cCellLipNPL = cCellLipNPL,
+      # cCellLipAPL = cCellLipAPL,
+      # cCellPro = cCellPro,
+      # cFBSLipN = cFBSLipN,
+      # cFBSLipNPL = cFBSLipNPL,
+      # cFBSLipAPL = cFBSLipAPL,
+      # cFBSPro = cFBSPro,
+      # SaPlasticVolMedium = saPlasticVolMedium,
       volAir_L = volAir_L
     )
 
