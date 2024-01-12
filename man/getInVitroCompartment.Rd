@@ -4,20 +4,20 @@
 \alias{getInVitroCompartment}
 \title{getInVitroCompartments}
 \usage{
-getInVitroCompartment(cCells, cSerum, microplateType, volMedium_mL)
+getInVitroCompartment(cCells, cSerum, microplateType, volMedium)
 }
 \arguments{
 \item{cCells}{cells concentration (in million/ml)}
 
 \item{cSerum}{serum concentration (in ???)}
 
-\item{volMedium_mL}{volume of medium in the well (in mL)}
+\item{volMedium}{volume of medium in the well (in mL)}
 
-\item{microplateWell}{number of wells in the microplate}
+\item{microplateWells}{number of wells in the microplate}
 }
 \value{
 a list of values representing
 }
 \description{
-Generates in vitro compartment variables
+Generates a list of values describing an in vitro compartment
 }
