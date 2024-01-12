@@ -3,29 +3,28 @@
 #' @description
 #' Compute the fraction unbound in vitro
 #'
+#' @param assumptions type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt)
+#' @param inVitroCompartment a list of values describing the in vitro compartment created by `getInVitroCompartment`
 #' @param LogP LogP of the compound
 #' @param hlcAt Henry's Law Constant in atm/(m3*mol)
 #' @param MW Molecular Weight of the compound
 #' @param pKa pkA of the compound
-#' @param ionization type of ionization (acid, base, none)
-#' @param assumptions type of assumption used (1: Poulin and Theil, 2: PK-Sim® Standard, 3: Rodgers & Rowland, 4: Schmidtt)
-#' @param fu fraction unbound
 #' @param BC
+#' @param ionization type of ionization (acid, base, none)
+#' @param fu In Vivo Fraction Unbound
 #'
 #' @return
 #' @export
 #'
 #' @details
-#' Hepatocytes Assays: \eqn{fu_{in vitro}=\frac{1}{1 + C_{cells} \times 10^{0.4 \times logP - 1.38}}}
-getInVitroFractionUnbound <- function(LogP, hlcAt, MW, pKa, ionization, assumptions, fu, BC) {
-  # Calculate ionization
-  if (ionization == "acid") {
-    fNeutral <- 1 / (1 + 10**(pH - pKa))
-  } else if (ionization == "base") {
-    fNeutral <- 1 / (1 + 10**(pKa - pH))
-  } else {
-    fNeutral <- 1
-  }
+#' Hepatocytes Assays: \eqn{fu_{in\ vitro}=\frac{1}{1 + C_{cells} \times 10^{0.4 \times logP - 1.38}}}
+getInVitroFractionUnbound <- function(assumptions, inVitroCompartment, LogP, hlcAt, MW, pKa, BC, ionization = "none", fu = NULL) {
+  # check if the arguments are valid
+  rlang::arg_match(ionization, c("acid", "base", "none"))
+  rlang::arg_match(assumptions, c("Poulin and Theil", "PK-Sim® Standard", "Rodgers & Rowland", "Schmidtt"))
+
+
+  fNeutral <- getIonization(ionization, pH, pKa)
 
   # Partitions to different components
   kOW <- 10**logP
@@ -90,7 +89,20 @@ getInVitroFractionUnbound <- function(LogP, hlcAt, MW, pKa, ionization, assumpti
   fuAir <- fuInvitro * kAir * volAir_L
   if (fuAir > 0.1) {
     warning("Probable evaporation")
-  } else {}
+  }
 
   return(fuInvitro)
+}
+
+
+getIonization <- function(ionization, pH, pKa) {
+  # Calculate ionization
+  if (ionization == "acid") {
+    fNeutral <- 1 / (1 + 10**(pH - pKa))
+  } else if (ionization == "base") {
+    fNeutral <- 1 / (1 + 10**(pKa - pH))
+  } else {
+    fNeutral <- 1
+  }
+  return(fNeutral)
 }

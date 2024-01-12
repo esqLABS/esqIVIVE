@@ -5,17 +5,22 @@
 \title{getInVitroFractionUnbound}
 \usage{
 getInVitroFractionUnbound(
+  assumptions,
+  inVitroCompartment,
   LogP,
   hlcAt,
   MW,
   pKa,
-  ionization,
-  assumptions,
-  fu,
-  BC
+  BC,
+  ionization = "none",
+  fu = NULL
 )
 }
 \arguments{
+\item{assumptions}{type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt)}
+
+\item{inVitroCompartment}{a list of values describing the in vitro compartment created by \code{getInVitroCompartment}}
+
 \item{LogP}{LogP of the compound}
 
 \item{hlcAt}{Henry's Law Constant in atm/(m3*mol)}
@@ -26,15 +31,11 @@ getInVitroFractionUnbound(
 
 \item{ionization}{type of ionization (acid, base, none)}
 
-\item{assumptions}{type of assumption used (1: Poulin and Theil, 2: PK-Sim® Standard, 3: Rodgers & Rowland, 4: Schmidtt)}
-
-\item{fu}{fraction unbound}
-
-\item{BC}{}
+\item{fu}{In Vivo Fraction Unbound}
 }
 \description{
 Compute the fraction unbound in vitro
 }
 \details{
-Hepatocytes Assays: \eqn{fu_{in vitro}=\frac{1}{1 + C_{cells} \times 10^{0.4 \times logP - 1.38}}}
+Hepatocytes Assays: \eqn{fu_{in\ vitro}=\frac{1}{1 + C_{cells} \times 10^{0.4 \times logP - 1.38}}}
 }
