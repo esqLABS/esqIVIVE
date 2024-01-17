@@ -17,8 +17,7 @@ IVIVE_Clspe<-function(invitro_system,N_invitro,type_data,logP,MW,Ionization,pKa,
   if(type_data=="experimental_data"){
     #Fit clearance to experimental data
     #Load the depletion curve
-    clear_curve=read.csv("Clearance_example.csv",header=TRUE)
-
+    clear_curve=read.csv("tests/Clearance_example.csv",header=TRUE)
     clear_curve_xy=clear_curve
     colnames(clear_curve_xy)=c("x","y")
 
@@ -32,7 +31,7 @@ IVIVE_Clspe<-function(invitro_system,N_invitro,type_data,logP,MW,Ionization,pKa,
     }
 
     #fit model
-    fitKcat <- nls(y ~  Kcat_fuction(y0,x,Kcat),
+    fitKcat <- nls(y ~  Kcat_function(y0,x,Kcat),
                    data = clear_curve_xy,
                    start=list(Kcat=0.01),
                    trace=TRUE)
@@ -65,7 +64,7 @@ IVIVE_Clspe<-function(invitro_system,N_invitro,type_data,logP,MW,Ionization,pKa,
   #Universal calculations----------------------------
 
   fu_invitro<-0.1  # to remove
-  #Calculate Kcat for unb fraction
+  #Calculate Clearance for unb fraction
   Cl_values["KcatU",]=Cl_values["Kcat",]/fu_invitro
 
   #Calculate the specific clearance, it will be in units of per min

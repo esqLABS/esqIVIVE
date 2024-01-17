@@ -11,7 +11,7 @@ library(ggplot2)
 #Calculate in vitro intrinsic clearance values---------------------------------
 
 #Load in vitro data
-mm_exp_curve=read.csv("Example_michaelis_menten_curve.csv",header=TRUE)
+mm_exp_curve=read.csv("tests/Example_michaelis_menten_curve.csv",header=TRUE)
 mm_exp_curve_xy=mm_exp_curve
 colnames(mm_exp_curve_xy)=c("x","y")
 
@@ -23,7 +23,7 @@ fitmm <- nls(y ~ Vmax * x / (Km + x),
 fit_95conf=confint(fitmodel)
 
 mm_fuction <- function(x){
-  y=coefficients(fitmodel)["Vmax"] * x / (coefficients(fitmodel)["Km"] + x)
+  y=coefficients(fitmm)["Vmax"] * x / (coefficients(fitmm)["Km"] + x)
   return (y)
 }
 
