@@ -1,8 +1,8 @@
-testFuData<-read.csv("tests/test_fu_microsomes.csv")
+testFuData<-read.csv("tests/test_fu_microsomes.csv") # Based on collection of Poulins papers
 
 for (i in seq(1:nrow(testFuData))){
 
-  FractionUnbound(partitionQSPR="Poulin and Theil + fu",logLipo=as.double(testFuData[i,"LogP..37C."]),
+  testFuData[i,11]=FractionUnbound(partitionQSPR="Poulin and Theil + fu",logLipo=as.double(testFuData[i,"LogP..37C."]),
                             hlcAt=0.00001,ionization=c(testFuData[i,"Class"],0,0),
                             typeSystem="microsomes",FBS=0,microplateType=96,
                             volMedium=0.22,pKa=c(as.double(testFuData[i,"pKa"]),0,0),
@@ -11,3 +11,4 @@ for (i in seq(1:nrow(testFuData))){
 
 
 }
+names(testFuData[,11])<-"our predictions"

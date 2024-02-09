@@ -18,7 +18,7 @@
 #'
 #' @details
 #'
-#'
+#'mayeb consider to have average data..
 FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                                       typeSystem,FBS,microplateType,
                                       volMedium,
@@ -111,7 +111,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
     kNPL<- 0.3*10^logLipo+0.7
 
     fuInvitro <- 1 / (1 + kNL * cCellNL
-                        + kNPL * cCellPL
+                        + kNPL * cCellNPL
                         + kPlastic * saPlasticVolMedium
                         + (1/fu-1)*FBS)
 
@@ -130,7 +130,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
     kNL <- 10^logLipo
 
     #What is the f_lipids
-    fuInvitro=as.double(1 / ( 1 + kNL * ( cCellNL + cCellPL)
+    fuInvitro=as.double(1 / ( 1 + kNL * ( cCellNL + cCellNPL)
                   + kPlastic * saPlasticVolMedium
                   + KPro * cCellPro
                   + (1/fu-1)*FBS))
@@ -241,17 +241,17 @@ pH_BC=7.22
     Z=10^(pKa[1]-pH_BC) + 10^(pKa[1]+pKa[2]-2*pH_BC) +
       10^(pKa[1]+pKa[2]+pKa[3]-3*pH_BC)
 
-  }else if (identical(ionParam,c(-1,1,0))|identical(ionization,c(1,-1,0))){
+  }else if (identical(ionParam,c(-1,1,0))|identical(ionParam,c(1,-1,0))){
     #monoproticBaseMonoproticAcid
 
-    X=10^(pKa[which(ionization %in% -1)]-pH_IW) +
-      10^(pH_IW-pKa[which(ionization %in% 1)])
+    X=10^(pKa[which(ionParam %in% -1)]-pH_IW) +
+      10^(pH_IW-pKa[which(ionParam %in% 1)])
 
-    Y=10^(pKa[which(ionization %in% -1)]-pH) +
-      10^(pH-pKa[which(ionization %in% 1)])
+    Y=10^(pKa[which(ionParam %in% -1)]-pH) +
+      10^(pH-pKa[which(ionParam %in% 1)])
 
-    Z=10^(pKa[which(ionization %in% -1)]-pH_BC) +
-      10^(pH_BC-pKa[which(ionization %in% 1)])
+    Z=10^(pKa[which(ionParam %in% -1)]-pH_BC) +
+      10^(pH_BC-pKa[which(ionParam %in% 1)])
 
   }else if (identical(ionParam,c(-1,1,1))|identical(ionParam,c(1,-1,1))|identical(ionParam,c(1,1,-1))){
     #monoproticBaseDiproticAcid
