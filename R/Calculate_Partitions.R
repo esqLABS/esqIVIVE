@@ -21,9 +21,8 @@
 #'mayeb consider to have average data..
 FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                                       typeSystem,FBS,microplateType,
-                                      volMedium,
-                                      pKa=NULL,fu = NULL,cMicro=NULL,cCells=NULL,
-                                      BP=NULL) {
+                                      volMedium,pKa=pKa,fu = fu,BP=BP,
+                                      cMicro=NULL,cCells=NULL) {
 
    # check if the arguments are valid
   rlang::arg_match(partitionQSPR, c("All Poulin and Theil",
@@ -32,9 +31,9 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                                     "Berezhkovskiy + fu",
                                     "All PK-Sim® Standard",
                                     "PK-Sim® Standard + fu",
-                                    "Rodgers & Rowland+ fu",
-                                    "All Schmidtt",
-                                    "Schmitt and fu"))
+                                    "Rodgers & Rowland + fu",
+                                    "All Schmitt",
+                                    "Schmitt + fu"))
 
   #ionization
   pH<- 7.4
@@ -49,12 +48,12 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
       ionParam[i]<-0
     }}
 
-  ionization=getIonization(ionization,pH,pKa)
-  X= ionization["X"]
-  Y= ionization["Y"]
-  Z= ionization["Z"]
+  fneutral=getIonization(ionParam,pH,pKa)
+  X= fneutral["X"]
+  Y= fneutral["Y"]
+  Z= fneutral["Z"]
 
-  KPro <- (0.81 + 0.11 * 10^logLipo) / 24.92 * 5.0
+  kPro <- (0.81 + 0.11 * 10^logLipo) / 24.92 * 5.0
 
   # Calculate air-water partition coefficient
   # Divide henry law constant in atm/(m3*mol) with the temperature in kelvin and gas constant R (j/k*mol)
@@ -122,7 +121,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
      #What is the f_lipids
     fuInvitro=as.double(1/(1 + kNL * (cCellNL+cMediumNL+cCellNPL+cMediumNPL)
                     + kPlastic * saPlasticVolMedium
-                    + KPro*(cCellPro+cMediumPro)))
+                    + kPro*(cCellPro+cMediumPro)))
 
 
   } else if (partitionQSPR == "PK-Sim® Standard + fu") {
@@ -132,7 +131,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
     #What is the f_lipids
     fuInvitro=as.double(1 / ( 1 + kNL * ( cCellNL + cCellNPL)
                   + kPlastic * saPlasticVolMedium
-                  + KPro * cCellPro
+                  + kPro * cCellPro
                   + (1/fu-1)*FBS))
 
   } else if (partitionQSPR == "Rodgers & Rowland + fu") {
@@ -140,7 +139,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
     #partition into acid phospholipids is only considered if chemical is a strong base
     #this is done by considering x as 0 for acids and neutral chemic.
 
-    ionFactor=getIonization(ionization,pH,pKa)
+    ionFactor=getIonization(ionParam,pH,pKa)
     X= ionFactor["X"]
     Y= ionFactor["Y"]
     Z= ionFactor["Z"]
@@ -158,22 +157,22 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                 (1+Z)/(1+Y)* fiwBC -
                 (kNL* fnlBC + (0.3*kNL+0.7)* fnpBC))
 
-    KAPL=KAPL_1* (1+Y)/ APbc / Z
+    kAPL=KAPL_1* (1+Y)/ APbc / Z
 
-    fuInvitro <-as.double( 1 / (1 + kNL * (cCellNL+cMediumNL) +
+    fuInvitro <-as.double( 1 / ( 1+kNL * (cCellNL+cMediumNL) +
                           (kNL * 0.3 + 0.7) * (cCellNPL+cMediumNPL) +
-                          KAPL*(cCellAPL)*X/(1+Y)+
+                          kAPL*(cCellAPL)*X/(1+Y)+
                           kPlastic * saPlasticVolMedium))
 
   } else if (partitionQSPR == "All Schmitt") {
 
     LogP=logLipo
-    ionParamSchmitt <-getIonizationSchmitt(ionization,pH,pKa)
+    ionParamSchmitt <-getIonizationSchmitt(ionParam,pH,pKa)
     logD_Factor <-ionParamSchmitt["logD_Factor"]
     kAPLpHFactor <-ionParamSchmitt["kAPLpHFactor"]
     LogD <- LogP+log10(logD_Factor)
-    KNPL<- 10**LogP
-    KNL <- 10**LogP
+    kNPL<- 10**LogP
+    kNL <- 10**LogD
     kAPL <- kNPL*kAPLpHFactor
 
     fuInVitro <- as.double(1 / (1 + kNL * ( cCellNL+cMediumNL) +
@@ -181,11 +180,11 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                           kAPL * ( cCellAPL) +
                           kPro * ( cCellPro +cMediumPro)))
 
-  } else if (partitionQSPR == "Schmitt and fu") {
+  } else if (partitionQSPR == "Schmitt + fu") {
 
     LogP=logLipo
 
-    ionParamSchmitt <-getIonizationSchmitt(ionization,pH,pKa)
+    ionParamSchmitt <-getIonizationSchmitt(ionParam,pH,pKa)
     logD_Factor <-ionParamSchmitt["logD_Factor"]
     kAPLpHFactor <-ionParamSchmitt["kAPLpHFactor"]
     LogD <- LogP+log10(logD_Factor)
@@ -307,7 +306,7 @@ pH_BC=7.22
 }
 
 
-getIonizationSchmitt <- function(ionization, pH, pKa) {
+getIonizationSchmitt <- function(ionParam, pH, pKa) {
   #Calculate the fraction neutral
   F1 <- 1/(1+10^(ionParam[1]*(pKa[1]-pH)))
   F2 <- 1/(1+10^(ionParam[2]*(pKa[2]-pH)))
