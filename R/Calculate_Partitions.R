@@ -29,8 +29,8 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                                     "Poulin and Theil + fu",
                                     "All Berezhkovskiy",
                                     "Berezhkovskiy + fu",
-                                    "All PK-Sim® Standard",
-                                    "PK-Sim® Standard + fu",
+                                    "All PK-Sim Standard",
+                                    "PK-Sim Standard + fu",
                                     "Rodgers & Rowland + fu",
                                     "All Schmitt",
                                     "Schmitt + fu"))
@@ -114,7 +114,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                         + kPlastic * saPlasticVolMedium
                         + (1/fu-1)*FBS)
 
-  } else if (partitionQSPR == "All PK-Sim® Standard") {
+  } else if (partitionQSPR == "All PK-Sim Standard") {
 
     kNL <- 10^logLipo
 
@@ -124,7 +124,7 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                     + kPro*(cCellPro+cMediumPro)))
 
 
-  } else if (partitionQSPR == "PK-Sim® Standard + fu") {
+  } else if (partitionQSPR == "PK-Sim Standard + fu") {
 
     kNL <- 10^logLipo
 
@@ -171,8 +171,8 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
     logD_Factor <-ionParamSchmitt["logD_Factor"]
     kAPLpHFactor <-ionParamSchmitt["kAPLpHFactor"]
     LogD <- LogP+log10(logD_Factor)
-    kNPL<- 10**LogP
     kNL <- 10**LogD
+    kNPL<- 10**LogP
     kAPL <- kNPL*kAPLpHFactor
 
     fuInVitro <- as.double(1 / (1 + kNL * ( cCellNL+cMediumNL) +
@@ -193,9 +193,9 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
     kAPL <- kNPL*kAPLpHFactor
 
     fuInVitro <- as.double(1 / (1 + kNL * cCellNL+
-                          KNPL * cCellNPL+
-                          KAPL * cCellAPL+
-                          KPro * cCellPro +
+                          kNPL * cCellNPL+
+                          kAPL * cCellAPL+
+                          kPro * cCellPro +
                            (1/fu-1)*FBS))
   } else {}
 
