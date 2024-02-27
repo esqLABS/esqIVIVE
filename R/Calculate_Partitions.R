@@ -9,8 +9,8 @@
 #' @param hlcAt Henry's Law Constant in atm/(m3*mol)
 #' @param BP Blood plasma ratio
 #' @param fu In Vivo Fraction Unbound in plasma from literature
-#' @param ionParam Vector of length 3 with ionization class, 1=acid, 0=neutral and -1=base, if not input then it is c(0,0,0)
-#' @param pKa pkA of the compound
+#' @param ionization Vector of length 3 with ionization class, acid, neutral and base, if not input then it is c(0,0,0)
+#' @param pKa vector of pkA of the compound
 #'
 #'
 #' @return  fuInvitro and possible warning for evaporation
@@ -19,10 +19,26 @@
 #' @details
 #'
 #'mayeb consider to have average data..
-FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
+FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                       typeSystem,FBS,microplateType,
-                                      volMedium,pKa=pKa,fu = fu,BP=BP,
+                                      volMedium,pKa=NULL, hlcAt=NULL,fu = NULL,BP=NULL,
                                       cMicro=NULL,cCells=NULL) {
+    #deal with empty variable
+    if (exists("pKa")==FALSE){
+      pKa=c(0,0,0)
+    } else {}
+
+    if (exists("hlcAt")==FALSE)  {
+      hlcAt=0
+    }else{}
+
+    if (exists("fu")==FALSE)  {
+        fu=0
+     }else{}
+
+      if (exists("BP")==FALSE)  {
+        BP=1
+      }else{}
 
    # check if the arguments are valid
   rlang::arg_match(partitionQSPR, c("All Poulin and Theil",
@@ -35,13 +51,14 @@ FractionUnbound <- function(partitionQSPR,logLipo, hlcAt,ionization,
                                     "All Schmitt",
                                     "Schmitt + fu"))
 
-  #ionization
+
+   #ionization
   pH<- 7.4
 
-  ionParam<- 0
+  ionParam<-c(0,0,0)
   for (i in seq(1,3)){
     if(ionization[i]=="acid"){
-      ionParam[i]<-1
+      ionParam [i]<-1
     } else if (ionization[i]=="base"){
       ionParam[i]<--1
     } else {
