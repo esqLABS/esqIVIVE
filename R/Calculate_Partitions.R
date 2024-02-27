@@ -6,11 +6,13 @@
 #' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt)
 #' @param inVitroCompartment a list of values describing the in vitro compartment created by `getInVitroCompartment`
 #' @param logLipo LogP or LogMA of the compound
-#' @param hlcAt Henry's Law Constant in atm/(m3*mol)
+#' @param hlcAt Henry's Law Constant in atm/(m3*mol), for now there ia deafult value because it gives problems when not given..
 #' @param BP Blood plasma ratio
 #' @param fu In Vivo Fraction Unbound in plasma from literature
 #' @param ionization Vector of length 3 with ionization class, acid, neutral and base, if not input then it is c(0,0,0)
 #' @param pKa vector of pkA of the compound
+#' @param cCells concentration of cells million /mL
+#' @param cMicro concentration of microsomes mg/mL
 #'
 #'
 #' @return  fuInvitro and possible warning for evaporation
@@ -21,7 +23,7 @@
 #'mayeb consider to have average data..
 FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                       typeSystem,FBS,microplateType,
-                                      volMedium,pKa=NULL, hlcAt=NULL,fu = NULL,BP=NULL,
+                                      volMedium,pKa=NULL,hlcAt=NULL,fu = NULL,BP=NULL,
                                       cMicro=NULL,cCells=NULL) {
     #deal with empty variable
     if (exists("pKa")==FALSE){
@@ -29,11 +31,11 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
     } else {}
 
     if (exists("hlcAt")==FALSE)  {
-      hlcAt=0
+      hlcAt=1E-10
     }else{}
 
     if (exists("fu")==FALSE)  {
-        fu=0
+        fu=0.2
      }else{}
 
       if (exists("BP")==FALSE)  {
@@ -192,7 +194,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
     kNPL<- 10**LogP
     kAPL <- kNPL*kAPLpHFactor
 
-    fuInVitro <- as.double(1 / (1 + kNL * ( cCellNL+cMediumNL) +
+    fuInvitro <- as.double(1 / (1 + kNL * ( cCellNL+cMediumNL) +
                           kNPL * ( cCellNPL+cMediumNPL) +
                           kAPL * ( cCellAPL) +
                           kPro * ( cCellPro +cMediumPro)))
@@ -209,7 +211,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
     kNL <- 10**LogD
     kAPL <- kNPL*kAPLpHFactor
 
-    fuInVitro <- as.double(1 / (1 + kNL * cCellNL+
+    fuInvitro <- as.double(1 / (1 + kNL * cCellNL+
                           kNPL * cCellNPL+
                           kAPL * cCellAPL+
                           kPro * cCellPro +
@@ -381,6 +383,6 @@ volatility<-function(fuInvitro,kAir,volAir_L){
 
             if (fuAir > 0.05) {
               warning("Probable evaporation of test compound")
-            } else {}
+            } else {return(fuAir)}
             }
 
