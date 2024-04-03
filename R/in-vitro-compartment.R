@@ -2,16 +2,19 @@
 #'
 #' @description
 #' Generates a list of values describing an in vitro compartment
+#' This function is used inside the Fraction unbound function
 #' @param typeSystem if system is hepatocytes or microsomes
 #' @param cCells cells concentration (in million/ml)
+#' @param cMicro concentration of microsome protein mg/mL
 #' @param FBS fraction of serum concentration, values can only go from 0-1
 #' @param microplateWells number of wells in the microplate
 #' @param volMedium volume of medium in the well (in mL)
 #'
 #' @return a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
-#' @export
+#' @export a list of concentration of lipids, volume of headspace and surface area of plastic
 #'
-#' @examples
+#' @examples getInVitroCompartment("hepatocytes",0.05,microplateType=96,volMedium=0.15,cCells=0.02)
+#' @examples getInVitroCompartment("microsomes",0,microplateType=24,volMedium=0.5,cMicro=1)
 getInVitroCompartment <- function(typeSystem,FBS,microplateType, volMedium,cCells=NULL,cMicro=NULL) {
 
   # check if the arguments are valid
@@ -46,22 +49,22 @@ getInVitroCompartment <- function(typeSystem,FBS,microplateType, volMedium,cCell
   saPlasticVolMedium <- surfAreaP_m2 / volMedium_L
 
   #Protein and lipod compartments----------------------------------------------
-  #density of lipids assumed 0.9 g/mL and of proteins 1.34 mg/mL
+  #density of lipids assumed 0.9 g/mL and of proteins 1.35 g/mL
 
   if (typeSystem=="hepatocytes"){
-  # Based on DOI 10.1002/jps.23602
-  # This approximations lead to similar values to what FFischer report for HepG2
-  cCellAPL <- 0.0001 * cCells
-  cCellNPL <- 5.26 * cCellAPL # neutral phospholipids in liver is 5.26 times the amount of acidic phospholipids
+  # see report on input parameters for refernces of values
+  cellVol<-0.00254 # mL per million cells
+  cCellAPL<- 0.0088 * cellVol*cCells
+  cCellNPL<-0.0331* cellVol*cCells
   cCellPL <- cCellNPL + cCellAPL
-  cCellNL <- 0.000652 * cCells # this includes all neutral lipids ( storage and neutral phospholipids)
-  cCellPro <- 0.25*cCells
+  cCellNL <- 0.0445* cellVol*cCells# this includes all neutral lipids ( storage and neutral phospholipids)
+  cCellPro <- 0.2*0.00254*cCells
 
   } else if (typeSystem=="microsomes"){
 
-  cCellPro<- cMicro/1000/1.35
+  cCellPro<- cMicro/1000/1.35 #mg to g to ml
   cCellPL<- 0.797 * cMicro /1000 /0.9
-  cCellNL<- 0.235 * cMicro /1000 /0.9 # 0.,235 mg lipi/mg protein
+  cCellNL<- 0.235 * cMicro /1000 /0.9 # 0.235 mg lipid/mg protein
   cCellAPL<- 0.18 * cCellPL
   cCellNPL<- cCellPL- cCellAPL
   #for microsome system consider assay is performed in glass
@@ -74,7 +77,7 @@ getInVitroCompartment <- function(typeSystem,FBS,microplateType, volMedium,cCell
 
   # calculate the concentration of protein in the system
   # From average protein content in medium from Fischer paper
-  cMediumPro <- FBS * 0.040+0.00105
+  cMediumPro <- FBS * 0.040
 
   inVitroCompartment <-
     list(
