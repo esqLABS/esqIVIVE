@@ -15,9 +15,14 @@
 #' @param cMicro concentration of microsome protein mg/mL
 #' @param cCells concentration of hepatocytes used million cells/mL
 #'
-clearance_IVIVE<-function(typeValue,expData,typeSystem,partitionQSPR,logLipo, hlcAt,ionization,
-                          FBS,microplateType,volMedium,
-                          pKa=NULL,fu = NULL,cMicro=NULL,cCells=NULL,
+#'
+#'@return  Specific clearance parameter to plug in PK-Sim
+#'@examples
+
+
+clearance_IVIVE<-function(typeValue,expData,typeSystem,partitionQSPR,logLipo,ionization,
+                          FBS,microplateType,volMedium,units=NULL,hlcAt=NULL,
+                          pKa=NULL,fu=NULL,cMicro=NULL,cCells=NULL,
                           BP=NULL){
 
   # check if the arguments are valid
@@ -28,75 +33,106 @@ clearance_IVIVE<-function(typeValue,expData,typeSystem,partitionQSPR,logLipo, hl
   rlang::arg_match(typeValue, c("decay experimentalcurve",
                                 "halfLife",
                                 "in vitro clearance parameter" ))
-
-  #deal with optional arguments
-
-  if(missing(pKa)) {
+  #deal with empty variable
+  if (exists("pKa")==FALSE){
     pKa<-c(0,0,0)
-  }else { pKa=pKa }
+  } else {}
 
-  if(missing(fu)) {
-    fu<-1
-  }else { fu=fu }
+  if (exists("hlcAt")==FALSE)  {
+   hlcAt<-1E-6
+  }else{}
 
-  if(missing(BP)) {
+  if (exists("fu")==FALSE)  {
+    fu<-0.2
+  }else{}
+
+  if (exists("BP")==FALSE)  {
     BP<-1
-  }else { BP=BP }
+  }else{}
 
+
+  source("R/Calculate_Partitions.R")
+  #get fu_in vitro
+  if (typeSystem=="microsomes"){
+    fuInVitro<-as.double(FractionUnbound(partitionQSPR=partitionQSPR,
+                                         logLipo=logLipo,
+                                         hlcAt=hlcAt,ionization=ionization,
+                                         typeSystem="microsomes",FBS=FBS,
+                                         microplateType=microplateType,
+                                         volMedium=volMedium,pKa=pKa,
+                                         BP=BP,fu=fu,
+                                         cMicro=cMicro))
+
+    nLiver<-40  # mg/g liver
+    nInvitro<-cMicro    #mg/mL
+
+  } else if (typeSystem=="hepatocytes"){
+    fuInVitro<-as.double(FractionUnbound(partitionQSPR=partitionQSPR,
+                                         logLipo=logLipo,
+                                         hlcAt=hlcAt,ionization=ionization,
+                                         typeSystem="hepatocytes",FBS=FBS,
+                                         microplateType=microplateType,
+                                         volMedium=volMedium,pKa=pKa,
+                                         BP=BP,fu=fu,
+                                         cCells=cCells))
+
+    nLiver<-139  # million cells/g liver
+    nInvitro<-cCells # million cells/mL assay
+
+  } else {}
 
   #Derive the in vitro clearance value
   if (typeValue=="decay experimentalcurve"){
 
-    kcat<-determineClearance(expData)
+    kcat<-determineClearance(expData)[1]
+    clinvitro<-kcat/nInvitro
 
   } else if (typeValue=="halfLife") {
 
-    halfLife<-expData
-    kcat<-0.693/halfLife
+     halfLife<-expData
+
+    #make matrix of calculations depedning on the units
+    matrixCalcHalf<-cbind(c("minutes","hours","seconds"),
+                          c(1,1/60,60))
+
+    multFactorHalf<-as.double(matrixCalcHalf[which(matrixCalcHalf[,1]==units),2])
+    kcat<-0.693/halfLife*multFactorHalf
+    clinvitro<-kcat/nInvitro
 
   } else if (typeValue=="in vitro clearance parameter") {
 
-    kcat["Kcat",]<-expData
+    #make matrix of calculations depedning on the units
+    matrixCalClear<-cbind(c("/minutes","/hours","/seconds",
+                            "mL/minutes/Millioncells", "uL/minutes/Millioncells",
+                            "mL/hours/Millioncells", "uL/hours/Millioncells",
+                            "mL/seconds/Millioncells","uL/seconds/Millioncells",
+                            "mL/minutes/cell","uL/minutes/cell",
+                            "mL/hours/cell", "uL/hours/cell",
+                            "mL/seconds/cell","uL/seconds/cell"),
+                          c(1/nInvitro,1/nInvitro*60,1/nInvitro/60,
+                            1,1/1000,
+                            1/60,1/60000,
+                            60,60/1000,
+                            1E6,1000,
+                            1E6/60,1E6/60000,
+                            60*1E6,60*1E6/1000))
+
+    multFactorClear<-as.double(matrixCalClear[which(matrixCalClear[,1]==units),2])
+    clinvitro<-expData*multFactorClear  #mL/min/million cells
 
   } else {
-
-    kcat<-0
-  }
-
-
-  #get fu_in vitro
-  if (invitro_system=="microsomes"){
-  fuInVitro<-as.double(FractionUnbound(partitionQSPR=partitionQSPR,logLipo=logLipo,
-                   hlcAt=hlcAt,ionization=ionization,
-                   typeSystem="microsomes",FBS=FBS,microplateType=microplateType,
-                   volMedium=0.22,pKa=pKa,
-                   BP=BP,fu=fu,
-                   cMicro=cMicro))
-
-  nLiver<-N_liver=40  # mg/g
-  nInvitro<-cMicro    #mg/mL
-
-  } else if (invitro_system=="hepatocytes"){
-  fuInVitro<-as.double(FractionUnbound(partitionQSPR=partitionQSPR,logLipo=logLipo,
-                                         hlcAt=hlcAt,ionization=ionization,
-                                         typeSystem="hepatocytes",FBS=FBS,microplateType=microplateType,
-                                         volMedium=0.22,pKa=pKa,
-                                         BP=BP,fu=fu,
-                                         cCells=cCells))
-
-  nLiver<-139  # million cells/g liver
-  nInvitro<-cCells # million cells/mL assay
-
+    clinvitro<-0
   }
 
   #fraction of liver that is cells
   fintcell_liver=0.67
   #Calculate Clearance for unb fraction
-  KcatU<-kcat/fu_invitro
-  Cl_spe<-KcatU*nLiver*fintcell_liver/nInvitro
+  clinvitroU<- clinvitro/fuInVitro
+  ClspePermin<-as.double(clinvitroU*nLiver*fintcell_liver)
 
-  return(Cl_values)
+  print(ClspePermin)
 }
+
 
 #function to determine clearance from experimental curve
 determineClearance<-function(expData)  {
@@ -120,8 +156,10 @@ determineClearance<-function(expData)  {
                  start=list(Kcat=0.01),
                  trace=TRUE)
 
+
+  colnames(clear_curve_xy)<-colnames(expData)
   #Plot for evaluating if fit is reasonable
-  diag_plot<-ggplot(clear_curve,aes(x=Time_min,y=Concentration_uM))+
+  diag_plot<-ggplot(clear_curve_xy,aes(x=Time_min,y=Concentration_uM))+
     geom_point()+
     labs(title="fit curve")+
     stat_function(fun = function(x) Kcat_function(x,y0=y0,Kcat=coefficients(fitKcat)), colour = "blue")
@@ -133,10 +171,9 @@ determineClearance<-function(expData)  {
   kcat=as.double(data.frame("Kcat_permin"=coefficients(fitKcat)["Kcat"],fit_95conf[1],fit_95conf[2]))
   names( kcat)=c("Mean","2.5%_CI","95%_CI")
 
-  return( kcat)
-
+  return(kcat)
 
 }
 
 # test
-# expData<-read.csv("tests/Clearance_example.csv",header=TRUE)
+

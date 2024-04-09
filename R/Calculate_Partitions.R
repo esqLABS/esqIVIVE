@@ -6,7 +6,7 @@
 #' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt)
 #' @param inVitroCompartment a list of values describing the in vitro compartment created by `getInVitroCompartment`
 #' @param logLipo LogP or LogMA of the compound
-#' @param hlcAt Henry's Law Constant in atm/(m3*mol), for now there ia deafult value because it gives problems when not given..
+#' @param hlcAt Henry's Law Constant in atm/(m3*mol)
 #' @param BP Blood plasma ratio
 #' @param fu In Vivo Fraction Unbound in plasma from literature
 #' @param ionization Vector of length 3 with ionization class, acid, neutral and base, if not input then it is c(0,0,0)
@@ -18,6 +18,11 @@
 #' @return  fuInvitro and possible warning for evaporation
 #' @export
 #'
+#' @examples
+# FractionUnbound(partitionQSPR="All PK-Sim Standard",logLipo=3,ionization=c("acid",0,0),
+#                            typeSystem="hepatocytes",FBS=0,microplateType=96,
+#                            volMedium=0.22,pKa=c(6,0,0),hlcAt=1E-6,cCells=2)
+#'
 #' @details
 #'
 #'mayeb consider to have average data..
@@ -25,22 +30,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                       typeSystem,FBS,microplateType,
                                       volMedium,pKa=NULL,hlcAt=NULL,fu = NULL,BP=NULL,
                                       cMicro=NULL,cCells=NULL) {
-    #deal with empty variable
-    if (exists("pKa")==FALSE){
-      pKa=c(0,0,0)
-    } else {}
 
-    if (exists("hlcAt")==FALSE)  {
-      hlcAt=1E-10
-    }else{}
-
-    if (exists("fu")==FALSE)  {
-        fu=0.2
-     }else{}
-
-      if (exists("BP")==FALSE)  {
-        BP=1
-      }else{}
 
    # check if the arguments are valid
   rlang::arg_match(partitionQSPR, c("All Poulin and Theil",
@@ -54,9 +44,6 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                     "Schmitt + fu"))
 
 
-   #ionization
-  pH<- 7.4
-
   ionParam<-c(0,0,0)
   for (i in seq(1,3)){
     if(ionization[i]=="acid"){
@@ -67,16 +54,18 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
       ionParam[i]<-0
     }}
 
-  fneutral=getIonization(ionParam,pH,pKa)
-  X= fneutral["X"]
-  Y= fneutral["Y"]
-  Z= fneutral["Z"]
+  fneutral=getIonization(ionParam,pKa)
+  X= fneutral["X"] #Interstitial tissue
+  Y= fneutral["Y"] #intracellular
+  Z= fneutral["Z"] #blood cells
+
 
   kPro <- (0.81 + 0.11 * 10^logLipo) / 24.92 * 5.0
 
   # Calculate air-water partition coefficient
   # Divide henry law constant in atm/(m3*mol) with the temperature in kelvin and gas constant R (j/k*mol)
-  kAir <- hlcAt / (0.08206 * 310)
+  #last factor is to convert form atm to Pa
+  kAir <- hlcAt / (0.08206 * 310) *101325
 
   # Calculate plastic partitioning
   kPlasticFischer <- 10**(logLipo * 0.47 - 4.64)
@@ -137,8 +126,8 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
 
     kNL <- 10^logLipo
 
-     #What is the f_lipids
-    fuInvitro=as.double(1/(1 + kNL * (cCellNL+cMediumNL+cCellNPL+cMediumNPL)
+    #assume all neutral lipids have same binding
+    fuInvitro<-as.double(1/(1 + kNL * (cCellNL+cMediumNL+cCellNPL+cMediumNPL)
                     + kPlastic * saPlasticVolMedium
                     + kPro*(cCellPro+cMediumPro)))
 
@@ -147,7 +136,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
 
     kNL <- 10^logLipo
 
-    #What is the f_lipids
+
     fuInvitro=as.double(1 / ( 1 + kNL * ( cCellNL + cCellNPL)
                   + kPlastic * saPlasticVolMedium
                   + kPro * cCellPro
@@ -156,12 +145,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
   } else if (partitionQSPR == "Rodgers & Rowland + fu") {
     #RR can only be used by using fu
     #partition into acid phospholipids is only considered if chemical is a strong base
-    #this is done by considering x as 0 for acids and neutral chemic.
-
-    ionFactor=getIonization(ionParam,pH,pKa)
-    X= ionFactor["X"]
-    Y= ionFactor["Y"]
-    Z= ionFactor["Z"]
+    #this is done by considering X as 0 for acids and neutral chemic.
 
     kOW=10^logLipo
     kNL=kOW*(1/(1+Y))
@@ -186,7 +170,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
   } else if (partitionQSPR == "All Schmitt") {
 
     LogP=logLipo
-    ionParamSchmitt <-getIonizationSchmitt(ionParam,pH,pKa)
+    ionParamSchmitt <-getIonizationSchmitt(ionParam,pKa)
     logD_Factor <-ionParamSchmitt["logD_Factor"]
     kAPLpHFactor <-ionParamSchmitt["kAPLpHFactor"]
     LogD <- LogP+log10(logD_Factor)
@@ -203,7 +187,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
 
     LogP=logLipo
 
-    ionParamSchmitt <-getIonizationSchmitt(ionParam,pH,pKa)
+    ionParamSchmitt <-getIonizationSchmitt(ionParam,pKa)
     logD_Factor <-ionParamSchmitt["logD_Factor"]
     kAPLpHFactor <-ionParamSchmitt["kAPLpHFactor"]
     LogD <- LogP+log10(logD_Factor)
@@ -228,9 +212,10 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
 
 
 
-getIonization <-function (ionParam, pH, pKa){
+getIonization <-function (ionParam, pKa){
  #confirm##################
-pH_IW=7.4
+pH<- 7.4
+pH_IW<-7.4
 pH_BC=7.22
 
   if (identical(ionParam,c(-1,0,0))){
@@ -304,14 +289,14 @@ pH_BC=7.22
   }else if (identical(ionParam,c(1,1,0))){
     #diproticacid
 
-    X=0
+    X=10^(pH_IW-pKa[1]) + 10^(2*pH_IW-pKa[1]-pKa[2])
     Y=10^(pH-pKa[1]) + 10^(2*pH-pKa[1]-pKa[2])
     Z=1
 
   }else if (identical(ionParam,c(1,0,0))){
     #monoprotic acid
 
-    X=0
+    X=10^(pH_IW-pKa[1])
     Y=10^(pH-pKa[1])
     Z=1
 
@@ -325,11 +310,23 @@ pH_BC=7.22
 }
 
 
-getIonizationSchmitt <- function(ionParam, pH, pKa) {
+getIonizationSchmitt <- function(ionParam, pKa) {
+
+  pH<- 7.4
+
   #Calculate the fraction neutral
+  #conditional if molecule is neutral
+  if (abs(ionParam[1])==1){
   F1 <- 1/(1+10^(ionParam[1]*(pKa[1]-pH)))
+  }else {F1=1}
+
+  if (abs(ionParam[2])==1){
   F2 <- 1/(1+10^(ionParam[2]*(pKa[2]-pH)))
+  }else{F2=1}
+
+  if (abs(ionParam[2])==1){
   F3 <- 1/(1+10^(ionParam[3]*(pKa[3]-pH)))
+  }else{F3=1}
 
   # fraction neutral
   K1<-F1*F2*F3
@@ -349,7 +346,7 @@ getIonizationSchmitt <- function(ionParam, pH, pKa) {
   K8<-(1-F1)*(1-F2)*(1-F3)
 
   #taken from schmitt paper
-  alpha=-0.003 # ratio of lipophilciity between the neutral and the carged species of a molecule
+  alpha=0.001 # ratio of lipophilciity between the neutral and the charged species of a molecule
   #check eq 9 from Schmitt paper
   logD_Factor<-K1+
               (K2 +K3 +K4)* alpha ^ 1 +
@@ -383,6 +380,6 @@ volatility<-function(fuInvitro,kAir,volAir_L){
 
             if (fuAir > 0.05) {
               warning("Probable evaporation of test compound")
-            } else {return(fuAir)}
+            } else {}
             }
 

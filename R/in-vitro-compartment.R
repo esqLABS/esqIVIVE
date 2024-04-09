@@ -13,8 +13,9 @@
 #' @return a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
 #' @export a list of concentration of lipids, volume of headspace and surface area of plastic
 #'
-#' @examples getInVitroCompartment("hepatocytes",0.05,microplateType=96,volMedium=0.15,cCells=0.02)
+#' @examples getInVitroCompartment("hepatocytes",0.05,microplateType=96,volMedium=0.15,cCells=0.1)
 #' @examples getInVitroCompartment("microsomes",0,microplateType=24,volMedium=0.5,cMicro=1)
+#'
 getInVitroCompartment <- function(typeSystem,FBS,microplateType, volMedium,cCells=NULL,cMicro=NULL) {
 
   # check if the arguments are valid
