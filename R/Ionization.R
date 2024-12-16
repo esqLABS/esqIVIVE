@@ -13,7 +13,7 @@
 getIonization <-function (ionization, pKa){
   #confirm##################
   pH<- 7.4
-  pH_cells=7.22
+  pH_cell=7.22
 
   #convert type ionization in 1, 0 and -1
   ionParam<-c(0,0)
