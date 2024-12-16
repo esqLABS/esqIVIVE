@@ -14,7 +14,7 @@ In the near future the codes will be transformed in a package .
 As of now the public can use the code as is, examples are provided.
 Currently there are available codes to calculate:
 - the fraction unbound in in vitro hepatic models (microsomes and hepatocytes)
-- the calculation or extrapolation of in vitro hepatic clearance
+- the calculation or extrapolation of in vitro hepatic clearance : https://github.com/esqLABS/esqIVIVE/blob/main/R/clearance_IVIVE.R
 - the calculation or extrapolation of in vitro hepatic metabolic Vmax and Km
 - the calculation of fraction unbound in plasma using protein-specific affinity constant
 

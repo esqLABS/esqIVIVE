@@ -18,7 +18,18 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of esqIVIVE is to ...
+The goal of esqIVIVE is to perform extrapolation of in vitro ADME parameters 
+and in vitro effect concentrations to in vivo. 
+The herein extrapolations have been developed focusing on the integration with OSP tools.
+
+In the near future the codes will be transformed in a package . 
+As of now the public can use the code as is, examples are provided.
+Currently there are available codes to calculate:
+- the fraction unbound in in vitro hepatic models (microsomes and hepatocytes)
+- the calculation or extrapolation of in vitro hepatic clearance : https://github.com/esqLABS/esqIVIVE/blob/main/R/clearance_IVIVE.R
+- the calculation or extrapolation of in vitro hepatic metabolic Vmax and Km
+- the calculation of fraction unbound in plasma using protein-specific affinity constant
+
 
 ## Installation
 
