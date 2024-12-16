@@ -16,12 +16,12 @@
 #Add possibility to use PP-LFER QSARs.-need to check how ionization is considered
 #make documentation
 
-#running example
-stand_Fu<-convertKintoFu("khsa_kgL"=10^4.48,
-                         "kglob_kgL"=10^2.16,
-                         "kmemlip_LL"=10^3.51,
-                         "klip_LL"=100,
-                         "species"="human")
+#EXAMPLE
+# stand_Fu<-convertKintoFu("khsa_Lkg"=10^4.48,
+#                          "kglob_Lkg"=10^2.16,
+#                          "kmemlip_LL"=10^3.51,
+#                          "klip_LL"=100,
+#                          "species"="human")
 
 
 ###- distribution of Fu_plasma predicted by Kalb -###
