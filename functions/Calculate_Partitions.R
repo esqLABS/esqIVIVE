@@ -13,7 +13,7 @@
 #' @param pKa vector of pkA of the compound
 #' @param cCells concentration of cells million /mL
 #' @param cMicro concentration of microsomes mg/mL
-#'
+#' @param volMedium
 #'
 #' @return  fuInvitro and possible warning for evaporation
 #' @export
@@ -31,6 +31,9 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                       volMedium,pKa=NULL,hlcAt=NULL,fu = NULL,BP=NULL,
                                       cMicro=NULL,cCells=NULL) {
 
+# Have default value of medium volume considering the proportion of the common sim.
+# Have default value of fu
+# How for BP
 
    # check if the arguments are valid
   rlang::arg_match(partitionQSPR, c("All Poulin and Theil",
@@ -43,22 +46,11 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                     "All Schmitt",
                                     "Schmitt + fu"))
 
-
-  ionParam<-c(0,0,0)
-  for (i in seq(1,3)){
-    if(ionization[i]=="acid"){
-      ionParam [i]<-1
-    } else if (ionization[i]=="base"){
-      ionParam[i]<--1
-    } else {
-      ionParam[i]<-0
-    }}
-
-  fneutral=getIonization(ionParam,pKa)
-  X= fneutral["X"] #Interstitial tissue
-  Y= fneutral["Y"] #intracellular
-  Z= fneutral["Z"] #blood cells
-
+  #run function to get ionization factors
+  source("R/Ionization.R")
+  fneutral=getIonization(ionization,pKa)
+  X= fneutral["fneutral_plasma"] #Interstitial tissue
+  Y= fneutral["fneutral_cells"] #intracellular
 
   kPro <- (0.81 + 0.11 * 10^logLipo) / 24.92 * 5.0
 
@@ -157,20 +149,20 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
     APbc<-0.57 # acidic phspholipids in blood cells
 
     KAPL_1=max(0,kpuBC -
-                (1+Z)/(1+Y)* fiwBC -
+                (1+Y)/(1+X)* fiwBC -
                 (kNL* fnlBC + (0.3*kNL+0.7)* fnpBC))
 
-    kAPL=KAPL_1* (1+Y)/ APbc / Z
+    kAPL=KAPL_1* (1+Y)/ APbc / Y
 
     fuInvitro <-as.double( 1 / ( 1+kNL * (cCellNL+cMediumNL) +
                           (kNL * 0.3 + 0.7) * (cCellNPL+cMediumNPL) +
-                          kAPL*(cCellAPL)*X/(1+Y)+
+                          kAPL*(cCellAPL)*X/(1+X)+
                           kPlastic * saPlasticVolMedium))
 
   } else if (partitionQSPR == "All Schmitt") {
 
     LogP=logLipo
-    ionParamSchmitt <-getIonizationSchmitt(ionParam,pKa)
+    ionParamSchmitt <-getIonizationSchmitt(ionization,pKa)
     logD_Factor <-ionParamSchmitt["logD_Factor"]
     kAPLpHFactor <-ionParamSchmitt["kAPLpHFactor"]
     LogD <- LogP+log10(logD_Factor)
@@ -206,113 +198,23 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
   # Warning for volatility
   volatility(fuInvitro, kAir, volAir_L)
 
-
   return(fuInvitro)
 }
 
 
-
-getIonization <-function (ionParam, pKa){
- #confirm##################
-pH<- 7.4
-pH_IW<-7.4
-pH_BC=7.22
-
-  if (identical(ionParam,c(-1,0,0))){
-
-    #Monoprotic base
-    X=10^(pKa[1]-pH_IW)
-    Y=10^(pKa[1]-pH)
-    Z=10^(pKa[1]-pH_BC)
-
-  } else if (identical(ionParam,c(-1,-1,0))){
-    #diprotic base
-
-    X=10^(pKa[1]-pH_IW) + 10^(pKa[1]+pKa[2]-2*pH_IW)
-    Y=10^(pKa[1]-pH) + 10^(pKa[1]+pKa[2]-2*pH)
-    Z=10^(pKa[1]-pH_BC) + 10^(pKa[1]+pKa[2]-2*pH_BC)
-
-  }else if (identical(ionParam,c(-1,-1,-1))){
-    #triproticBase
-
-    X=10^(pKa[1]-pH_IW) + 10^(pKa[1]+pKa[2]-2*pH_IW) +
-      10^(pKa[1]+pKa[2]+pKa[3]-3*pH_IW)
-
-    Y=10^(pKa[1]-pH) + 10^(pKa[1]+pKa[2]-2*pH) +
-      10^(pKa[1]+pKa[2]+pKa[3]-3*pH)
-
-    Z=10^(pKa[1]-pH_BC) + 10^(pKa[1]+pKa[2]-2*pH_BC) +
-      10^(pKa[1]+pKa[2]+pKa[3]-3*pH_BC)
-
-  }else if (identical(ionParam,c(-1,1,0))|identical(ionParam,c(1,-1,0))){
-    #monoproticBaseMonoproticAcid
-
-    X=10^(pKa[which(ionParam %in% -1)]-pH_IW) +
-      10^(pH_IW-pKa[which(ionParam %in% 1)])
-
-    Y=10^(pKa[which(ionParam %in% -1)]-pH) +
-      10^(pH-pKa[which(ionParam %in% 1)])
-
-    Z=10^(pKa[which(ionParam %in% -1)]-pH_BC) +
-      10^(pH_BC-pKa[which(ionParam %in% 1)])
-
-  }else if (identical(ionParam,c(-1,1,1))|identical(ionParam,c(1,-1,1))|identical(ionParam,c(1,1,-1))){
-    #monoproticBaseDiproticAcid
-
-    X=10^(pKa[which(ionParam %in% -1)]-pH_IW) +
-      10^(pH_IW-min(pKa[which(ionParam %in% 1)])) +
-      10^(2*pH_IW-pKa[which(ionParam %in% 1)][1]-pKa[which(ionParam %in% 1)][2])
-
-    Y=10^(pKa[which(ionParam %in% -1)]-pH) +
-      10^(pH-min(pKa[which(ionParam %in% 1)])) +
-      10^(2*pH-pKa[which(ionParam %in% 1)][1]-pKa[which(ionParam %in% 1)][2])
-
-    Z=10^(pKa[which(ionParam %in% -1)]-pH_BC) +
-      10^(pH_BC-min(pKa[which(ionParam %in% 1)])) +
-      10^(2*pH_BC-pKa[which(ionParam %in% 1)][1]-pKa[which(ionParam %in% 1)][2])
-
-  }else if (identical(ionParam,c(-1,-1,1))|identical(ionParam,c(1,-1,-1))|identical(ionParam,c(-1,1,-1))){
-    #diproticBaseMonoproticAcid
-
-    X=10^(pH_IW-pKa[which(ionParam %in% 1)]) +
-      10^(max(pKa[which(ionParam %in% -1)])-pH_IW) +
-      10^(pKa[which(ionParam %in% -1)][1]+pKa[which(ionParam %in% -1)][2]-2*pH_IW)
-
-    Y=10^(pH-pKa[which(ionParam %in% 1)]) +
-      10^(max(pKa[which(ionParam %in% -1)])-pH) +
-      10^(pKa[which(ionParam %in% -1)][1]+pKa[which(ionParam %in% -1)][2]-2*pH)
-
-    Z=10^(pH_BC-pKa[which(ionParam %in% 1)]) +
-      10^(max(pKa[which(ionParam %in% -1)])-pH_BC) +
-      10^(pKa[which(ionParam %in% -1)][1]+pKa[which(ionParam %in% -1)][2]-2*pH_BC)
-
-  }else if (identical(ionParam,c(1,1,0))){
-    #diproticacid
-
-    X=10^(pH_IW-pKa[1]) + 10^(2*pH_IW-pKa[1]-pKa[2])
-    Y=10^(pH-pKa[1]) + 10^(2*pH-pKa[1]-pKa[2])
-    Z=1
-
-  }else if (identical(ionParam,c(1,0,0))){
-    #monoprotic acid
-
-    X=10^(pH_IW-pKa[1])
-    Y=10^(pH-pKa[1])
-    Z=1
-
-  } else {
-
-    X=0
-    Y=0
-    Z=1
-  }
-  return (c("X"=X,"Y"=Y,"Z"=Z))
-}
-
-
-getIonizationSchmitt <- function(ionParam, pKa) {
+getIonizationSchmitt <- function(ionization, pKa) {
 
   pH<- 7.4
+
+  ionParam<-c(0,0,0)
+  for (i in seq(1,3)){
+    if(ionization[i]=="acid"){
+      ionParam [i]<-1
+    } else if (ionization[i]=="base"){
+      ionParam[i]<--1
+    } else {
+      ionParam[i]<-0
+    }}
 
   #Calculate the fraction neutral
   #conditional if molecule is neutral

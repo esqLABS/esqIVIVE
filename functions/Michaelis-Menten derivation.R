@@ -7,7 +7,6 @@
 library(ggplot2)
 
 
-
 #Calculate in vitro intrinsic clearance values---------------------------------
 
 #Load in vitro data
@@ -20,7 +19,7 @@ fitmm <- nls(y ~ Vmax * x / (Km + x),
              data = mm_exp_curve_xy,
              start=list(Vmax=max(mm_exp_curve_xy$y),Km=mean(mm_exp_curve_xy$x)),
              trace=TRUE)
-fit_95conf=confint(fitmodel)
+fit_95conf=confint(fitmm)
 
 mm_fuction <- function(x){
   y=coefficients(fitmm)["Vmax"] * x / (coefficients(fitmm)["Km"] + x)

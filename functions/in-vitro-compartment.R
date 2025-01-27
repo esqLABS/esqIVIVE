@@ -49,7 +49,7 @@ getInVitroCompartment <- function(typeSystem,FBS,microplateType, volMedium,cCell
   volAir_L <- (volWell_mm3 - volMedium_mm3) / 1E6
   saPlasticVolMedium <- surfAreaP_m2 / volMedium_L
 
-  #Protein and lipod compartments----------------------------------------------
+  #Protein and lipid compartments----------------------------------------------
   #density of lipids assumed 0.9 g/mL and of proteins 1.35 g/mL
 
   if (typeSystem=="hepatocytes"){
