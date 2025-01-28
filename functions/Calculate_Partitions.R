@@ -19,9 +19,9 @@
 #' @export
 #'
 #' @examples
-# FractionUnbound(partitionQSPR="All PK-Sim Standard",logLipo=3,ionization=c("acid",0,0),
-#                            typeSystem="hepatocytes",FBS=0,microplateType=96,
-#                            volMedium=0.22,pKa=c(6,0,0),hlcAt=1E-6,cCells=2)
+FractionUnbound(partitionQSPR="All PK-Sim Standard",logLipo=3,ionization=c("acid",0,0),
+                           typeSystem="hepatocytes",FBS=0,microplateType=96,
+                           volMedium=0.22,pKa=c(6,0,0),hlcAt=1E-6,cCells=2)
 #'
 #' @details
 #'
@@ -47,7 +47,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
                                     "Schmitt + fu"))
 
   #run function to get ionization factors
-  source("R/Ionization.R")
+  source("functions/Ionization.R")
   fneutral=getIonization(ionization,pKa)
   X= fneutral["fneutral_plasma"] #Interstitial tissue
   Y= fneutral["fneutral_cells"] #intracellular
@@ -65,7 +65,7 @@ FractionUnbound <- function(partitionQSPR,logLipo,ionization,
   kPlastic <- as.double(mean(kPlasticFischer, kPlasticKramer) * 1/(1+Y))
 
   #get in vitro compartments----------------------------------------------------
-  source("R/in-vitro-compartment.R")
+  source("functions/in-vitro-compartment.R")
   if (typeSystem=="microsomes"){
 
   InVitroCompartment<-getInVitroCompartment("microsomes",FBS=FBS,
