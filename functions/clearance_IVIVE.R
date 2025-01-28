@@ -25,8 +25,25 @@
 #'
 #'@return  Specific clearance parameter to plug in PK-Sim
 #'@examples
-
-
+#'
+#'expData<-read.csv("tests/Clearance_example.csv",header=TRUE)
+#'library(ggplot2)
+#'clearance_IVIVE(typeValue="decay experimentalcurve",expData=expData,
+#' partitionQSPR="All Schmitt",
+#' logLipo=5,
+#' ionization=c("acid",0,0),
+#' typeSystem="hepatocytes",
+#' FBS=0.0,pKa=c(3,0,0),
+#' hlcAt=1E-6,
+#' microplateType=96,
+#' volMedium=0.2,
+#' cCells=0.02)
+#'
+#'
+#'
+#'
+#'
+#'
 clearance_IVIVE<-function(typeValue,units,expData,typeSystem,partitionQSPR,logLipo,
                           FBS,microplateType=NULL,ionization=NULL,volMedium=NULL,
                           REF=NULL,hlcAt=NULL,
@@ -74,7 +91,7 @@ clearance_IVIVE<-function(typeValue,units,expData,typeSystem,partitionQSPR,logLi
 
   if (is.null(fu_hep))  {
 
-      source("R/Calculate_Partitions.R")
+      source("functions/Calculate_Partitions.R")
       #get fu_hep
       if (typeSystem=="microsomes"){
         fu_hep<-as.double(FractionUnbound(partitionQSPR=partitionQSPR,
