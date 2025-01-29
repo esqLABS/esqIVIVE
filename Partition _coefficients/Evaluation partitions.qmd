@@ -37,7 +37,7 @@ Since the logMA was not available for many chemicals we use the same linear regr
 
 ```{r}
 
-source("partition check/function_plots_partition.R")
+source("Partition coefficients/function_plots_partition.R")
 
 #run the models
   Berez_model<-Rat_model("Berez",lipophilicity)

@@ -1,6 +1,6 @@
 #To plot the different Partitions
 
-source("partition check/Partition functions.R")
+source("Partition_coefficients/Partition functions.R")
 
 
 # Make the simulations for the different partition methods
@@ -70,17 +70,17 @@ desc_R2<-data.frame(partition_R2,
                       "Schmitt"=summary(lm(Schmitt~ Experimental, data = tissue_df[medium_logP,]))$r.squared))
 
 colnames(desc_R2)<-c("all","acid","base","neutral","high logP","middle logP")
-  
-  
-#Make plot different 
+
+
+#Make plot different
 vect_partition<-colnames(tissue_df)[c(10,11,12,13,14)]
 plot_tissue<-list()
 
 #for loop to make plots for the different partitions
 for (t in 1:length(vect_partition)){
-  
+
   column<-vect_partition[t]
-  
+
   plot_tissue[[t]]<-ggplot(data=tissue_df)+
    geom_point(aes(x=Experimental,y=!!sym(column),col=LogP,shape=A_B_N))+
    labs(shape="Type chemical")+
@@ -92,15 +92,15 @@ for (t in 1:length(vect_partition)){
    xlim(0,60)+
    theme_bw(base_size = 15)+
    geom_abline(intercept = 0, slope = 1)
-  
+
 }
   combined_plot<-ggarrange(plot_tissue[[1]],plot_tissue[[2]],
             plot_tissue[[3]],plot_tissue[[4]],
             plot_tissue[[5]], common.legend=TRUE)
-  
-  annotate_figure(combined_plot, top = text_grob(paste("Partition to ",tissue), 
+
+  annotate_figure(combined_plot, top = text_grob(paste("Partition to ",tissue),
                                         face = "bold", size = 20))
-  
+
   return(desc_R2)
 }
 
