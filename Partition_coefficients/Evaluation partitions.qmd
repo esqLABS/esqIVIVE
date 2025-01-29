@@ -11,7 +11,7 @@ editor: visual
 
 This workflow is to evaluate the OSP partition algorithms.
 
-We are using the experimental partitioning values collected in Utsey et al, where they also report their input parameters. \[NEED TO KNOW HOW PARTITIONS WERE DERIVED, IN VIVO OR EX VIVO\]
+We are using the experimental partitioning values collected in Pearce et al (2017) where they also report their input parameters. \[NEED TO KNOW HOW PARTITIONS WERE DERIVED, IN VIVO OR EX VIVO\]
 
 \*for now I am excluding zwitterions. Need better curation of data to include them.
 
@@ -31,20 +31,22 @@ We are using the experimental partitioning values collected in Utsey et al, wher
 
 ## Running Code
 
-Per tissue where we have partitioning data and with two options for input lipophlciity we can get the correlation plots but also the calculated R2 , also for different groups of chemicals.
+Per tissue where we have partitioning data and with two options for input lipophliciity we can get the correlation plots but also the calculated R2 , also for different groups of chemicals.
 
 Since the logMA was not available for many chemicals we use the same linear regression from Yu et al that was used in Ans Punt models and in Rene HTP.
 
+get_scriptpath()
+
 ```{r}
 
-source("Partition coefficients/function_plots_partition.R")
+source("Partition_coefficients/function_plots_partition.R")
 
 #run the models
-  Berez_model<-Rat_model("Berez",lipophilicity)
-  PK_Sim_model<-Rat_model("PKSim",lipophilicity)
-  Poulin_model<-Rat_model("Poulin",lipophilicity)
-  RR_model<-Rat_model("Rodger_Rowland",lipophilicity)
-  Schmitt_model<-Rat_model("Schmitt",lipophilicity)
+  Berez_model<-Rat_model("Berez",lipophilicity="logP")
+  PK_Sim_model<-Rat_model("PKSim",lipophilicity="logP")
+  Poulin_model<-Rat_model("Poulin",lipophilicity="logP")
+  RR_model<-Rat_model("Rodger_Rowland",lipophilicity="logP")
+  Schmitt_model<-Rat_model("Schmitt",lipophilicity="logP")
   
 plot_tissue("Lung",lipophilicity="LogP")
 

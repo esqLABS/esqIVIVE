@@ -9,7 +9,6 @@ library(ggpubr)
 #read excel partitions
 exp_partition_raw<-read_xlsx("Partition_coefficients/10928_2017_9548_MOESM1_ESM.xlsx",sheet="Data")
 
-
 #filter rat and transform columns
 exp_partition<-exp_partition_raw %>%
                 filter(Species == "Rat" ) %>%
@@ -93,11 +92,11 @@ exp_partition<-exp_partition %>% group_by(Drug) %>%
 
     #for having different options for lipophiliticy
     if (lipophilicity=="LogP"){
-      lipo_values<-as.double(exp_partition[i,"LogP"])
+      lipo_values<-as.vector(exp_partition[,"LogP"])
 
     } else if (lipophilicity=="LogMA"){
 
-      lipo_values<-as.double(exp_partition[i,"logMA"])
+      lipo_values<-as.vector(exp_partition[,"logMA"])
 
     }
     #The number of parameters to vary for each batch
