@@ -1,0 +1,62 @@
+---
+title: "OSP partitions check"
+author: "Susana Proenca"
+format: html
+editor: visual
+---
+
+## Evaluation of PK-Sim partition coefficients
+
+## Introduction
+
+This workflow is to evaluate the OSP partition algorithms.
+
+We are using the experimental partitioning values collected in Utsey et al, where they also report their input parameters. \[NEED TO KNOW HOW PARTITIONS WERE DERIVED, IN VIVO OR EX VIVO\]
+
+\*for now I am excluding zwitterions. Need better curation of data to include them.
+
+### To do
+
+-   include blood-cells partitioning
+
+-   possibility correcting fraction unbound
+
+-   get ionization included
+
+-   make plots for every tissue with different lipophilicity
+
+-   make conclusions
+
+-   see overlap list chemicals with ONTOX-DNT and INOTIV-DNT
+
+## Running Code
+
+Per tissue where we have partitioning data and with two options for input lipophlciity we can get the correlation plots but also the calculated R2 , also for different groups of chemicals.
+
+Since the logMA was not available for many chemicals we use the same linear regression from Yu et al that was used in Ans Punt models and in Rene HTP.
+
+```{r}
+
+source("partition check/function_plots_partition.R")
+
+#run the models
+  Berez_model<-Rat_model("Berez",lipophilicity)
+  PK_Sim_model<-Rat_model("PKSim",lipophilicity)
+  Poulin_model<-Rat_model("Poulin",lipophilicity)
+  RR_model<-Rat_model("Rodger_Rowland",lipophilicity)
+  Schmitt_model<-Rat_model("Schmitt",lipophilicity)
+  
+plot_tissue("Lung",lipophilicity="LogP")
+
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+### DNT chemicals
+
+For the DNT chemicals in ONTOX and INOTIV -colb that have brain data plot them here.
