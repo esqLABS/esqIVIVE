@@ -1,58 +1,29 @@
 
-library(readxl)
-library(tidyr)
-library(ospsuite)
-library(dplyr)
-library(ggplot2)
-library(ggpubr)
-
-#read excel partitions
-exp_partition_raw<-read_xlsx("Partition_coefficients/10928_2017_9548_MOESM1_ESM.xlsx",sheet="Data")
-
-#filter rat and transform columns
-exp_partition<-exp_partition_raw %>%
-                filter(Species == "Rat" ) %>%
-                filter(A_B_N != "Z" ) %>%
-                pivot_wider(names_from = Tissue,  values_from = Exp_PC ,values_fn = list(Tissue = ~!is.na(.))) %>%
-                mutate(
-                  Type_ionization = case_when(
-                  A_B_N == "A" ~ -1,
-                  A_B_N== "B" ~ 1,
-                  A_B_N == "N" ~ 0 )) %>%
-                  mutate( A_B_N = case_when(
-                      A_B_N == "A" ~ "acid",
-                      A_B_N== "B" ~ "base",
-                      A_B_N == "N" ~ "neutral"
-                      ))
-
-exp_partition<-exp_partition %>% group_by(Drug) %>%
-                summarise(across(c(CAS,A_B_N,Type_ionization,Effect_pKa), ~first(na.omit(.x))),
-                across(c(LogP,logMA,fu,
-                                 Brain,Gut,Kidney,Liver,Muscle,Pancreas
-                                 ,Spleen,Adipose,Blood_Cells ,Bone,Heart,Lung
-                                  ,Skin,Testis,Thymus,Stomach)
-                                 , ~mean(.x, na.rm = TRUE))) %>%
-                mutate(logMA=ifelse(is.na(logMA),1.294+0.304*LogP,logMA))
 
 #load rat simulations-----------------------------------------------------------
 
-  Rat_model<-function(partitionQSPR,lipophilicity){
+  Rat_model<-function(partitionQSPR,lipophilicity,ionization){
+
+    #mind that the path for these pkml files it relatively to the QUARTO file
     if (partitionQSPR=="Rodger_Rowland") {
-      sim1 <- loadSimulation("Partition_coefficients/Rat-Rodgers and Rowland.pkml", loadFromCache = FALSE)
+      sim1 <- loadSimulation("Rat-Rodgers and Rowland.pkml", loadFromCache = FALSE)
 
     } else if  (partitionQSPR=="Schmitt") {
-      sim1 <- loadSimulation("Partition_coefficients/Rat-Schmitt.pkml", loadFromCache = FALSE)
+      sim1 <- loadSimulation("Rat-Schmitt.pkml", loadFromCache = FALSE)
 
     } else if  (partitionQSPR=="PKSim") {
-      sim1 <- loadSimulation("Partition_coefficients/Rat-PK-Sim.pkml", loadFromCache = FALSE)
+      sim1 <- loadSimulation("Rat-PK-Sim.pkml", loadFromCache = FALSE)
 
     } else if  (partitionQSPR=="Poulin") {
-      sim1 <- loadSimulation("Partition_coefficients/Rat-Poulin.pkml", loadFromCache = FALSE)
+      sim1 <- loadSimulation("Rat-Poulin.pkml", loadFromCache = FALSE)
 
     } else if  (partitionQSPR=="Berez") {
-      sim1 <- loadSimulation("Partition_coefficients/Rat-Berez.pkml", loadFromCache = FALSE)
+      sim1 <- loadSimulation("Rat-Berez.pkml", loadFromCache = FALSE)
 
     }
+
+   ## If I need to explore the paths to parameters
+   # tree <- getSimulationTree(sim1)
 
     outputs<-c(
     "Dose"=getParameter("Applications|Daily ingestion|Dissolved formulation|Application_1|ProtocolSchemaItem|DosePerBodyWeight",sim1),
@@ -70,45 +41,56 @@ exp_partition<-exp_partition %>% group_by(Drug) %>%
     "skinKp"=getParameter("Neighborhoods|Skin_int_Skin_cell|Test_Chemical|Partition coefficient (intracellular/plasma)",sim1),
     "testisKp"=getParameter("Neighborhoods|Gonads_int_Gonads_cell|Test_Chemical|Partition coefficient (intracellular/plasma)",sim1),
     "pInt"=getParameter("Test_Chemical|Specific intestinal permeability (transcellular)", sim1),
+    "bloodcells"=getParameter("Test_Chemical|Partition coefficient (blood cells/plasma)", sim1),
     "Permeability"=getParameter("Test_Chemical|Permeability",sim1),
     "Fu"=getParameter("Test_Chemical|Fraction unbound (plasma)",sim1),
     "massDrug"=getParameter("Test_Chemical|Total drug mass",sim1))
 
     addOutputs(outputs,simulation = sim1)
 
-    #inputs
+    #indicate what are the inputs
     parameterPaths <- c("Test_Chemical|Fraction unbound (plasma, reference value)",
-                        "Test_Chemical|Lipophilicity")#,
-                       # "Test_Chemical|pKa value 0",
-                        #"Test_Chemical|Compound type 0")
+                        "Test_Chemical|Lipophilicity",
+                        "Test_Chemical|pKa value 0",
+                        "Test_Chemical|Compound type 0")
 
     simBatch <- createSimulationBatch(simulation = sim1, parametersOrPaths = parameterPaths)
 
-
     #exp_partition[is.na(exp_partition)]<-0
-
-    ##Check if imported correctly
-
 
     #for having different options for lipophiliticy
     if (lipophilicity=="LogP"){
-      lipo_values<-as.vector(exp_partition[,"LogP"])
+      lipo_values<-as.vector(exp_partition[,"LogP"][[1]])
 
     } else if (lipophilicity=="LogMA"){
 
-      lipo_values<-as.vector(exp_partition[,"logMA"])
+      lipo_values<-as.vector(exp_partition[,"logMA"][[1]])
 
-    }
+    } else {warning("error in choice of lipophilicity")}
+
+     #option to consider ionization or not
+    if (ionization=="considered"){
+
+      pKa<-as.double(exp_partition[,"Effect_pKa"][[1]])
+      ionization_type<-as.double(exp_partition[,"Type_ionization"][[1]])
+      pKa[is.na(pKa)] <- 0
+
+    } else if (ionization=="ignored"){
+
+      pKa<-rep(0,nrow(exp_partition))
+      ionization_type<-rep(0,nrow(exp_partition))
+
+    }else {warning("error in choice of ionization")}
+
     #The number of parameters to vary for each batch
     #needs to correspond to the vector of parameterPaths and in the same order
     for (i in 1:nrow(exp_partition)){
 
 
       parameterValues = c(as.double(exp_partition[i,"fu"]),
-                          as.double(exp_partition[i,"LogP"]))
-                        #  as.double(exp_partition[i,"Effect_pKa"]),
-                         # as.double(exp_partition[i,"A_B_N"]))
-
+                          lipo_values[i],
+                          pKa[i],
+                          ionization_type[i])
 
       simBatch$addRunValues(parameterValues = parameterValues)
 
@@ -118,10 +100,10 @@ exp_partition<-exp_partition %>% group_by(Drug) %>%
     results <- runSimulationBatches(simBatch)
 
 
-    pred_partitions<-data.frame(matrix(ncol = 14, nrow = nrow(exp_partition)))
+    pred_partitions<-data.frame(matrix(ncol = 15, nrow = nrow(exp_partition)))
     colnames(pred_partitions)<-c("Drug","Brain","Adipose","Liver","Kidney",
                                   "Heart","Gut","Muscle","Pancreas",
-                                  "Spleen","Bone","Lung","Skin","Testis")
+                                  "Spleen","Bone","Lung","Skin","Testis","Blood_Cells")
 
     for (j in 1:nrow(exp_partition)){
       #get table results
@@ -135,12 +117,13 @@ exp_partition<-exp_partition %>% group_by(Drug) %>%
         "Heart"=as.double(outputValues1$data$`Neighborhoods|Heart_int_Heart_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
         "Gut"=as.double(outputValues1$data$`Neighborhoods|Lumen_uje_UpperJejunum_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
         "Muscle"=as.double(outputValues1$data$`Neighborhoods|Muscle_int_Muscle_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
-        "Pancreasp"=as.double(outputValues1$data$`Neighborhoods|Pancreas_int_Pancreas_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
+        "Pancreas"=as.double(outputValues1$data$`Neighborhoods|Pancreas_int_Pancreas_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
         "Spleen"=as.double(outputValues1$data$`Neighborhoods|Spleen_int_Spleen_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
         "Bone"=as.double(outputValues1$data$`Neighborhoods|Bone_int_Bone_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
         "Sung"=as.double(outputValues1$data$`Neighborhoods|Lung_int_Lung_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
         "Skin"=as.double(outputValues1$data$`Neighborhoods|Skin_int_Skin_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
-        "Testis"=as.double(outputValues1$data$`Neighborhoods|Gonads_int_Gonads_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]))
+        "Testis"=as.double(outputValues1$data$`Neighborhoods|Gonads_int_Gonads_cell|Test_Chemical|Partition coefficient (intracellular/plasma)`[1]),
+        "Blood_Cells"=as.double(outputValues1$data$`Test_Chemical|Partition coefficient (blood cells/plasma)`[1]))
 
     }
     return("pred_partitions"=pred_partitions)
