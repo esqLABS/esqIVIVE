@@ -1,5 +1,21 @@
 rm(list=ls())
 
+
+#example for clearance values
+clearance_IVIVE(typeValue="in vitro clearance parameter",expData=0.3,
+                units="mL/seconds/mg protein",
+                partitionQSPR="All Poulin and Theil",
+                logLipo=2,
+                ionization=c("neutral",0,0),
+                typeSystem="hepatocytes",
+                FBS=0,pKa=c(0,0,0),
+                hlcAt=0.02,
+                microplateType=96,
+                volMedium=0.2,
+                cCells=0.2)
+
+
+
 expData<-read.csv("tests/Clearance_example.csv",header=TRUE)
 library(ggplot2)
 
