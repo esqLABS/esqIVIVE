@@ -10,6 +10,7 @@
 #for the protein partition
 #if unit partition coefficient is L/L then K_Lkg=K_LL/density_kgL
 #if unit partition coefficient is L/mol, K_Lkg=K_Lmol/MW_gmol*1000gkg
+#MW_gmol of albumin 65,000g/mol
 
 #tO DO:
 
@@ -17,11 +18,11 @@
 #make documentation
 
 #EXAMPLE
-# stand_Fu<-convertKintoFu("khsa_Lkg"=10^4.48,
-#                          "kglob_Lkg"=10^2.16,
-#                          "kmemlip_LL"=10^3.51,
-#                          "klip_LL"=100,
-#                          "species"="human")
+# stand_Fu<-convertKintoFu("khsa_Lkg"=376,
+#                          "kglob_Lkg"=41,
+#                          "kmemlip_LL"=1862,
+#                          "klip_LL"=10^6.5,
+#                          "species"="rat")
 
 
 ###- distribution of Fu_plasma predicted by Kalb -###
@@ -64,7 +65,7 @@ convertKintoFu<-function(khsa_Lkg,kglob_Lkg,kmemlip_LL,klip_LL,species){
 #for acidic phenols, cabroxylic acids, pyridine and amines you can use the PPLFER.
 
 #Examples-
-# QSARs_plasma("logP",1.62,"pKa"=c(0,0),"ionization"=c(0,0))
+# QSARs_plasma("logP",4.31,"pKa"=c(0,0),"ionization"=c(0,0))
 
 # QSARs_plasma("PPLFER",3,"pKa"=c(2,0),"ionization"=c("acid",0),
 #              "LFER_E"=1.22,"LFER_S"=0.86,"LFER_A"=0.61,"LFER_B"=0.09,
@@ -74,18 +75,25 @@ convertKintoFu<-function(khsa_Lkg,kglob_Lkg,kmemlip_LL,klip_LL,species){
 QSARs_plasma<-function(QSAR,logP,pKa,ionization,
                        LFER_E=NULL,LFER_B=NULL,LFER_A=NULL,LFER_S=NULL,LFER_V=NULL){
   #run function to get ionization factors
-  source("R/Ionization.R")
+  source("functions/Ionization.R")
   fneutral=getIonization(ionization,pKa)
   X= fneutral["fneutral_plasma"] #Interstitial tissue
   Y= fneutral["fneutral_cells"] #intracellular
 
   if (QSAR=="logP"){
-
     logD<-logP*1/(1+X)
-    kmemlip_LL<-10^logD
+
+    if(pKa[1]!=0){
+      kmemlip_LL<-10^logD
+    } else {
+    #Yu et al  regression
+    kmemlip_LL<-10^(1.294+0.304*LogP)}
+
     #for albumin we are not correcting for ionization since acid molecules also bind albumin
-    khsa_kgL<-0.163+0.0221*10^logP  #Schmitt equation, check where is it based and which equation was used in the VCBA
-    kglob_kgL<-0.163+0.0221*10^logD
+    khsa_Lkg<-0.163+0.0221*kmemlip_LL #Schmitt equation
+    kglob_Lkg_1<-0.163+0.0221*kmemlip_LL #Schmitt equation for general tissue protein
+    kglob_Lkg_2<-10^(0.37*logD-0.29) #based on the eq used in the VCBA
+    kglob_Lkg<-mean(kglob_kgL_1,kglob_kgL_2)
 
   }else if (QSAR=="PPLFER"){
     #Add LFER_a
@@ -107,6 +115,6 @@ QSARs_plasma<-function(QSAR,logP,pKa,ionization,
     kglob_kgL=kmus_kg
   }
 
-  return(c("kmemlip_LL"=kmemlip_LL,"khsa_kgL"=khsa_kgL,
-           "kglob_kgL"=kglob_kgL))
+  return(c("kmemlip_LL"=kmemlip_LL,"khsa_Lkg"= khsa_Lkg,
+           "kglob_Lkg"=kglob_Lkg))
 }
