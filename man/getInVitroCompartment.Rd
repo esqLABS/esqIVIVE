@@ -4,20 +4,37 @@
 \alias{getInVitroCompartment}
 \title{getInVitroCompartments}
 \usage{
-getInVitroCompartment(cCells, cSerum, microplateType, volMedium)
+getInVitroCompartment(
+  typeSystem,
+  FBS,
+  microplateType,
+  volMedium,
+  cCells = NULL,
+  cMicro = NULL
+)
 }
 \arguments{
-\item{cCells}{cells concentration (in million/ml)}
+\item{typeSystem}{if system is hepatocytes or microsomes}
 
-\item{cSerum}{serum concentration (in ???)}
+\item{FBS}{fraction of serum concentration, values can only go from 0-1}
 
 \item{volMedium}{volume of medium in the well (in mL)}
+
+\item{cCells}{cells concentration (in million/ml)}
+
+\item{cMicro}{concentration of microsome protein mg/mL}
 
 \item{microplateWells}{number of wells in the microplate}
 }
 \value{
-a list of values representing
+a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
 }
 \description{
 Generates a list of values describing an in vitro compartment
+This function is used inside the Fraction unbound function
+}
+\examples{
+getInVitroCompartment("hepatocytes", 0.05, microplateType = 96, volMedium = 0.15, cCells = 0.1)
+getInVitroCompartment("microsomes", 0, microplateType = 24, volMedium = 0.5, cMicro = 1)
+
 }
