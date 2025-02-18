@@ -72,41 +72,66 @@ convertKintoFu <- function(khsa_Lkg, kglob_Lkg, kmemlip_LL, klip_LL, species) {
 #              "LFER_V"=1.39)
 
 
-QSARs_plasma <- function(QSAR, logP, pKa, ionization,
-                         LFER_E = NULL, LFER_B = NULL, LFER_A = NULL, LFER_S = NULL, LFER_V = NULL) {
-  # run function to get ionization factors
-  fneutral <- getIonization(ionization, pKa)
-  X <- fneutral["fneutral_plasma"] # Interstitial tissue
-  Y <- fneutral["fneutral_cells"] # intracellular
+QSARs_plasma<-function(QSAR,logP,pKa,ionization,LFER_E=NULL,LFER_B=NULL,LFER_A=NULL,LFER_S=NULL,LFER_V=NULL){
+  #run function to get ionization factors
 
-  if (QSAR == "logP") {
-    logD <- logP * 1 / (1 + X)
-    kmemlip_LL <- 10^logD
-    # for albumin we are not correcting for ionization since acid molecules also bind albumin
-    khsa_kgL <- 0.163 + 0.0221 * 10^logP # Schmitt equation, check where is it based and which equation was used in the VCBA
-    kglob_kgL <- 0.163 + 0.0221 * 10^logD
-  } else if (QSAR == "PPLFER") {
-    # Add LFER_a
-    LFER_Ei <- 0.15 + LFER_E
-    LFER_Vi <- -0.0215 + LFER_V
-    LFER_Bi <- 2.15 - 0.204 * LFER_S + 1.217 * LFER_B + 0.314 * LFER_V
-    LFER_Si <- 1.224 + 0.908 * LFER_E + 0.827 * LFER_S + 0.453 * LFER_V
-    LFER_Ai <- -0.208 - 0.058 * LFER_S + 0.0354 * LFER_A + 0.076 * LFER_V
-    LFER_J <- 1.793 + 0.267 * LFER_E - 0.195 * LFER_S + 0.35 * LFER_V
+  source("functions/Ionization.R")
 
-    # check units
-    # check possibly appli limit, range chemicals...
-    kmemlip_LL <- 10^(0.29 + 0.74 * LFER_E - 0.72 * LFER_S - 3.63 * LFER_B + 3.3 * LFER_V)
-    kbsa_kgL <- 0.29 + 0.36 * LFER_E - 0.26 * LFER_S - 3.23 * LFER_B + 2.82 * LFER_V
-    # equation for ions from https://pubs.acs.org/doi/10.1021/acs.est.5b06176
-    kbsa_kgL <- 0.85 + 0.63 * LFER_Ei - 0.63 * LFER_Si - 0.05 * LFER_Ai + 2.08 * LFER_Bi + 2.06 * LFER_Vi + 3.13 * LFER_J
-    khsa_kgL <- kbsa_kgL
-    kmus_kg <- -0.24 + 0.68 * LFER_E - 0.76 * LFER_S - 2.29 * LFER_B + 2.51 * LFER_V
-    kglob_kgL <- kmus_kg
+  fneutral=getIonization(ionization,pKa)
+
+  X= fneutral["fneutral_plasma"] #Interstitial tissue
+
+  Y= fneutral["fneutral_cells"] #intracellular
+
+  if (QSAR=="logP"){
+
+    logD<-logP*1/(1+X)
+
+    if(pKa[1]!=0){
+      kmemlip_LL<-10^logD
+      } else {
+      #Yu et al  regression
+      kmemlip_LL<-10^(1.294+0.304*LogP)}
+
+    #for albumin we are not correcting for ionization since acid molecules also bind albumin
+
+    khsa_Lkg<-0.163+0.0221*kmemlip_LL #Schmitt equation
+
+    kglob_Lkg_1<-0.163+0.0221*kmemlip_LL #Schmitt equation for general tissue protein
+
+    kglob_Lkg_2<-10^(0.37*logD-0.29) #based on the eq used in the VCBA
+
+    kglob_Lkg<-mean(kglob_kgL_1,kglob_kgL_2)
+
+  }else if (QSAR=="PPLFER"){
+
+    #Add LFER_a
+
+    LFER_Ei=0.15+LFER_E
+
+    LFER_Vi=-0.0215+LFER_V
+
+    LFER_Bi=2.15-0.204*LFER_S+1.217*LFER_B+0.314*LFER_V
+
+    LFER_Si= 1.224+0.908*LFER_E+0.827*LFER_S+0.453*LFER_V
+
+    LFER_Ai=-0.208-0.058*LFER_S+0.0354*LFER_A+0.076*LFER_V
+
+    LFER_J=1.793+0.267*LFER_E-0.195*LFER_S+0.35*LFER_V
+
+
+    #check possibly appli limit, range chemicals...
+  kmemlip_LL=10^(0.29+0.74*LFER_E-0.72*LFER_S-3.63*LFER_B+3.3*LFER_V)
+  kbsa_kgL=0.29+0.36*LFER_E-0.26*LFER_S-3.23*LFER_B+2.82*LFER_V
+  #equation for ions from https://pubs.acs.org/doi/10.1021/acs.est.5b06176
+  kbsa_kgL=0.85+0.63*LFER_Ei-0.63*LFER_Si-0.05*LFER_Ai+2.08*LFER_Bi+2.06*LFER_Vi+3.13*LFER_J
+  khsa_kgL=kbsa_kgL
+  kmus_kg=-0.24+0.68*LFER_E-0.76*LFER_S-2.29*LFER_B+2.51*LFER_V
+  kglob_kgL=kmus_kg
+
   }
+return(c("kmemlip_LL"=kmemlip_LL,"khsa_Lkg"= khsa_Lkg,
+       "kglob_Lkg"=kglob_Lkg))
 
-  return(c(
-    "kmemlip_LL" = kmemlip_LL, "khsa_kgL" = khsa_kgL,
-    "kglob_kgL" = kglob_kgL
-  ))
+
 }
