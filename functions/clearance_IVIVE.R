@@ -13,7 +13,7 @@
 #' @param cMicro concentration of microsome protein mg/mL
 #' @param cCells concentration of hepatocytes used million cells/mL
 #' @param species values can human and rat for now, defaulting to human
-#' @param tissue tissue of interest, since scaling factors are dependent on the tissue
+#' @param tissue tissue of interest, since scaling factors are dependent on the tissue, will default to liver
 #'
 #'@return  Specific clearance parameter to plug in PK-Sim
 #'@examples
