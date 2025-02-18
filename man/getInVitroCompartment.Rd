@@ -34,7 +34,7 @@ Generates a list of values describing an in vitro compartment
 This function is used inside the Fraction unbound function
 }
 \examples{
-getInVitroCompartment("hepatocytes",0.05,microplateType=96,volMedium=0.15,cCells=0.1)
-getInVitroCompartment("microsomes",0,microplateType=24,volMedium=0.5,cMicro=1)
+getInVitroCompartment("hepatocytes", 0.05, microplateType = 96, volMedium = 0.15, cCells = 0.1)
+getInVitroCompartment("microsomes", 0, microplateType = 24, volMedium = 0.5, cMicro = 1)
 
 }
