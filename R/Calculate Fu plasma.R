@@ -75,7 +75,6 @@ convertKintoFu <- function(khsa_Lkg, kglob_Lkg, kmemlip_LL, klip_LL, species) {
 QSARs_plasma <- function(QSAR, logP, pKa, ionization,
                          LFER_E = NULL, LFER_B = NULL, LFER_A = NULL, LFER_S = NULL, LFER_V = NULL) {
   # run function to get ionization factors
-  source("R/Ionization.R")
   fneutral <- getIonization(ionization, pKa)
   X <- fneutral["fneutral_plasma"] # Interstitial tissue
   Y <- fneutral["fneutral_cells"] # intracellular

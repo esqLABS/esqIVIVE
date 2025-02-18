@@ -50,7 +50,6 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
   ))
 
   # run function to get ionization factors
-  source("functions/Ionization.R")
   fneutral <- getIonization(ionization, pKa)
   X <- fneutral["fneutral_plasma"] # Interstitial tissue
   Y <- fneutral["fneutral_cells"] # intracellular
@@ -68,7 +67,6 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
   kPlastic <- as.double(mean(kPlasticFischer, kPlasticKramer) * 1 / (1 + Y))
 
   # get in vitro compartments----------------------------------------------------
-  source("functions/in-vitro-compartment.R")
   if (typeSystem == "microsomes") {
     InVitroCompartment <- getInVitroCompartment("microsomes",
       FBS = FBS,

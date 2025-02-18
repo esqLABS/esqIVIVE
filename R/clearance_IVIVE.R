@@ -1,7 +1,7 @@
+#' Clearance IVIVE
 #'
 #' @description
 #' IVIVE for clearance
-#'
 #'
 #' @param typeValue describe what type of in vitro data for clearance it is
 #' @param units this are the units of the value
@@ -23,7 +23,10 @@
 #' @param BP Blood plasma ratio
 #' @param species values can human and rat for now, defaulting to human
 #'
-#' @return  Specific clearance parameter to plug in PK-Sim
+#' @return Specific clearance parameter to plug in PK-Sim
+#'
+#' @export
+#'
 #' @examples
 #'
 #' expData <- read.csv("tests/Clearance_example.csv", header = TRUE)
@@ -90,7 +93,6 @@ clearance_IVIVE <- function(typeValue, units, expData, typeSystem, partitionQSPR
 
 
   if (is.null(fu_hep)) {
-    source("functions/Calculate_Partitions.R")
     # get fu_hep
     if (typeSystem == "microsomes") {
       fu_hep <- as.double(FractionUnbound(
@@ -195,6 +197,15 @@ clearance_IVIVE <- function(typeValue, units, expData, typeSystem, partitionQSPR
 }
 
 # function to determine clearance from experimental curve
+#' Title
+#'
+#' @param expData
+#'
+#' @return
+#' @export
+#' @import ggplot2
+#'
+#' @examples
 determineClearance <- function(expData) {
   # Load the depletion curve
   clear_curve_xy <- expData
