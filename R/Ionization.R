@@ -1,14 +1,21 @@
-# Code for sorting ionization
+#' getIonization
+#'
+#' @description
+#' Function to calculate fraction unionized
+#' If there are multiple pKas for acidity just use the lower value
+#' If there are multiple pKas for basicity just use the lower value
+#' Mind that pKb is not the same as pKa !
+#' If you have pKb, just calculate pKa=14-pKb
+#' 
+#' @param ionization 
+#' @param pKa  
+#'
+#' @return factors that can be used to calculate the fraction neutral or ionized in plasma and intracellularly
+#'
+#' @examples getIonization(ionization=c("neutral",0),pKa<-c(0,0))
+#' @examples getIonization(ionization=c("acid",0),pKa<-c(14,0))
+#' @examples getIonization(ionization=c("base","acid"),pKa<-c(5,7))
 
-# examples to test
-# getIonization(ionization=c("neutral",0),pKa<-c(0,0))
-# getIonization(ionization=c("acid",0),pKa<-c(14,0))
-# getIonization(ionization=c("base","acid"),pKa<-c(5,7))
-
-# If there are multiple pKas for acidity just use the lower value
-# If there are multiple pKas for basicity just use the lower value
-# Mind that pKb is not the same as pKa !
-# If you have pKb, just calculate pKa=14-pKb
 
 getIonization <- function(ionization, pKa) {
   # confirm##################
@@ -50,5 +57,5 @@ getIonization <- function(ionization, pKa) {
     X <- 0
     Y <- 0
   }
-  return(c("fneutral_plasma" = X, "fneutral_cells" = Y))
+  return(c("ion_factor_plasma" = X, "ion_factor_cells" = Y))
 }
