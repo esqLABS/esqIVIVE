@@ -19,20 +19,20 @@
 #' @export
 #'
 #' @examples
-FractionUnbound(
-  partitionQSPR = "All PK-Sim Standard", logLipo = 3, ionization = c("acid", 0),
-  typeSystem = "hepatocytes", FBS_fraction = 0, microplateType = 96,
-  volMedium_mL = 0.22, pKa = c(6, 0), hlcAt_atmm3mol = 1E-6, cCells_Mml = 2)
+#'FractionUnbound(
+#'  partitionQSPR = "All PK-Sim Standard", logLipo = 3, ionization = c("acid", 0),
+#'  typeSystem = "hepatocytes", FBS_fraction = 0, microplateType = 96,
+#'  volMedium_mL = 0.22, pKa = c(6, 0), hlcAt_atmm3mol = 1E-6, cCells_Mml = 2)
 #'
-FractionUnbound(
-  partitionQSPR = "Poulin and Theil + fu", logLipo = 3, ionization = c("acid", 0),
-  typeSystem = "hepatocytes", FBS_fraction = 0, microplateType = 96,fu=0.01,BP=2,
-  volMedium_mL = 0.22, pKa = c(6, 0), hlcAt_atmm3mol = 1E-6, cCells_Mml = 2)
-
-FractionUnbound(
-  partitionQSPR = "All Schmitt", logLipo = 0.42, ionization = c("acid", 0),
-  typeSystem = "microsomes", FBS_fraction = 0, microplateType = 96,fu=0.2,BP=1,
-  volMedium_mL = 0.22, pKa = c(6, 0), cMicro_mgml = 2)
+#'FractionUnbound(
+#'  partitionQSPR = "Poulin and Theil + fu", logLipo = 3, ionization = c("acid", 0),
+#'  typeSystem = "hepatocytes", FBS_fraction = 0, microplateType = 96,fu=0.01,BP=2,
+#'  volMedium_mL = 0.22, pKa = c(6, 0), hlcAt_atmm3mol = 1E-6, cCells_Mml = 2)
+#'
+#'FractionUnbound(
+#'  partitionQSPR = "All Schmitt", logLipo = 0.42, ionization = c("acid", 0),
+#'  typeSystem = "microsomes", FBS_fraction = 0, microplateType = 96,fu=0.2,BP=1,
+#'  volMedium_mL = 0.22, pKa = c(6, 0), cMicro_mgml = 2)
 #'
 #' @details
 #'
