@@ -6,11 +6,11 @@
 #' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt)
 #' @param inVitroCompartment a list of values describing the in vitro compartment created by `getInVitroCompartment`
 #' @param logLipo LogP or LogMA of the compound
-#' @param hlcAt Henry's Law Constant in atm/(m3*mol)
+#' @param hlcAt_atmm3mol Henry's Law Constant in atm/(m3*mol)
 #' @param BP Blood plasma ratio
 #' @param fu In Vivo Fraction Unbound in plasma from literature
-#' @param ionization Vector of length 3 with ionization class, acid, neutral and base, if not input then it is c(0,0,0)
-#' @param pKa vector of pkA of the compound
+#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
+#' @param pKa vector of length of 2 with pkA of the compound
 #' @param cCells concentration of cells million /mL
 #' @param cMicro concentration of microsomes mg/mL
 #' @param volMedium
@@ -19,19 +19,28 @@
 #' @export
 #'
 #' @examples
-#' FractionUnbound(
-#'   partitionQSPR = "All PK-Sim Standard", logLipo = 3, ionization = c("acid", 0, 0),
-#'   typeSystem = "hepatocytes", FBS = 0, microplateType = 96,
-#'   volMedium = 0.22, pKa = c(6, 0, 0), hlcAt = 1E-6, cCells = 2
-#' )
+FractionUnbound(
+  partitionQSPR = "All PK-Sim Standard", logLipo = 3, ionization = c("acid", 0),
+  typeSystem = "hepatocytes", FBS_fraction = 0, microplateType = 96,
+  volMedium_mL = 0.22, pKa = c(6, 0), hlcAt_atmm3mol = 1E-6, cCells_Mml = 2)
+#'
+FractionUnbound(
+  partitionQSPR = "Poulin and Theil + fu", logLipo = 3, ionization = c("acid", 0),
+  typeSystem = "hepatocytes", FBS_fraction = 0, microplateType = 96,fu=0.01,BP=2,
+  volMedium_mL = 0.22, pKa = c(6, 0), hlcAt_atmm3mol = 1E-6, cCells_Mml = 2)
+
+FractionUnbound(
+  partitionQSPR = "All Schmitt", logLipo = 0.42, ionization = c("acid", 0),
+  typeSystem = "microsomes", FBS_fraction = 0, microplateType = 96,fu=0.2,BP=1,
+  volMedium_mL = 0.22, pKa = c(6, 0), cMicro_mgml = 2)
 #'
 #' @details
 #'
 #' mayeb consider to have average data..
 FractionUnbound <- function(partitionQSPR, logLipo, ionization,
-                            typeSystem, FBS, microplateType,
-                            volMedium, pKa = NULL, hlcAt = NULL, fu = NULL, BP = NULL,
-                            cMicro = NULL, cCells = NULL) {
+                            typeSystem, FBS_fraction, microplateType,
+                            volMedium_mL, pKa = NULL, hlcAt_atmm3mol = NULL, fu = NULL, BP = NULL,
+                            cMicro_mgml = NULL, cCells_Mml = NULL) {
   # Have default value of medium volume considering the proportion of the common sim.
   # Have default value of fu
   # How for BP
@@ -49,17 +58,36 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     "Schmitt + fu"
   ))
 
+  #make warning that micro and hep should match
+  if(typeSystem=="hepatocytes"&&exists("cCell_Mml")){
+    } else if (typeSystem=="microsomes"&&exists("cMicro_mgml")) {
+    } else {
+      warning("input Type system not matchin with cCells or CMicro intput")
+    }
+  
+  
+  #get functions to use here
+  source("R/Ionization.R")
+  source("R/in-vitro-compartment.R")
   # run function to get ionization factors
-  fneutral <- getIonization(ionization, pKa)
-  X <- fneutral["fneutral_plasma"] # Interstitial tissue
-  Y <- fneutral["fneutral_cells"] # intracellular
+  
+  fionization <- getIonization(ionization, pKa)
+  X <- fionization["ion_factor_plasma"] # Interstitial tissue
+  Y <- fionization["ion_factor_cells"] # intracellular
 
-  kPro <- (0.81 + 0.11 * 10^logLipo) / 24.92 * 5.0
-
+  kPro_1<-0.73*10^logLipo-0.39 # from Endo 2012,dx.doi.org/10.1021/es303379y partition to chicken muscle, R2=0.86
+  kPro_2<-0.163+0.0221*10^logLipo  #from Schmitt 2008, doi:10.1016/j.tiv.2007.09.010
+  kPro<-mean(kPro_1,kPro_2)
+  
   # Calculate air-water partition coefficient
+  #default to a low hlc if it is not given
+  if(is.null(hlcAt_atmm3mol)){
+    hlcAt_atmm3mol <-0.000001
+  }else{}
   # Divide henry law constant in atm/(m3*mol) with the temperature in kelvin and gas constant R (j/k*mol)
   # last factor is to convert form atm to Pa
-  kAir <- hlcAt / (0.08206 * 310) * 101325
+  kAir <- hlcAt_atmm3mol / (0.08206 * 310) * 101325
+ 
 
   # Calculate plastic partitioning
   kPlasticFischer <- 10**(logLipo * 0.47 - 4.64)
@@ -69,26 +97,26 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
   # get in vitro compartments----------------------------------------------------
   if (typeSystem == "microsomes") {
     InVitroCompartment <- getInVitroCompartment("microsomes",
-      FBS = FBS,
+      FBS_fraction = FBS_fraction,
       microplateType = microplateType,
-      volMedium = volMedium, cMicro = cMicro
+      volMedium_mL = volMedium_mL, cMicro_mgml = cMicro_mgml
     )
   } else if (typeSystem == "hepatocytes") {
     InVitroCompartment <- getInVitroCompartment("hepatocytes",
-      FBS = FBS,
+      FBS_fraction = FBS_fraction,
       microplateType = microplateType,
-      volMedium = volMedium, cCells = cCells
+      volMedium_mL = volMedium_mL, cCells_Mml = cCells_Mml
     )
   }
 
-  cCellNL <- as.double(InVitroCompartment["cCellNL"])
-  cCellNPL <- as.double(InVitroCompartment["cCellNPL"])
-  cCellAPL <- as.double(InVitroCompartment["cCellAPL"])
-  cCellPro <- as.double(InVitroCompartment["cCellPro"])
-  cMediumNL <- as.double(InVitroCompartment["cMediumNL"])
-  cMediumNPL <- as.double(InVitroCompartment["cMediumNPL"])
-  cMediumPro <- as.double(InVitroCompartment["cMediumPro"])
-  saPlasticVolMedium <- as.double(InVitroCompartment["saPlasticVolMedium"])
+  cCellNL <- as.double(InVitroCompartment["cCellNL_vvmedium"])
+  cCellNPL <- as.double(InVitroCompartment["cCellNPL_vvmedium"])
+  cCellAPL <- as.double(InVitroCompartment["cCellAPL_vvmedium"])
+  cCellPro <- as.double(InVitroCompartment["cCellPro_vvmedium"])
+  cMediumNL <- as.double(InVitroCompartment["cMediumNL_vvmedium"])
+  cMediumNPL <- as.double(InVitroCompartment["cMediumNPL_vvmedium"])
+  cMediumPro <- as.double(InVitroCompartment["cMediumPro_vvmedium"])
+  saPlasticVolMedium <- as.double(InVitroCompartment["saPlasticVolMedium_m2L"])
   volAir_L <- as.double(InVitroCompartment["volAir_L"])
 
   # QSPRs for calculating partitioning in in vitro------------------------------
@@ -103,6 +131,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cMediumNL) +
       kPL * (cCellNPL + cMediumNPL) +
       kPlastic * saPlasticVolMedium))
+    
   } else if (partitionQSPR == "Poulin and Theil + fu" || partitionQSPR == "Berezhkovskiy + fu") {
     # Calculate lipid partitioning
     kNL <- 10^logLipo
@@ -111,7 +140,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     fuInvitro <- 1 / (1 + kNL * cCellNL
       + kNPL * cCellNPL
       + kPlastic * saPlasticVolMedium
-      + (1 / fu - 1) * FBS)
+      + (1 / fu - 1) * FBS_fraction)
   } else if (partitionQSPR == "All PK-Sim Standard") {
     kNL <- 10^logLipo
 
@@ -126,7 +155,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cCellNPL)
       + kPlastic * saPlasticVolMedium
       + kPro * cCellPro
-      + (1 / fu - 1) * FBS))
+      + (1 / fu - 1) * FBS_fraction))
   } else if (partitionQSPR == "Rodgers & Rowland + fu") {
     # RR can only be used by using fu
     # partition into acid phospholipids is only considered if chemical is a strong base
@@ -139,7 +168,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     fiwBC <- 0.63
     fnlBC <- 0.003
     fnpBC <- 0.0059
-    APbc <- 0.57 # acidic phspholipids in blood cells
+    APbc <- 0.57 # acidic phospholipids in blood cells
 
     KAPL_1 <- max(0, kpuBC -
       (1 + Y) / (1 + X) * fiwBC -
@@ -151,7 +180,9 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       (kNL * 0.3 + 0.7) * (cCellNPL + cMediumNPL) +
       kAPL * (cCellAPL) * X / (1 + X) +
       kPlastic * saPlasticVolMedium))
+    
   } else if (partitionQSPR == "All Schmitt") {
+     
     LogP <- logLipo
     ionParamSchmitt <- getIonizationSchmitt(ionization, pKa)
     logD_Factor <- ionParamSchmitt["logD_Factor"]
@@ -165,6 +196,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       kNPL * (cCellNPL + cMediumNPL) +
       kAPL * (cCellAPL) +
       kPro * (cCellPro + cMediumPro)))
+    
   } else if (partitionQSPR == "Schmitt + fu") {
     LogP <- logLipo
 
@@ -180,7 +212,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       kNPL * cCellNPL +
       kAPL * cCellAPL +
       kPro * cCellPro +
-      (1 / fu - 1) * FBS))
+      (1 / fu - 1) * FBS_fraction))
   } else {}
 
 
@@ -195,7 +227,7 @@ getIonizationSchmitt <- function(ionization, pKa) {
   pH <- 7.4
 
   ionParam <- c(0, 0, 0)
-  for (i in seq(1, 3)) {
+  for (i in seq(1, 2)) {
     if (ionization[i] == "acid") {
       ionParam[i] <- 1
     } else if (ionization[i] == "base") {
