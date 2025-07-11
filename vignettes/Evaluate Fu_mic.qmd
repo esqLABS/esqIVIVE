@@ -1,0 +1,179 @@
+---
+title: "Compare algorithms to predict Fu"
+author: "Susana Proenca"
+format: html
+editor: visual
+project:
+  execute-dir: esqIVIVE
+---
+
+## Theory
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+Some algorithms are purely empirical regressions
+
+Austin
+
+\$\$fu\_{inc} = 1 \\cdot C \\cdot 10\^{0.56 \\log \\left( \\frac{P}{D} \\right) - 1.41} + 1\$\$
+
+#### Import table
+
+```{r}
+#| label: import data
+#| include: false
+testFuData <- read.csv("test_fu_microsomes.csv")  
+source("../R/Calculate_Fu_inc_mic.R")
+
+library(dplyr)
+library(ggpubr)
+library(ggplot2)
+
+```
+
+#### Calculate Fu_mic for all
+
+```{r}
+#| echo: false
+QSARs <- c(
+  "All Poulin and Theil",
+  "All Berezhkovskiy",
+  "All PK-Sim Standard",
+  # "Rodgers & Rowland + fu",
+  "All Schmitt"
+)
+
+for (j in seq(1:length(QSARs))) {
+  for (i in seq(1:nrow(testFuData))) {
+    testFuData[i, 13 + j] <- FractionUnbound(
+      partitionQSPR = QSARs[j], logLipo = as.double(testFuData[i, "LogP37C"]),
+      ionization = c(testFuData[i, "Class"], 0),
+      typeSystem = "microsomes", FBS_fraction  = 0, microplateType = 96,
+      volMedium = 0.22, pKa = c(as.double(testFuData[i, "pKa"]), 0),
+      BP = 1, fu = 0.2,
+      cMicro_mgml = as.double(testFuData[i, "Cp.mg.mL."]))
+  }
+}
+colnames(testFuData)[seq(14, 17)] <- c(
+  "All_Poulin_and_Theil",
+  "All_Berezhkovskiy",
+  "All_PK_Sim_Standard",
+  # "Rodgers_Rowland_fu",
+  "All_Schmitt"
+)
+
+head(testFuData)
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+### Plots
+
+```{r}
+Poulin_paper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_Poulin,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+Halifax_paper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_HalifaxHouston,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+
+Turner_paper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_Turner,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+Austinpaper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_Austin,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+Poulin_Theil<-ggplot(testFuData, aes(x = Obs_Fumic, y = All_Poulin_and_Theil,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+Schmitt<-ggplot(testFuData, aes(x = Obs_Fumic, y = All_Schmitt,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+PKsimstand<-ggplot(testFuData, aes(x = Obs_Fumic, y = All_PK_Sim_Standard,col = Class)) +
+  # geom_point(aes(x=Obs,y=Pred.Poulin))+
+  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
+  geom_smooth(method = "lm", se = FALSE)+
+  geom_point()+
+  theme_bw()+
+  stat_regline_equation(aes(label = ..rr.label..)) 
+
+ggarrange(Poulin_paper,Halifax_paper,Turner_paper,Austinpaper,Poulin_Theil,
+          Schmitt,PKsimstand,common.legend = TRUE)
+```
+
+### Error Table
+
+Calculate hoe many is within 1.5 % fold , 2 folder, 5 fold, AFE and AAFE.
+
+```{r}
+error_table<-data.frame((matrix(ncol = 6, nrow = 7)))
+  
+#error functions
+# % within fold function
+percent_within_fold <- function(observed, predicted, fold) {
+  mean(predicted >= observed / fold & predicted <= observed * fold) * 100
+}
+
+# Average Fold Error (AFE) function
+afe <- function(observed, predicted) {
+  mean(abs(predicted / observed))
+}
+
+aafe <- function(observed, predicted) {
+  mean(abs(log10(predicted / observed)))
+}
+
+error_table<-list()
+
+
+for (i in 1:8){
+  
+ predi<-colnames(testFuData)[9+i]
+ error_table[[predi]] <- testFuData %>%
+  group_by(Class) %>%
+  summarize(
+    percent_within_2fold = percent_within_fold(Obs_Fumic, .data[[predi]], 2),
+    percent_within_5fold = percent_within_fold(Obs_Fumic, .data[[predi]], 5),
+    afe_method= afe(Obs_Fumic, .data[[predi]]),
+    aafe_method = aafe(Obs_Fumic, .data[[predi]]),
+    .groups = 'drop'
+  ) 
+  
+}
+#View(error_table[["Fu_Poulin"]])
+
+  
+
+```
+
+Calculate liver partitioning for all is it more proportional to any specific ..

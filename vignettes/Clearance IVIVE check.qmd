@@ -1,0 +1,49 @@
+---
+title: "Test for clearance IVIVE"
+author: "Susana Proenca"
+format: html
+editor: visual
+---
+
+## Introduction
+
+This vignette is to showcase the use and comparison of differerent IVIVE frameworks for clearance and how the predicted clearance using the PK-Sim standard PBK models compares with observed plasma clearances. This framework will use the htpbk package also created by ESQlabs.
+
+#### Import data
+
+Import hepatic clearance data from paper of Poulin 2024...Maybe instead , use the data from Riley .. they have the original clearance
+
+```{r}
+Poulin_dataset<-read.csv("Poulin2025-JPharmaceuticalSciences-dataset.csv")
+```
+
+#### Import needed functions or packages
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+![](images/clipboard-1227717430.png)
+
+### Make batch simulations
+
+1-Using standard IVIVE
+
+2-Using standard IVIVE and no-limiting permeability
+
+3-Correcting for fu-standard method
+
+4-Correcting for fu-standard method and have no-limiting permeability
+
+5-Correcting for fu-match partitioning method-\> RR
+
+6-Correcting for fu-match partitioning method-\> RR
+
+#### Compare predictiveness of different methods
+
+Questions: Does fu lead to better prediction.
+
+Are there cases where the permeability predicted by PK-Sim leads to permeability-limited clearance?
+
+The `echo: false` option disables the printing of code (only output is displayed).
