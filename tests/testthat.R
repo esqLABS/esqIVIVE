@@ -10,3 +10,5 @@ library(testthat)
 library(esqIVIVE)
 
 test_check("esqIVIVE")
+
+#test different examples to see if they do not crash
