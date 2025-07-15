@@ -72,9 +72,10 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     }
   
   #get functions to use here
-  source("R/Ionization.R")
-  source("R/in-vitro-compartment.R")
-  source("R/Algorithm4Fumic.R")
+  devtools::load_all()
+  # source("R/Ionization.R")
+  # source("R/in-vitro-compartment.R")
+  # source("R/Algorithm4Fumic.R")
   # run function to get ionization factors
   
   fionization <- getIonization(ionization, pKa)
