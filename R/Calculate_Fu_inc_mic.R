@@ -3,11 +3,12 @@
 #' @description
 #' Compute the fraction unbound in vitro
 #'
-#' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt)
+#' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt, 
+#' then from literature, Poulin, Turner, Austin and Halifax. See thevignette for more details)
 #' @param inVitroCompartment a list of values describing the in vitro compartment created by `getInVitroCompartment`
 #' @param logLipo LogP or LogMA of the compound
 #' @param hlcAt_atmm3mol Henry's Law Constant in atm/(m3*mol)
-#' @param BP Blood plasma ratio
+#' @param BP Blood plasma ratio, this parameter is needed for Rodgers and Rowland and Poulin method for basic chemicals
 #' @param fu In Vivo Fraction Unbound in plasma from literature
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
 #' @param pKa vector of length of 2 with pkA of the compound
@@ -47,6 +48,10 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
 
   # check if the arguments are valid
   rlang::arg_match(partitionQSPR, c(
+    "Austin",
+    "Halifax",
+    "Turner",
+    "Poulin",
     "All Poulin and Theil",
     "Poulin and Theil + fu",
     "All Berezhkovskiy",
@@ -55,7 +60,8 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     "PK-Sim Standard + fu",
     "Rodgers & Rowland + fu",
     "All Schmitt",
-    "Schmitt + fu"
+    "Schmitt + fu",
+    "All_literature"
   ))
 
   #make warning that micro and hep should match
@@ -65,10 +71,10 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       warning("input Type system not matchin with cCells or CMicro intput")
     }
   
-  
   #get functions to use here
   source("R/Ionization.R")
   source("R/in-vitro-compartment.R")
+  source("R/Algorithm4Fumic.R")
   # run function to get ionization factors
   
   fionization <- getIonization(ionization, pKa)
@@ -141,6 +147,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       + kNPL * cCellNPL
       + kPlastic * saPlasticVolMedium
       + (1 / fu - 1) * FBS_fraction)
+    
   } else if (partitionQSPR == "All PK-Sim Standard") {
     kNL <- 10^logLipo
 
@@ -148,6 +155,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cMediumNL + cCellNPL + cMediumNPL)
       + kPlastic * saPlasticVolMedium
       + kPro * (cCellPro + cMediumPro)))
+    
   } else if (partitionQSPR == "PK-Sim Standard + fu") {
     kNL <- 10^logLipo
 
@@ -156,6 +164,7 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       + kPlastic * saPlasticVolMedium
       + kPro * cCellPro
       + (1 / fu - 1) * FBS_fraction))
+    
   } else if (partitionQSPR == "Rodgers & Rowland + fu") {
     # RR can only be used by using fu
     # partition into acid phospholipids is only considered if chemical is a strong base
@@ -213,8 +222,31 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
       kAPL * cCellAPL +
       kPro * cCellPro +
       (1 / fu - 1) * FBS_fraction))
-  } else {}
+    
+  } else if (partitionQSPR == "Poulin" & typeSystem=="microsomes") {
+   
+    fuInvitro<-Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo,cMicro_mgml=Micro_mgml)
+    
+  } else if (partitionQSPR == "Austin"&& typeSystem=="microsomes") {
+    
+    fuInvitro<-Austin(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
+    
+  } else if (partitionQSPR == "Halifax" && typeSystem=="microsomes") {
+      
+    fuInvitro<-Halifax(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
+      
+  } else if (partitionQSPR == "Turner" && typeSystem=="microsomes") {
+      
+    fuInvitro<-Turner(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
+      
+  } else if (partitionQSPR == "All_literature" && typeSystem=="microsomes") {   
+    
+    fuInvitro<-mean(c(Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo,cMicro_mgml=Micro_mgml),
+                       Austin(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml),
+                       Halifax(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml),
+                        Turner(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)))
 
+  } else {}
 
   # Warning for volatility
   volatility(fuInvitro, kAir, volAir_L)
