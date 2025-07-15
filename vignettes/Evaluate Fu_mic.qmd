@@ -13,28 +13,63 @@ Quarto enables you to weave together content and executable code into a finished
 
 Some algorithms are purely empirical regressions
 
-Austin
+#### Austin et al 2002
 
-\$\$fu\_{inc} = 1 \\cdot C \\cdot 10\^{0.56 \\log \\left( \\frac{P}{D} \\right) - 1.41} + 1\$\$
+$$ 
+fu_{inc} = 1 \cdot C \cdot 10^{0.56 \log \left( \frac{P}{D} \right) - 1.41} + 1 
+$$
 
-#### Import table
+#### Halifax and Houston 2006
+
+$$ 
+fu_{inc} = \frac{1}{1+ C \cdot 10^{0.072\cdot \log P ^2 +0.067\cdot\log P-1.126}}
+$$
+
+#### Turner
+
+For neutral $$ 
+fu_{inc} = \frac{1}{1+ C \cdot 10^{0.46\cdot \log P-1.51}}
+$$ For predominantly ionized bases
+
+$$ 
+fu_{inc} = \frac{1}{1+ C \cdot 10^{0.58\cdot \log P-2.02}}
+$$ For predominantly ionized acid $$ 
+fu_{inc} = \frac{1}{1+ C \cdot 10^{0.2\cdot \log P-1.54}}
+$$ Poulin
+
+$$ 
+fu_{inc} = \frac{1}{Fw+\frac{Pnla\cdot Fnlm}{1+Im}}
+$$ Where Fw is the fraction ofwater is the system( very close to 1), Im is the ionization factor, Pnla=neutral lipids partition and Fnlm the fraction of fractional volume of neutral lipids in medium.
+
+For basic chemicals the affintiy to acidic phospholipids is also accounted.Here Papla is the partition to acidic phospholipids and Faplm is the fraction of acidic phospholipids.
+
+$$ 
+fu_{inc} = \frac{1}{Fw+\frac{Pnla\cdot Fnlm+Im\cdot Papla\cdot Faplm}{1+Im}}
+$$ Pnla is parameterized with logPow at 37 C. Since logKow values are often for 20 °C, the authors used a linear regression that corrects for the temperature difference. Papla is parameterized based on a similar regression form Rodgers and Rowland where they use the red blood cells plasma partition coefficient and fraction unbound in plasma.
 
 ```{r}
-#| label: import data
-#| include: false
-testFuData <- read.csv("test_fu_microsomes.csv")  
-source("../R/Calculate_Fu_inc_mic.R")
+#| label: load functions and data
+#| echo: false
+
+#install_local()
 
 library(dplyr)
 library(ggpubr)
 library(ggplot2)
+library(here)
+library(devtools)
+devtools::load_all()
 
+
+data_path<-system.file("data","test_fu_microsomes.csv",package="esqIVIVE")
+testFuData <-read.csv(data_path)
 ```
 
 #### Calculate Fu_mic for all
 
 ```{r}
 #| echo: false
+
 QSARs <- c(
   "All Poulin and Theil",
   "All Berezhkovskiy",
@@ -65,7 +100,16 @@ colnames(testFuData)[seq(14, 17)] <- c(
 head(testFuData)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+Mind that experimental values also have intrinsic variability and Wang et al 2024, it is described how chemicals with lower Fu_microsomes tend to have higher coeficients of variation. Specifically for Verapamil 1 mg/mL microsomes concentration different analytical methods 0.43 with RED device, 0.58 wuth ultrafiltration, 0.41 with HLM-beads, 0.45 with Ultracentrifugation and 0.89 Transil and 0.3 with linear extrapolation stability assay.
+
+```{r}
+Verapamil<-testFuData[which(testFuData$Compound=="Verapamil")[4],10:17]
+
+plot(x=rep(1,8),y=as.double(Verapamil),xlim=c(0,3),xlab="Fu_Verapamil")
+points(x=rep(2,6),c(0.43,0.58,0.41,0.45,0.89,0.3),col="red")
+legend(x=2.5,y=0.3, legend=c("exp","predicted"),col=c("red","black"),pch=19)
+
+```
 
 ### Plots
 
@@ -133,7 +177,7 @@ ggarrange(Poulin_paper,Halifax_paper,Turner_paper,Austinpaper,Poulin_Theil,
 
 ### Error Table
 
-Calculate hoe many is within 1.5 % fold , 2 folder, 5 fold, AFE and AAFE.
+Calculate how many is within 1.5 % fold , 2 folder, 5 fold, AFE and AAFE.
 
 ```{r}
 error_table<-data.frame((matrix(ncol = 6, nrow = 7)))
@@ -177,3 +221,17 @@ for (i in 1:8){
 ```
 
 Calculate liver partitioning for all is it more proportional to any specific ..
+
+steps
+
+#import from diana htpbk
+
+#make table to save values row chemicals and col the different partitions
+
+#add parameeters, logP and pKa class as input parameters as loop and get Kliver/water for different partitions coefficents
+
+#Compare the proportion of Fu to Kp ..
+
+```{r}
+
+```
