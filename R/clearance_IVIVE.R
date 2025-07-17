@@ -4,7 +4,7 @@
 #'
 #'
 #' @param typeValue describe what type of in vitro data for clearance it is
-#' @param units this are the units of the value, does not matter typeValue is "decay experimentalcurve"
+#' @param units this are the units of the value. it does not matter typeValue is "decay experimentalcurve"
 #' @param typeSystem microsomes or hepatocytes
 #' @param expData depending on the type of value this can be a csv file or just one value
 #' @param volMedium volume of medium in the well (in mL)
@@ -115,7 +115,8 @@ clearance_IVIVE<-function(typeValue,units,expData,typeSystem,fu_invitro,tissue=N
                             "mL/seconds/mg protein","uL/seconds/mg protein","L/seconds/mg protein",
                             "mL/minutes","uL/minutes",#not sure if correct
                             "mL/seconds","uL/seconds",
-                            "mL/hours","uL/hours"),
+                            "mL/hours","uL/hours",
+                            "mL/minutes/kg","uL/minutes/kg","mL/hours/kg","uL/hours/kg"),
                           c(1/cInvitro,1/cInvitro*60,1/cInvitro/60,
                             1,1/1000,1000,
                             1/60,1/60000,1000/60,
@@ -128,8 +129,8 @@ clearance_IVIVE<-function(typeValue,units,expData,typeSystem,fu_invitro,tissue=N
                             60,60/1000,60000,
                             1/(cInvitro*volMedium),1/(cInvitro*volMedium)/1000,
                             1/(cInvitro*volMedium)*60,1/(cInvitro*volMedium)*60/1000,
-                            1/(cInvitro*volMedium)/60,1/(cInvitro*volMedium)/60000
-                            ))
+                            1/(cInvitro*volMedium)/60,1/(cInvitro*volMedium)/60000,
+                            1/32/0.67,1/32/0.67/1000,1/32/0.67/60,1/32/0.67/60000)) #multiplying by the g liver weight per kilo BW
 
     multFactorClear<-as.double(matrixCalClear[which(matrixCalClear[,1]==units),2])
 
