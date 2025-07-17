@@ -30,7 +30,7 @@
 #'
 #' example microsomes
 #'clearance_IVIVE(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
-#'                expData=18.27,fu_invitro=0.5,cMicro=0.5,volMedium=0.5,empirical_scalar="No")
+#'                expData=18.27,fu_invitro=0.5,cMicro_mgml=0.5,volMedium=0.5,empirical_scalar="No")
 #'
 #'
 
@@ -108,7 +108,7 @@ clearance_IVIVE<-function(typeValue,units,expData,typeSystem,fu_invitro,empirica
   if (typeSystem=="microsomes"){
     
         nLiver<-SF_matrix[which(SF_matrix[,1]==tissue),"MPGO"] # mg/g liver
-        cInvitro<-cMicro   #mg/mL
+        cInvitro<-cMicro_mgml   #mg/mL
     
    } else if (typeSystem=="hepatocytes"){
     
