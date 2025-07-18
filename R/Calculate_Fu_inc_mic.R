@@ -12,8 +12,8 @@
 #' @param fu In Vivo Fraction Unbound in plasma from literature
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
 #' @param pKa vector of length of 2 with pkA of the compound
-#' @param cCells concentration of cells million /mL
-#' @param cMicro concentration of microsomes mg/mL
+#' @param cCells_Mml concentration of cells million /mL
+#' @param cMicro_mgml concentration of microsomes mg/mL
 #' @param volMedium
 #'
 #' @return  fuInvitro and possible warning for evaporation
@@ -226,11 +226,11 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     
   } else if (partitionQSPR == "Poulin" & typeSystem=="microsomes") {
    
-    fuInvitro<-Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo,cMicro_mgml=Micro_mgml)
+    fuInvitro<-Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo)
     
-  } else if (partitionQSPR == "Austin"&& typeSystem=="microsomes") {
+  } else if (partitionQSPR == "Austin" && typeSystem=="microsomes") {
     
-    fuInvitro<-Austin(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
+    fuInvitro<-Austin_mic(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
     
   } else if (partitionQSPR == "Halifax" && typeSystem=="microsomes") {
       
@@ -246,7 +246,26 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
                        Austin(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml),
                        Halifax(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml),
                         Turner(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)))
-
+  
+  } else if (partitionQSPR == "Austin" && typeSystem=="hepatocytes") {  
+      
+      fuInvitro<-Austin_hep(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml)
+      
+  } else if (partitionQSPR == "Poulin" && typeSystem=="hepatocytes") {  
+    
+    fuInvitro<-Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo)
+ 
+  } else if (partitionQSPR == "Kilford" && typeSystem=="hepatocytes") {  
+    
+    fuInvitro<-Kilford(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml)
+ 
+   } else if (partitionQSPR == "All_literature" && typeSystem=="hepatocytes") {  
+    
+    fuInvitro<-mean(c(Kilford(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml),
+                      Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo),
+                      Austin_hep(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml)))
+                      
+    
   } else {}
 
   # Warning for volatility
