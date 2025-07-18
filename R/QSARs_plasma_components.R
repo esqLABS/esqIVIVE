@@ -18,7 +18,7 @@
 #' @return  kmemlip_LL,kalb_Lkg and kglob_Lkg
 #' @detail
 #' 
-#'for neutral chemicals with logP >4 use the logP QSAR
+#' for neutral chemicals with logP >4 use the logP QSAR
 #' for acidic phenols, cabroxylic acids, pyridine and amines you can use the PPLFER.
 #' fup calculator (https://drumap.nibiohn.go.jp/fup/).
 #' to DO:

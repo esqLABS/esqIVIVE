@@ -52,7 +52,7 @@ Halifax<-function(ionization,pKa,X,logLipo,cMicro_mgml){
   return(fuInvitro)
 }
 
-Austin<-function(ionization,pKa,X,logLipo,cMicro_mgml){
+Austin_mic<-function(ionization,pKa,X,logLipo,cMicro_mgml){
   
   if (ionization[1]=="base" & pKa[1]>7){
     LogP<-1/(1+X)*10^logLipo
@@ -64,7 +64,31 @@ Austin<-function(ionization,pKa,X,logLipo,cMicro_mgml){
   return(fuInvitro)
 }
 
-Poulin<-function(ionization,pKa,X,Y,BP,fu,cCellNL,logLipo,cMicro_mgml){
+Austin_hep<-function(ionization,pKa,X,logLipo,cCells_Mml ){
+  
+  if (ionization[1]=="base" & pKa[1]>7){
+    LogP<-1/(1+X)*10^logLipo
+  } else {
+    LogP<-logLipo
+  }
+  
+  fuInvitro<-1/(1+cCells_Mml*10^(0.4*logLipo-1.38))
+  return(fuInvitro)
+}
+
+Kilford<-function(ionization,pKa,X,logLipo,cCells_Mml){
+  if (ionization[1]=="base" & pKa[1]>7){
+    LogP<-1/(1+X)*10^logLipo
+  } else {
+    LogP<-logLipo
+  }
+  VR<-0.005*cCells_Mml
+  fuInvitro<-1/(1+125*VR*10^(0.072*logLipo^2+0.067*logLipo-1.126))
+  
+  return(fuInvitro)
+}
+
+Poulin<-function(ionization,pKa,X,Y,BP,fu,cCellNL,logLipo){
   kNL<-10**logLipo
 
   if (ionization[1]=="base" & pKa[1]>7){
