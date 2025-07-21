@@ -11,7 +11,7 @@ This vignette is to showcase the use and comparison of differerent IVIVE framewo
 
 #### Import data
 
-Import hepatic clearance data from paper of Poulin 2024...Maybe instead , use the data from Riley .. they have the original clearance
+Import hepatic clearance data from paper of Obach(Prediction of Human Clearance of Twenty-Nine Drugs from Hepatic Microsomal Intrinsic Clearance Data: An Examination of In Vitro Half-Life Approach and Nonspecific Binding to Microsomes)...Maybe instead , use the data from Riley .. they have the original clearance
 
 ```{r}
 Poulin_dataset<-read.csv("Poulin2025-JPharmaceuticalSciences-dataset.csv")
