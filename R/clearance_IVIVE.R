@@ -70,7 +70,7 @@ clearance_IVIVE<-function(typeValue,units,expData,typeSystem,fu_invitro,empirica
   }else{}
 
   
-  #Fraction intracellular per organ
+  #Scaling factors 
   
   scaling_factors<-list()
   scaling_factors[["human"]]<-data.frame("organs"=c("brain","gonads",
