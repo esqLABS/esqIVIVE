@@ -3,7 +3,7 @@
 #' @description
 #' Compute the fraction unbound in vitro
 #'
-#' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt, 
+#' @param partitionQSPR type of assumption used (Poulin and Theil, PK-Sim® Standard, Rodgers & Rowland, Schmidtt,
 #' then from literature, Poulin, Turner, Austin and Halifax. See thevignette for more details)
 #' @param inVitroCompartment a list of values describing the in vitro compartment created by `getInVitroCompartment`
 #' @param logLipo LogP or LogMA of the compound
@@ -38,63 +38,71 @@
 #' @details
 #'
 #' mayeb consider to have average data..
-FractionUnbound <- function(partitionQSPR, logLipo, ionization,
-                            typeSystem, FBS_fraction, microplateType,
-                            volMedium_mL, pKa = NULL, hlcAt_atmm3mol = NULL, fu = NULL, BP = NULL,
-                            cMicro_mgml = NULL, cCells_Mml = NULL) {
+FractionUnbound <- function(
+  partitionQSPR,
+  logLipo,
+  ionization,
+  typeSystem,
+  FBS_fraction,
+  microplateType,
+  volMedium_mL,
+  pKa = NULL,
+  hlcAt_atmm3mol = NULL,
+  fu = NULL,
+  BP = NULL,
+  cMicro_mgml = NULL,
+  cCells_Mml = NULL
+) {
   # Have default value of medium volume considering the proportion of the common sim.
   # Have default value of fu
   # How for BP
 
   # check if the arguments are valid
-  rlang::arg_match(partitionQSPR, c(
-    "Austin",
-    "Halifax",
-    "Turner",
-    "Poulin",
-    "All Poulin and Theil",
-    "Poulin and Theil + fu",
-    "All Berezhkovskiy",
-    "Berezhkovskiy + fu",
-    "All PK-Sim Standard",
-    "PK-Sim Standard + fu",
-    "Rodgers & Rowland + fu",
-    "All Schmitt",
-    "Schmitt + fu",
-    "All_literature"
-  ))
+  rlang::arg_match(
+    partitionQSPR,
+    c(
+      "Austin",
+      "Halifax",
+      "Turner",
+      "Poulin",
+      "All Poulin and Theil",
+      "Poulin and Theil + fu",
+      "All Berezhkovskiy",
+      "Berezhkovskiy + fu",
+      "All PK-Sim Standard",
+      "PK-Sim Standard + fu",
+      "Rodgers & Rowland + fu",
+      "All Schmitt",
+      "Schmitt + fu",
+      "All_literature"
+    )
+  )
 
   #make warning that micro and hep should match
-  if(typeSystem=="hepatocytes"&&exists("cCell_Mml")){
-    } else if (typeSystem=="microsomes"&&exists("cMicro_mgml")) {
-    } else {
-      warning("input Type system not matchin with cCells or CMicro intput")
-    }
-  
-  #get functions to use here
-  devtools::load_all()
-  # source("R/Ionization.R")
-  # source("R/in-vitro-compartment.R")
-  # source("R/Algorithm4Fumic.R")
+  if (typeSystem == "hepatocytes" && !is.null(cCells_Mml)) {} else if (
+    typeSystem == "microsomes" && !is.null(cMicro_mgml)
+  ) {} else {
+    warning("input Type system not matching with cCells or cMicro input")
+  }
+
   # run function to get ionization factors
-  
+
   fionization <- getIonization(ionization, pKa)
   X <- fionization["ion_factor_plasma"] # Interstitial tissue
   Y <- fionization["ion_factor_cells"] # intracellular
 
-  kPro_1<-0.73*10^logLipo-0.39 # from Endo 2012,dx.doi.org/10.1021/es303379y partition to chicken muscle, R2=0.86
-  kPro_2<-0.163+0.0221*10^logLipo  #from Schmitt 2008, doi:10.1016/j.tiv.2007.09.010
-  kPro<-mean(kPro_1,kPro_2)
-  
+  kPro_1 <- 0.73 * 10^logLipo - 0.39 # from Endo 2012,dx.doi.org/10.1021/es303379y partition to chicken muscle, R2=0.86
+  kPro_2 <- 0.163 + 0.0221 * 10^logLipo #from Schmitt 2008, doi:10.1016/j.tiv.2007.09.010
+  kPro <- mean(kPro_1, kPro_2)
+
   # Calculate air-water partition coefficient
   #default to a low hlc if it is not given
-  if(is.null(hlcAt_atmm3mol)){
-    hlcAt_atmm3mol <-0.000001
-  }else{}
+  if (is.null(hlcAt_atmm3mol)) {
+    hlcAt_atmm3mol <- 0.000001
+  } else {}
   # Divide henry law constant in atm/(m3*mol) with the temperature in kelvin and gas constant R (j/k*mol)
   # last factor is to convert form atm to Pa
   kAir <- hlcAt_atmm3mol / (0.08206 * 310) * 101325
- 
 
   # Calculate plastic partitioning
   kPlasticFischer <- 10**(logLipo * 0.47 - 4.64)
@@ -103,16 +111,20 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
 
   # get in vitro compartments----------------------------------------------------
   if (typeSystem == "microsomes") {
-    InVitroCompartment <- getInVitroCompartment("microsomes",
+    InVitroCompartment <- getInVitroCompartment(
+      "microsomes",
       FBS_fraction = FBS_fraction,
       microplateType = microplateType,
-      volMedium_mL = volMedium_mL, cMicro_mgml = cMicro_mgml
+      volMedium_mL = volMedium_mL,
+      cMicro_mgml = cMicro_mgml
     )
   } else if (typeSystem == "hepatocytes") {
-    InVitroCompartment <- getInVitroCompartment("hepatocytes",
+    InVitroCompartment <- getInVitroCompartment(
+      "hepatocytes",
       FBS_fraction = FBS_fraction,
       microplateType = microplateType,
-      volMedium_mL = volMedium_mL, cCells_Mml = cCells_Mml
+      volMedium_mL = volMedium_mL,
+      cCells_Mml = cCells_Mml
     )
   }
 
@@ -128,44 +140,59 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
 
   # QSPRs for calculating partitioning in in vitro------------------------------
 
-  if (partitionQSPR == "All Poulin and Theil" || partitionQSPR == "All Berezhkovskiy") {
+  if (
+    partitionQSPR == "All Poulin and Theil" ||
+      partitionQSPR == "All Berezhkovskiy"
+  ) {
     # Calculate protein partitioning
 
     # Calculate lipid partitioning
     kNL <- 10^logLipo
     kPL <- 0.3 * 10^logLipo + 0.7
 
-    fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cMediumNL) +
-      kPL * (cCellNPL + cMediumNPL) +
-      kPlastic * saPlasticVolMedium))
-    
-  } else if (partitionQSPR == "Poulin and Theil + fu" || partitionQSPR == "Berezhkovskiy + fu") {
+    fuInvitro <- as.double(
+      1 /
+        (1 +
+          kNL * (cCellNL + cMediumNL) +
+          kPL * (cCellNPL + cMediumNPL) +
+          kPlastic * saPlasticVolMedium)
+    )
+  } else if (
+    partitionQSPR == "Poulin and Theil + fu" ||
+      partitionQSPR == "Berezhkovskiy + fu"
+  ) {
     # Calculate lipid partitioning
     kNL <- 10^logLipo
     kNPL <- 0.3 * 10^logLipo + 0.7
 
-    fuInvitro <- 1 / (1 + kNL * cCellNL
-      + kNPL * cCellNPL
-      + kPlastic * saPlasticVolMedium
-      + (1 / fu - 1) * FBS_fraction)
-    
+    fuInvitro <- 1 /
+      (1 +
+        kNL * cCellNL +
+        kNPL * cCellNPL +
+        kPlastic * saPlasticVolMedium +
+        (1 / fu - 1) * FBS_fraction)
   } else if (partitionQSPR == "All PK-Sim Standard") {
     kNL <- 10^logLipo
 
     # assume all neutral lipids have same binding
-    fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cMediumNL + cCellNPL + cMediumNPL)
-      + kPlastic * saPlasticVolMedium
-      + kPro * (cCellPro + cMediumPro)))
-    
+    fuInvitro <- as.double(
+      1 /
+        (1 +
+          kNL * (cCellNL + cMediumNL + cCellNPL + cMediumNPL) +
+          kPlastic * saPlasticVolMedium +
+          kPro * (cCellPro + cMediumPro))
+    )
   } else if (partitionQSPR == "PK-Sim Standard + fu") {
     kNL <- 10^logLipo
 
-
-    fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cCellNPL)
-      + kPlastic * saPlasticVolMedium
-      + kPro * cCellPro
-      + (1 / fu - 1) * FBS_fraction))
-    
+    fuInvitro <- as.double(
+      1 /
+        (1 +
+          kNL * (cCellNL + cCellNPL) +
+          kPlastic * saPlasticVolMedium +
+          kPro * cCellPro +
+          (1 / fu - 1) * FBS_fraction)
+    )
   } else if (partitionQSPR == "Rodgers & Rowland + fu") {
     # RR can only be used by using fu
     # partition into acid phospholipids is only considered if chemical is a strong base
@@ -180,19 +207,24 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     fnpBC <- 0.0059
     APbc <- 0.57 # acidic phospholipids in blood cells
 
-    KAPL_1 <- max(0, kpuBC -
-      (1 + Y) / (1 + X) * fiwBC -
-      (kNL * fnlBC + (0.3 * kNL + 0.7) * fnpBC))
+    KAPL_1 <- max(
+      0,
+      kpuBC -
+        (1 + Y) / (1 + X) * fiwBC -
+        (kNL * fnlBC + (0.3 * kNL + 0.7) * fnpBC)
+    )
 
     kAPL <- KAPL_1 * (1 + Y) / APbc / Y
 
-    fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cMediumNL) +
-      (kNL * 0.3 + 0.7) * (cCellNPL + cMediumNPL) +
-      kAPL * (cCellAPL) * X / (1 + X) +
-      kPlastic * saPlasticVolMedium))
-    
+    fuInvitro <- as.double(
+      1 /
+        (1 +
+          kNL * (cCellNL + cMediumNL) +
+          (kNL * 0.3 + 0.7) * (cCellNPL + cMediumNPL) +
+          kAPL * (cCellAPL) * X / (1 + X) +
+          kPlastic * saPlasticVolMedium)
+    )
   } else if (partitionQSPR == "All Schmitt") {
-     
     LogP <- logLipo
     ionParamSchmitt <- getIonizationSchmitt(ionization, pKa)
     logD_Factor <- ionParamSchmitt["logD_Factor"]
@@ -202,11 +234,14 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     kNPL <- 10**LogP
     kAPL <- kNPL * kAPLpHFactor
 
-    fuInvitro <- as.double(1 / (1 + kNL * (cCellNL + cMediumNL) +
-      kNPL * (cCellNPL + cMediumNPL) +
-      kAPL * (cCellAPL) +
-      kPro * (cCellPro + cMediumPro)))
-    
+    fuInvitro <- as.double(
+      1 /
+        (1 +
+          kNL * (cCellNL + cMediumNL) +
+          kNPL * (cCellNPL + cMediumNPL) +
+          kAPL * (cCellAPL) +
+          kPro * (cCellPro + cMediumPro))
+    )
   } else if (partitionQSPR == "Schmitt + fu") {
     LogP <- logLipo
 
@@ -218,54 +253,131 @@ FractionUnbound <- function(partitionQSPR, logLipo, ionization,
     kNL <- 10**LogD
     kAPL <- kNPL * kAPLpHFactor
 
-    fuInvitro <- as.double(1 / (1 + kNL * cCellNL +
-      kNPL * cCellNPL +
-      kAPL * cCellAPL +
-      kPro * cCellPro +
-      (1 / fu - 1) * FBS_fraction))
-    
-  } else if (partitionQSPR == "Poulin" & typeSystem=="microsomes") {
-   
-    fuInvitro<-Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo)
-    
-  } else if (partitionQSPR == "Austin" && typeSystem=="microsomes") {
-    
-    fuInvitro<-Austin_mic(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
-    
-  } else if (partitionQSPR == "Halifax" && typeSystem=="microsomes") {
-      
-    fuInvitro<-Halifax(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
-      
-  } else if (partitionQSPR == "Turner" && typeSystem=="microsomes") {
-      
-    fuInvitro<-Turner(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)
-      
-  } else if (partitionQSPR == "All_literature" && typeSystem=="microsomes") {   
-    
-    fuInvitro<-mean(c(Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo,cMicro_mgml=Micro_mgml),
-                       Austin(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml),
-                       Halifax(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml),
-                        Turner(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cMicro_mgml=cMicro_mgml)))
-  
-  } else if (partitionQSPR == "Austin" && typeSystem=="hepatocytes") {  
-      
-      fuInvitro<-Austin_hep(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml)
-      
-  } else if (partitionQSPR == "Poulin" && typeSystem=="hepatocytes") {  
-    
-    fuInvitro<-Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo)
- 
-  } else if (partitionQSPR == "Kilford" && typeSystem=="hepatocytes") {  
-    
-    fuInvitro<-Kilford(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml)
- 
-   } else if (partitionQSPR == "All_literature" && typeSystem=="hepatocytes") {  
-    
-    fuInvitro<-mean(c(Kilford(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml),
-                      Poulin(ionization=ionization,pKa=pKa,X=Y,Y=Y,cCellNL=cCellNL,logLipo=logLipo),
-                      Austin_hep(ionization=ionization,pKa=pKa,X=X,logLipo=logLipo,cCells_Mml=cCells_Mml)))
-                      
-    
+    fuInvitro <- as.double(
+      1 /
+        (1 +
+          kNL * cCellNL +
+          kNPL * cCellNPL +
+          kAPL * cCellAPL +
+          kPro * cCellPro +
+          (1 / fu - 1) * FBS_fraction)
+    )
+  } else if (partitionQSPR == "Poulin" & typeSystem == "microsomes") {
+    fuInvitro <- Poulin(
+      ionization = ionization,
+      pKa = pKa,
+      X = Y,
+      Y = Y,
+      cCellNL = cCellNL,
+      logLipo = logLipo
+    )
+  } else if (partitionQSPR == "Austin" && typeSystem == "microsomes") {
+    fuInvitro <- Austin_mic(
+      ionization = ionization,
+      pKa = pKa,
+      X = X,
+      logLipo = logLipo,
+      cMicro_mgml = cMicro_mgml
+    )
+  } else if (partitionQSPR == "Halifax" && typeSystem == "microsomes") {
+    fuInvitro <- Halifax(
+      ionization = ionization,
+      pKa = pKa,
+      X = X,
+      logLipo = logLipo,
+      cMicro_mgml = cMicro_mgml
+    )
+  } else if (partitionQSPR == "Turner" && typeSystem == "microsomes") {
+    fuInvitro <- Turner(
+      ionization = ionization,
+      pKa = pKa,
+      X = X,
+      logLipo = logLipo,
+      cMicro_mgml = cMicro_mgml
+    )
+  } else if (partitionQSPR == "All_literature" && typeSystem == "microsomes") {
+    fuInvitro <- mean(c(
+      Poulin(
+        ionization = ionization,
+        pKa = pKa,
+        X = Y,
+        Y = Y,
+        cCellNL = cCellNL,
+        logLipo = logLipo,
+        cMicro_mgml = Micro_mgml
+      ),
+      Austin(
+        ionization = ionization,
+        pKa = pKa,
+        X = X,
+        logLipo = logLipo,
+        cMicro_mgml = cMicro_mgml
+      ),
+      Halifax(
+        ionization = ionization,
+        pKa = pKa,
+        X = X,
+        logLipo = logLipo,
+        cMicro_mgml = cMicro_mgml
+      ),
+      Turner(
+        ionization = ionization,
+        pKa = pKa,
+        X = X,
+        logLipo = logLipo,
+        cMicro_mgml = cMicro_mgml
+      )
+    ))
+  } else if (partitionQSPR == "Austin" && typeSystem == "hepatocytes") {
+    fuInvitro <- Austin_hep(
+      ionization = ionization,
+      pKa = pKa,
+      X = X,
+      logLipo = logLipo,
+      cCells_Mml = cCells_Mml
+    )
+  } else if (partitionQSPR == "Poulin" && typeSystem == "hepatocytes") {
+    fuInvitro <- Poulin(
+      ionization = ionization,
+      pKa = pKa,
+      X = Y,
+      Y = Y,
+      cCellNL = cCellNL,
+      logLipo = logLipo
+    )
+  } else if (partitionQSPR == "Kilford" && typeSystem == "hepatocytes") {
+    fuInvitro <- Kilford(
+      ionization = ionization,
+      pKa = pKa,
+      X = X,
+      logLipo = logLipo,
+      cCells_Mml = cCells_Mml
+    )
+  } else if (partitionQSPR == "All_literature" && typeSystem == "hepatocytes") {
+    fuInvitro <- mean(c(
+      Kilford(
+        ionization = ionization,
+        pKa = pKa,
+        X = X,
+        logLipo = logLipo,
+        cCells_Mml = cCells_Mml
+      ),
+      Poulin(
+        ionization = ionization,
+        pKa = pKa,
+        X = Y,
+        Y = Y,
+        cCellNL = cCellNL,
+        logLipo = logLipo
+      ),
+      Austin_hep(
+        ionization = ionization,
+        pKa = pKa,
+        X = X,
+        logLipo = logLipo,
+        cCells_Mml = cCells_Mml
+      )
+    ))
   } else {}
 
   # Warning for volatility
@@ -334,7 +446,11 @@ getIonizationSchmitt <- function(ionization, pKa) {
     K5 * alpha^max(ionParam[1] + ionParam[2], -ionParam[1] - ionParam[2]) +
     K6 * alpha^max(ionParam[1] + ionParam[3], -ionParam[1] - ionParam[3]) +
     K7 * alpha^max(ionParam[3] + ionParam[2], -ionParam[3] - ionParam[2]) +
-    K8 * alpha^max(ionParam[1] + ionParam[2] + ionParam[3], -ionParam[1] - ionParam[2] - ionParam[3])
+    K8 *
+      alpha^max(
+        ionParam[1] + ionParam[2] + ionParam[3],
+        -ionParam[1] - ionParam[2] - ionParam[3]
+      )
 
   # check equation 17 and 18 of Schmitt paper
   proportFactorAPL <- 20
@@ -352,6 +468,18 @@ getIonizationSchmitt <- function(ionization, pKa) {
 
 
 volatility <- function(fuInvitro, kAir, volAir_L) {
+  # Check if any parameters are NULL or NA
+  if (
+    is.null(fuInvitro) ||
+      is.null(kAir) ||
+      is.null(volAir_L) ||
+      is.na(fuInvitro) ||
+      is.na(kAir) ||
+      is.na(volAir_L)
+  ) {
+    return()
+  }
+
   fuAir <- fuInvitro * kAir * volAir_L
   # if more than 5 % of the chemicals is predicted to evaporate
   # a warning is given

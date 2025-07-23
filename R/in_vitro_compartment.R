@@ -6,17 +6,25 @@
 #' @param typeSystem if system is hepatocytes or microsomes
 #' @param cCells_Mml cells concentration (in million/ml)
 #' @param cMicro concentration of microsome protein mg/mL
-#' @param FBS fraction of serum concentration, values can only go from 0-1
+#' @param FBS_fraction fraction of serum concentration, values can only go from 0-1
 #' @param microplateWells number of wells in the microplate
 #' @param volMedium volume of medium in the well (in mL)
 #'
 #' @return a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
-#' @export a list of concentration of lipids, volume of headspace and surface area of plastic
+#' @export
 #'
-#' @examples getInVitroCompartment("hepatocytes", FBS_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
-#' @examples getInVitroCompartment("microsomes", FBS_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
+#' @examples 
+#' getInVitroCompartment("hepatocytes", FBS_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
+#' getInVitroCompartment("microsomes", FBS_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
 #'
-getInVitroCompartment <- function(typeSystem, FBS_fraction, microplateType, volMedium_mL, cCells_Mml = NULL, cMicro_mgml = NULL) {
+getInVitroCompartment <- function(
+  typeSystem,
+  FBS_fraction,
+  microplateType,
+  volMedium_mL,
+  cCells_Mml = NULL,
+  cMicro_mgml = NULL
+) {
   # check if the arguments are valid
   rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
 
@@ -52,30 +60,27 @@ getInVitroCompartment <- function(typeSystem, FBS_fraction, microplateType, volM
   # density of lipids assumed 0.9 g/mL and of proteins 1.35 g/mL
 
   if (typeSystem == "hepatocytes") {
-    
     # see report on input parameters for refernces of values
     # these values are going to be lower than Poulin paper indicates
     cellVol_mLM <- 0.00254 # mL per million cells
     cCellAPL_vvmedium <- 0.0088 * cellVol_mLM * cCells_Mml
     cCellNPL_vvmedium <- 0.0331 * cellVol_mLM * cCells_Mml
     cCellPL_vvmedium <- cCellNPL_vvmedium + cCellAPL_vvmedium
-    cCellNL_vvmedium <- 0.0445 * cellVol_mLM  * cCells_Mml # this includes all neutral lipids ( storage and neutral phospholipids)
-    cCellPro_vvcell <- 0.2 
-    cCellPro_vvmedium <- cCellPro_vvcell * cellVol_mLM* cCells_Mml
-    
+    cCellNL_vvmedium <- 0.0445 * cellVol_mLM * cCells_Mml # this includes all neutral lipids ( storage and neutral phospholipids)
+    cCellPro_vvcell <- 0.2
+    cCellPro_vvmedium <- cCellPro_vvcell * cellVol_mLM * cCells_Mml
   } else if (typeSystem == "microsomes") {
     #despite Poulin showing rat and human separatly it does not appear there issignificant differences
     cCellPro_vvmedium <- cMicro_mgml / 1000 / 1.35 # mg to g to ml
-    cCellPL_mgPLmgprot<-0.797
-    cCellPL_vvmedium<- cCellPL_mgPLmgprot * cMicro_mgml / 1000 / 0.9
+    cCellPL_mgPLmgprot <- 0.797
+    cCellPL_vvmedium <- cCellPL_mgPLmgprot * cMicro_mgml / 1000 / 0.9
     cCellNL_mgPLprot <- 0.235
-    cCellNL_vvmedium <- cCellNL_mgPLprot  * cMicro_mgml / 1000 / 0.9 
-    cCellAPL_vPLvNL<-0.18
-    cCellAPL_vvmedium <- cCellAPL_vPLvNL *cCellPL_vvmedium
+    cCellNL_vvmedium <- cCellNL_mgPLprot * cMicro_mgml / 1000 / 0.9
+    cCellAPL_vPLvNL <- 0.18
+    cCellAPL_vvmedium <- cCellAPL_vPLvNL * cCellPL_vvmedium
     cCellNPL_vvmedium <- cCellPL_vvmedium - cCellAPL_vvmedium
     # for microsome system consider assay is performed in glass
-    saPlasticVolMedium_m2L<- 0
-    
+    saPlasticVolMedium_m2L <- 0
   } else {}
 
   cMediumNL_vvmedium <- FBS_fraction * 0.00157
@@ -88,14 +93,14 @@ getInVitroCompartment <- function(typeSystem, FBS_fraction, microplateType, volM
 
   inVitroCompartment <-
     list(
-      cCellNL_vvmedium= cCellNL_vvmedium,
+      cCellNL_vvmedium = cCellNL_vvmedium,
       cCellNPL_vvmedium = cCellNPL_vvmedium,
       cCellAPL_vvmedium = cCellAPL_vvmedium,
       cCellPro_vvmedium = cCellPro_vvmedium,
       cMediumNL_vvmedium = cMediumNL_vvmedium,
       cMediumNPL_vvmedium = cMediumNPL_vvmedium,
       cMediumPro_vvmedium = cMediumPro_vvmedium,
-      saPlasticVolMedium_m2L  = saPlasticVolMedium_m2L ,
+      saPlasticVolMedium_m2L = saPlasticVolMedium_m2L,
       volAir_L = volAir_L
     )
 
