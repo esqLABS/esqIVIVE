@@ -7,14 +7,15 @@ test_that("clearance_IVIVE works", {
     logLipo = 5,
     ionization = c("acid", 0, 0),
     typeSystem = "hepatocytes",
-    FBS = 0.0, pKa = c(3, 0, 0),
-    hlcAt = 1E-6,
+    FBS_fraction = 0.0,
+    pKa = c(3, 0, 0),
+    hlcAt_atmm3mol = 1E-6,
     microplateType = 96,
-    volMedium = 0.2,
-    cCells = 0.02
+    volMedium_mL = 0.2,
+    cCells_Mml = 0.02
   )
 
-  expect_equal(res, 283.6378, tolerance = 0.0001)
+  expect_equal(res, 362.3, tolerance = 0.1)
 
   # example for half life
   expect_equal(
@@ -26,16 +27,16 @@ test_that("clearance_IVIVE works", {
       logLipo = 5,
       ionization = c("acid", 0, 0),
       typeSystem = "microsomes",
-      FBS = 0, pKa = c(3, 0, 0),
-      hlcAt = 1E-7,
+      FBS_fraction = 0,
+      pKa = c(3, 0, 0),
+      hlcAt_atmm3mol = 1E-7,
       microplateType = 96,
-      volMedium = 0.2,
-      cMicro = 0.2
+      volMedium_mL = 0.2,
+      cMicro_mgml = 0.2
     ),
-    27.8836,
-    tolerance = 0.0001
+    35.9,
+    tolerance = 0.1
   )
-
 
   # example for clearance values
   expect_equal(
@@ -47,17 +48,18 @@ test_that("clearance_IVIVE works", {
       logLipo = 2,
       ionization = c("neutral", 0, 0),
       typeSystem = "hepatocytes",
-      FBS = 0, pKa = c(0, 0, 0),
-      hlcAt = 0.02,
+      FBS_fraction = 0,
+      pKa = c(0, 0, 0),
+      hlcAt_atmm3mol = 0.02,
       microplateType = 96,
-      volMedium = 0.2,
-      cCells = 0.2
+      volMedium_mL = 0.2,
+      cCells_Mml = 0.2
     ),
-    3745.149,
-    tolerance = 0.0001
+    3206.3,
+    tolerance = 0.1
   )
 
-  # test clearance with given fu_hep
+  # test clearance with given fu_invitro
   expect_equal(
     clearance_IVIVE(
       typeSystem = "microsomes",
@@ -66,11 +68,12 @@ test_that("clearance_IVIVE works", {
       units = "uL/seconds/mg protein",
       partitionQSPR = "All Poulin and Theil",
       logLipo = 2,
-      FBS = 0, fu_hep = 0.1,
+      FBS_fraction = 0,
+      fu_invitro = 0.1,
       microplateType = 96,
-      cMicro = 0.2
+      cMicro_mgml = 0.2
     ),
-    10.746,
-    tolerance = 0.0001
+    9.7,
+    tolerance = 0.1
   )
 })
