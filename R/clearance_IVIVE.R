@@ -13,18 +13,18 @@
 #' @param species values can human and rat for now, defaulting to human
 #' @param volMedium volume of medium in the well (in mL)
 #' @param REF relative expression or activity factor
-#' @param cMicro_mgml concentration of microsome protein mg/mL
-#' @param cCells_Mml concentration of hepatocytes used million cells/mL
-#' @param partitionQSPR type of assumption used for calculating fu_invitro (optional)
-#' @param logLipo LogP or LogMA of the compound (optional)
+#' @param cMicro_mgml concentration of microsome protein (in mg/mL)
+#' @param cCells_Mml concentration of hepatocytes used (in million cells/mL)
+#' @param partition_qspr type of assumption used for calculating fu_invitro (optional)
+#' @param log_lipophilicity LogP or LogMA of the compound (optional)
 #' @param ionization vector of length 2 with ionization class, acid, neutral and base (optional)
-#' @param FBS_fraction fraction of serum concentration, values can only go from 0-1 (optional)
-#' @param microplateType number of wells in the microplate (optional)
-#' @param volMedium_mL volume of medium in the well (in mL) (optional)
-#' @param pKa vector of length 2 with pKa values of the compound (optional)
-#' @param hlcAt_atmm3mol Henry's Law Constant in atm/(m3*mol) (optional)
-#' @param fu In Vivo Fraction Unbound in plasma from literature (optional)
-#' @param BP Blood plasma ratio (optional)
+#' @param fetal_bovine_serum_fraction fraction of serum concentration, values can only go from 0-1 (optional)
+#' @param microplate_type number of wells in the microplate (optional)
+#' @param volume_medium volume of medium in the well (in mL) (optional)
+#' @param pka vector of length 2 with pKa values of the compound (optional)
+#' @param henry_law_constant Henry's Law Constant (in atm/(m3*mol)) (optional)
+#' @param fraction_unbound In Vivo Fraction Unbound in plasma from literature (optional)
+#' @param blood_plasma_ratio Blood plasma ratio (optional)
 #'
 #' @return Specific clearance parameter to plug in PK-Sim
 #' @export
@@ -39,11 +39,11 @@
 #' expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #'
 #' # example microsomes
-#' clearance_IVIVE(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
+#' predict_clearance_ivive(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
 #'                 expData=18.27,fu_invitro=0.5,cMicro_mgml=0.5,volMedium=0.5,empirical_scalar="No")
 #'
 
-clearance_IVIVE <- function(
+predict_clearance_ivive <- function(
   typeValue,
   units,
   expData,
@@ -57,16 +57,16 @@ clearance_IVIVE <- function(
   cMicro_mgml = NULL,
   cCells_Mml = NULL,
   # Additional parameters for calculating fu_invitro
-  partitionQSPR = NULL,
-  logLipo = NULL,
+  partition_qspr = NULL,
+  log_lipophilicity = NULL,
   ionization = NULL,
-  FBS_fraction = NULL,
-  microplateType = NULL,
-  volMedium_mL = NULL,
-  pKa = NULL,
-  hlcAt_atmm3mol = NULL,
-  fu = NULL,
-  BP = NULL
+  fetal_bovine_serum_fraction = NULL,
+  microplate_type = NULL,
+  volume_medium = NULL,
+  pka = NULL,
+  henry_law_constant = NULL,
+  fraction_unbound = NULL,
+  blood_plasma_ratio = NULL
 ) {
   # check if the arguments are valid
   rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
@@ -77,32 +77,32 @@ clearance_IVIVE <- function(
   )
 
   # Calculate fu_invitro if parameters are provided
-  if (is.null(fu_invitro) && !is.null(partitionQSPR)) {
-    # Set default values for ionization and pKa if not provided
+  if (is.null(fu_invitro) && !is.null(partition_qspr)) {
+    # Set default values for ionization and pka if not provided
     if (is.null(ionization)) {
       ionization <- c("neutral", 0)
     }
-    if (is.null(pKa)) {
-      pKa <- c(0, 0)
+    if (is.null(pka)) {
+      pka <- c(0, 0)
     }
-    if (is.null(hlcAt_atmm3mol)) {
-      hlcAt_atmm3mol <- 0.000001
+    if (is.null(henry_law_constant)) {
+      henry_law_constant <- 0.000001
     }
 
-    fu_invitro <- FractionUnbound(
-      partitionQSPR = partitionQSPR,
-      logLipo = logLipo,
+    fu_invitro <- calculate_fu_in_vitro(
+      partition_qspr = partition_qspr,
+      log_lipophilicity = log_lipophilicity,
       ionization = ionization,
-      typeSystem = typeSystem,
-      FBS_fraction = FBS_fraction,
-      microplateType = microplateType,
-      volMedium_mL = volMedium_mL,
-      pKa = pKa,
-      hlcAt_atmm3mol = hlcAt_atmm3mol,
-      fu = fu,
-      BP = BP,
-      cMicro_mgml = cMicro_mgml,
-      cCells_Mml = cCells_Mml
+      type_system = typeSystem,
+      fetal_bovine_serum_fraction = fetal_bovine_serum_fraction,
+      microplate_type = microplate_type,
+      volume_medium = volume_medium,
+      pka = pka,
+      henry_law_constant = henry_law_constant,
+      fraction_unbound = fraction_unbound,
+      blood_plasma_ratio = blood_plasma_ratio,
+      concentration_microsomes = cMicro_mgml,
+      concentration_cells = cCells_Mml
     )
   }
 
@@ -177,7 +177,7 @@ clearance_IVIVE <- function(
 
   #Derive the in vitro clearance value---------------------
   if (typeValue == "decay experimentalcurve") {
-    kcat_min <- determineClearance(expData)[1]
+    kcat_min <- fit_clearance_from_curve(expData)[1]
     ClspePermin <- kcat_min / cInvitro * SF
   } else if (typeValue == "halfLife") {
     halfLife <- expData
@@ -350,7 +350,7 @@ clearance_IVIVE <- function(
 }
 
 #function to determine clearance from experimental curve
-determineClearance <- function(expData) {
+fit_clearance_from_curve <- function(expData) {
   library(ggplot2)
 
   #Load the depletion curve
@@ -361,16 +361,16 @@ determineClearance <- function(expData) {
   y0 = mean(clear_curve_xy$y[clear_curve_xy$x == 0])
 
   #create clearance model
-  Kcat_function <- function(y0, x, Kcat) {
-    y = y0 * exp(-Kcat * x)
+  Kcat_function <- function(initial_concentration, time, clearance_rate_constant) {
+    y = initial_concentration * exp(-clearance_rate_constant * time)
     return(y)
   }
 
   #fit model
   fitKcat <- nls(
-    y ~ Kcat_function(y0, x, Kcat),
+    y ~ Kcat_function(initial_concentration, x, clearance_rate_constant),
     data = clear_curve_xy,
-    start = list(Kcat = 0.01),
+    start = list(clearance_rate_constant = 0.01),
     trace = TRUE
   )
 
@@ -380,7 +380,7 @@ determineClearance <- function(expData) {
     geom_point() +
     labs(title = "fit curve") +
     stat_function(
-      fun = function(x) Kcat_function(x, y0 = y0, Kcat = coefficients(fitKcat)),
+      fun = function(x) Kcat_function(x, initial_concentration = y0, clearance_rate_constant = coefficients(fitKcat)),
       colour = "blue"
     )
 
@@ -389,7 +389,7 @@ determineClearance <- function(expData) {
   #Make table with fit Kcat
   fit_95conf = confint(fitKcat)
   kcat = as.double(data.frame(
-    "Kcat_permin" = coefficients(fitKcat)["Kcat"],
+    "Kcat_permin" = coefficients(fitKcat)["clearance_rate_constant"],
     fit_95conf[1],
     fit_95conf[2]
   ))

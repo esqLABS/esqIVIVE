@@ -2,26 +2,31 @@
 % Please edit documentation in R/algorithm_fu_invitro.R
 \name{Turner}
 \alias{Turner}
+\alias{calculate_fu_turner}
 \title{Turner algorithm for Fu calculation}
 \usage{
-Turner(ionization, pKa, X, logLipo, cMicro_mgml)
+calculate_fu_turner(
+  ionization,
+  pka,
+  ion_factor,
+  log_lipophilicity,
+  concentration_microsomes
+)
 }
 \arguments{
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
-\item{pKa}{vector of length of 2 with pkA of the compound}
+\item{pka}{vector of length of 2 with pkA of the compound}
 
-\item{X}{ionization factor}
+\item{ion_factor}{ionization factor}
 
-\item{logLipo}{LogP or LogMA of the compound}
+\item{log_lipophilicity}{LogP or LogMA of the compound}
 
-\item{cMicro_mgml}{concentration of microsomes mg/mL}
+\item{concentration_microsomes}{concentration of microsomes (in mg/mL)}
 
-\item{BP}{Blood plasma ratio, this parameter is needed for Rodgers and Rowland and Poulin method for basic chemicals}
+\item{blood_plasma_ratio}{Blood plasma ratio, this parameter is needed for Rodgers and Rowland and Poulin method for basic chemicals}
 
-\item{fu}{In Vivo Fraction Unbound in plasma from literature}
-
-\item{cMicro}{concentration of microsomes mg/mL}
+\item{fraction_unbound}{In Vivo Fraction Unbound in plasma from literature}
 }
 \value{
 fuInvitro
@@ -41,7 +46,7 @@ Turner("acid",3,100,3,1)
 Halifax("base",3,100,3,1)
 Halifax(c("base",0),c(3,0),100,3,1)
 Austin("base",3,100,3,1)
-Poulin("base",pKa=3,X=100,Y=120,BP=1,fu=0.2,cCellNL=0.03,logLipo=3,cMicro_mgml=1)
-Poulin("acid",pKa=3,X=100,cCellNL=0.03,logLipo=3,cMicro_mgml=1)
+Poulin("base",pka=3,X=100,Y=120,blood_plasma_ratio=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3,concentration_microsomes=1)
+Poulin("acid",pka=3,X=100,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3,concentration_microsomes=1)
 
 }

@@ -16,15 +16,15 @@ IVIVE_MM <- function(
   units,
   typeSystem,
   fu_invitro,
-  Vmax = NULL,
-  Km_uM = NULL,
+  vmax = NULL,
+  km_micromolar = NULL,
   expData = NULL,
   tissue = NULL,
   species = NULL,
-  volMedium = NULL,
+  volume_medium = NULL,
   REF = NULL,
-  cMicro_mgml = NULL,
-  cCells_Mml = NULL
+  concentration_microsomes = NULL,
+  concentration_cells = NULL
 ) {
   # check if the arguments are valid
   rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
@@ -42,8 +42,8 @@ IVIVE_MM <- function(
   } else {}
 
   #make it accordingly to microplate
-  if (is.null(volMedium)) {
-    volMedium <- 1
+  if (is.null(volume_medium)) {
+    volume_medium <- 1
   } else {}
 
   if (is.null(tissue)) {
@@ -52,11 +52,11 @@ IVIVE_MM <- function(
 
   if ("typeValue" == exp_curve) {
     MM <- get_MM("mm_exp_curve_xy" = mm_exp_curve)
-    Km_uM <- MM[1, 1]
-    Vmax <- MM[2, 1]
+    km_micromolar <- MM[1, 1]
+    vmax <- MM[2, 1]
   } else {
-    Km_uM <- Km_uM
-    Vmax <- Vmax
+    km_micromolar <- km_micromolar
+    vmax <- vmax
   }
 
   #Calculate fraction unbound ---------------------------------------------------
@@ -86,15 +86,18 @@ IVIVE_MM <- function(
 #Calculate in vitro intrinsic clearance values---------------------------------
 
 #function to get MM form raw data
-get_MM <- function(mm_exp_curve_xy) {
+get_MM <- function(experimental_curve_data) {
   library(ggplot2)
-  colnames(mm_exp_curve_xy) = c("x", "y")
+  colnames(experimental_curve_data) = c("x", "y")
 
   #fit model
   fitmm <- nls(
     y ~ Vmax * x / (Km + x),
-    data = mm_exp_curve_xy,
-    start = list(Vmax = max(mm_exp_curve_xy$y), Km = mean(mm_exp_curve_xy$x)),
+    data = experimental_curve_data,
+    start = list(
+      Vmax = max(experimental_curve_data$y),
+      Km = mean(experimental_curve_data$x)
+    ),
     trace = TRUE
   )
   fit_95conf = confint(fitmm)

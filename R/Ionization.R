@@ -1,4 +1,4 @@
-#' getIonization
+#' calculate_ionization_factors
 #'
 #' @description
 #' Function to calculate fraction unionized
@@ -8,17 +8,17 @@
 #' If you have pKb, just calculate pKa=14-pKb
 #'
 #' @param ionization vector of length 2 with ionization class, acid, neutral and base
-#' @param pKa vector of length 2 with pKa values of the compound
+#' @param pka vector of length 2 with pKa values of the compound
 #'
 #' @return factors that can be used to calculate the fraction neutral or ionized in plasma and intracellularly
 #' @export
 #'
-#' @examples 
-#' getIonization(ionization=c("neutral",0),pKa<-c(0,0))
-#' getIonization(ionization=c("acid",0),pKa<-c(14,0))
-#' getIonization(ionization=c("base","acid"),pKa<-c(5,7))
+#' @examples
+#' calculate_ionization_factors(ionization=c("neutral",0),pka<-c(0,0))
+#' calculate_ionization_factors(ionization=c("acid",0),pka<-c(14,0))
+#' calculate_ionization_factors(ionization=c("base","acid"),pka<-c(5,7))
 
-getIonization <- function(ionization, pKa) {
+calculate_ionization_factors <- function(ionization, pka) {
   # confirm##################
   pH <- 7.4
   pH_cell <- 7.22
@@ -38,21 +38,21 @@ getIonization <- function(ionization, pKa) {
   if (identical(ionParam, c(-1, 0))) {
     # Monoprotic base
 
-    X <- 10^(pKa[1] - pH)
-    Y <- 10^(pKa[1] - pH_cell)
+    X <- 10^(pka[1] - pH)
+    Y <- 10^(pka[1] - pH_cell)
   } else if (identical(ionParam, c(-1, 1)) | identical(ionParam, c(1, -1))) {
     # monoproticBaseMonoproticAcid
 
-    X <- 10^(pKa[which(ionParam %in% -1)] - pH) +
-      10^(pH - pKa[which(ionParam %in% 1)])
+    X <- 10^(pka[which(ionParam %in% -1)] - pH) +
+      10^(pH - pka[which(ionParam %in% 1)])
 
-    Y <- 10^(pKa[which(ionParam %in% -1)] - pH_cell) +
-      10^(pH_cell - pKa[which(ionParam %in% 1)])
+    Y <- 10^(pka[which(ionParam %in% -1)] - pH_cell) +
+      10^(pH_cell - pka[which(ionParam %in% 1)])
   } else if (identical(ionParam, c(1, 0))) {
     # monoprotic acid
 
-    X <- 10^(pH - pKa[1])
-    Y <- 10^(pH_cell - pKa[1])
+    X <- 10^(pH - pka[1])
+    Y <- 10^(pH_cell - pka[1])
   } else {
     X <- 0
     Y <- 0

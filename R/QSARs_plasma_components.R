@@ -6,7 +6,7 @@
 #'
 #' @param QSAR type of QSAR, it can be logP based or PPLFER based (still sorting the ionization)
 #' @param logP is the lipophilicity as given by logKow
-#' @param pKa is a vector of length of 2
+#' @param pka is a vector of length of 2
 #' @param ionization is a vector of length of 2 which should indicate if chemical is neutral, acid basic.
 #' There are spots for ionization in case chemical is zwitterion
 #' @param LFER_E LFER E parameter
@@ -15,7 +15,7 @@
 #' @param LFER_S LFER S parameter
 #' @param LFER_V abraham volume
 #'
-#' @return kmemlip_LL, kalb_Lkg and kglob_Lkg
+#' @return partition_membrane_lipids (in L/L), partition_albumin (in L/kg) and partition_globulin (in L/kg)
 #' @details
 #'
 #' For neutral chemicals with logP >4 use the logP QSAR
@@ -27,12 +27,12 @@
 #'
 #' @examples
 #'
-#' QSARs_plasma(QSAR="logP", logP=2, pKa=c(3,0), ionization=c("acid",0))
+#' predict_plasma_affinities(QSAR="logP", logP=2, pka=c(3,0), ionization=c("acid",0))
 #'
-#' QSARs_plasma(QSAR="PPLFER", logP=2, pKa=c(3,0), ionization=c("acid",0), LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
+#' predict_plasma_affinities(QSAR="PPLFER", logP=2, pka=c(3,0), ionization=c("acid",0), LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
 #' @export
 
-QSARs_plasma <- function(
+predict_plasma_affinities <- function(
   QSAR,
   logP,
   pKa,
@@ -43,7 +43,7 @@ QSARs_plasma <- function(
   LFER_S = NULL,
   LFER_V = NULL
 ) {
-  fneutral = getIonization(ionization, pKa)
+  fneutral = calculate_ionization_factors(ionization, pKa)
 
   X = fneutral["ion_factor_plasma"] #Interstitial tissue
 
@@ -111,8 +111,8 @@ QSARs_plasma <- function(
     kglob_Lkg = kmus_Lkg
   }
   return(c(
-    "kmemlip_LL" = kmemlip_LL,
-    "kalb_Lkg" = kalb_Lkg,
-    "kglob_Lkg" = kglob_Lkg
+    "partition_membrane_lipids" = kmemlip_LL,
+    "partition_albumin" = kalb_Lkg,
+    "partition_globulin" = kglob_Lkg
   ))
 }
