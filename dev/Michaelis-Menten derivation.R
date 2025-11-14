@@ -4,10 +4,12 @@
 
 #libraries
 #Load in vitro data
-mm_exp_curve = read.csv(
-  "tests/Example_michaelis_menten_curve.csv",
-  header = TRUE
-)
+data_path<-system.file("data","test_michaelis_menten_curve.csv",package="esqIVIVE")
+mm_exp_curve<-read.csv(data_path,header=TRUE)
+
+#example 
+IVIVE_MM()
+
 
 
 #Describe in vitro experiment---------------------------------------------------
