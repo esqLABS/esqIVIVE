@@ -1,10 +1,11 @@
-#' calculate_in_vitro_compartments
+#' in_vitro_compartments
 #'
 #' @description
-#' Generates a list of values describing an in vitro compartment
+#' Generates a list of values describing a liver in vitro compartment based on hepatocytes or microsomes
 #' This function is used inside the Fraction unbound function
+#' 
 #' @param typeSystem if system is hepatocytes or microsomes
-#' @param fetal_bovine_serum_fraction fraction of serum concentration, values can only go from 0-1
+#' @param FBS_fraction fraction of serum concentration, values can only go from 0-1
 #' @param microplateType number of wells in the microplate
 #' @param volMedium_mL volume of medium in the well (in mL)
 #' @param cCells_Mml cells concentration (in million cells/mL)
@@ -14,12 +15,12 @@
 #' @export
 #'
 #' @examples
-#' calculate_in_vitro_compartments("hepatocytes", fetal_bovine_serum_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
-#' calculate_in_vitro_compartments("microsomes", fetal_bovine_serum_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
+#' in_vitro_compartments("hepatocytes", fetal_bovine_serum_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
+#' in_vitro_compartments("microsomes", fetal_bovine_serum_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
 #'
-calculate_in_vitro_compartments <- function(
+in_vitro_compartments <- function(
   typeSystem,
-  fetal_bovine_serum_fraction,
+  FBS_fraction,
   microplateType,
   volMedium_mL,
   cCells_Mml = NULL,
@@ -70,7 +71,7 @@ calculate_in_vitro_compartments <- function(
     cCellPro_vvcell <- 0.2
     cCellPro_vvmedium <- cCellPro_vvcell * cellVol_mLM * cCells_Mml
   } else if (typeSystem == "microsomes") {
-    #despite Poulin showing rat and human separatly it does not appear there issignificant differences
+    #despite Poulin showing rat and human separatly it does not appear there is significant differences
     cCellPro_vvmedium <- cMicro_mgml / 1000 / 1.35 # mg to g to ml
     cCellPL_mgPLmgprot <- 0.797
     cCellPL_vvmedium <- cCellPL_mgPLmgprot * cMicro_mgml / 1000 / 0.9
@@ -83,8 +84,8 @@ calculate_in_vitro_compartments <- function(
     saPlasticVolMedium_m2L <- 0
   } else {}
 
-  cMediumNL_vvmedium <- fetal_bovine_serum_fraction * 0.00157
-  cMediumNPL_vvmedium <- fetal_bovine_serum_fraction * 0.0003
+  cMediumNL_vvmedium <- FBS_fraction * 0.00157
+  cMediumNPL_vvmedium <- FBS_fraction * 0.0003
   # the value multiplying with the cSerum is from FFischer 2017 average FBS lipid composition
 
   # calculate the concentration of protein in the system

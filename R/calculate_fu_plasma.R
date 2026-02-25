@@ -7,14 +7,15 @@
 #' @export
 #' @examples
 #' correct_fu_pearce(fraction_unbound=0.2, log_lipophilicity=4)
-correct_fu_pearce <- function(fraction_unbound, log_lipophilicity) {
+#' 
+  correct_fu_pearce <- function(fraction_unbound, log_lipophilicity) {
   fNL_plasma <- 7E-3 #fraction neutral lipids in plasma
   fu_corrected <- 1 /
     ((10^log_lipophilicity) * fNL_plasma + 1 / fraction_unbound)
   return("Fu_plasma" = fu_corrected)
 }
 
-#' @name calculate_fu_from_partition_coefficients
+#' @name calculate_fu_from_Ks
 #' @title Calculate Fu in plasma based on affinity to different components
 #' @description Calculate the Fu in plasma based on the affinity to the different components: albumin,
 #' globulin and membrane lipids such as the ones in lipoproteins
@@ -26,12 +27,13 @@ correct_fu_pearce <- function(fraction_unbound, log_lipophilicity) {
 #' @return Fu_plasma value
 #' @export
 #' @examples
-#' calculate_fu_from_partition_coefficients("partition_albumin"=10^4.48,
+#' calculate_fu_from_Ks("partition_albumin"=10^4.48,
 #'                "partition_globulin"=10^2.16,
 #'                "partition_membrane_lipids"=10^3.51,
 #'                "partition_lipids"=100,
 #'                "species"="human")
-calculate_fu_from_partition_coefficients <- function(
+#'                
+  calculate_fu_from_Ks <- function(
   partition_albumin,
   partition_globulin,
   partition_membrane_lipids,

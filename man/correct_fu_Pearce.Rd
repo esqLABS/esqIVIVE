@@ -19,4 +19,5 @@ Corrects the Fu based on Pearce correction factor for neutral lipids in plasma
 }
 \examples{
 correct_fu_pearce(fraction_unbound=0.2, log_lipophilicity=4)
+
 }

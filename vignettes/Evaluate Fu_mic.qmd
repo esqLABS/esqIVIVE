@@ -22,7 +22,7 @@ $$
 #### Halifax and Houston 2006
 
 $$ 
-fu_{inc} = \frac{1}{1+ C \cdot 10^{0.072\cdot \log P ^2 +0.067\cdot\log P-1.126}}
+fu_{inc} = \frac{1}{1+ C \cdot 10^{0.072\cdot \log \left( \frac{P}{D} \right)^2 +0.067\cdot\log \left( \frac{P}{D} \right)-1.126}}
 $$
 
 #### Turner
@@ -35,7 +35,7 @@ $$
 fu_{inc} = \frac{1}{1+ C \cdot 10^{0.58\cdot \log P-2.02}}
 $$ For predominantly ionized acid $$ 
 fu_{inc} = \frac{1}{1+ C \cdot 10^{0.2\cdot \log P-1.54}}
-$$ Poulin
+$$ **Poulin**
 
 $$ 
 fu_{inc} = \frac{1}{Fw+\frac{Pnla\cdot Fnlm}{1+Im}}

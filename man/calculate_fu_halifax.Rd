@@ -4,20 +4,12 @@
 \alias{calculate_fu_halifax}
 \title{Halifax algorithm for Fu calculation}
 \usage{
-calculate_fu_halifax(
-  ionization,
-  pka,
-  ion_factor,
-  log_lipophilicity,
-  concentration_microsomes
-)
+calculate_fu_halifax(ionization, pKa, log_lipophilicity, conc_mic_mgml)
 }
 \arguments{
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
-\item{pKa}{vector of length of 2 with pkA of the compound}
-
-\item{X}{ionization factor}
+\item{pKa}{vector of length of 2 with pKa of the compound}
 
 \item{logLipo}{LogP or LogMA of the compound}
 
@@ -30,6 +22,6 @@ fuInvitro
 The Halifax algorithm for calculating Fu in vitro
 }
 \examples{
-calculate_fu_halifax("base",3,100,3,1)
-calculate_fu_halifax(c("base",0),c(3,0),100,3,1)
+calculate_fu_halifax(c("base",0),c(3,0),3,1)
+
 }

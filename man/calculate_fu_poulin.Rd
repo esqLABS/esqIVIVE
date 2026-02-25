@@ -6,11 +6,9 @@
 \usage{
 calculate_fu_poulin(
   ionization,
-  pka,
-  ion_factor_plasma,
-  ion_factor_cells,
-  blood_plasma_ratio,
-  fraction_unbound,
+  pKa,
+  blood_plasma = NULL,
+  fraction_unbound = NULL,
   concentration_cell_neutral_lipids,
   log_lipophilicity
 )
@@ -18,19 +16,19 @@ calculate_fu_poulin(
 \arguments{
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
-\item{pka}{vector of length of 2 with pkA of the compound}
+\item{pKa}{vector of length of 2 with pKa of the compound}
 
-\item{ion_factor_plasma}{ionization factor}
-
-\item{ion_factor_cells}{intracellular ionization factor}
-
-\item{blood_plasma_ratio}{blood plasma ratio}
+\item{blood_plasma}{blood plasma ratio}
 
 \item{fraction_unbound}{fraction unbound in plasma}
 
 \item{concentration_cell_neutral_lipids}{neutral lipid concentration}
 
 \item{log_lipophilicity}{LogP or LogMA of the compound}
+
+\item{ion_factor_plasma}{ionization factor}
+
+\item{ion_factor_cells}{intracellular ionization factor}
 }
 \value{
 fuInvitro
@@ -39,6 +37,6 @@ fuInvitro
 The Poulin algorithm for calculating Fu in vitro
 }
 \examples{
-calculate_fu_poulin("base",pka=3,ion_factor_plasma=100,ion_factor_cells=120,blood_plasma_ratio=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
-calculate_fu_poulin("acid",pka=3,ion_factor_plasma=100,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
+calculate_fu_poulin(ionization=c("base",0),pKa=c(6,0),blood_plasma=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
+calculate_fu_poulin(ionization=c("neutral",0),pKa=c(0,0),concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
 }

@@ -6,22 +6,19 @@
 \usage{
 calculate_fu_austin_microsomes(
   ionization,
-  pka,
-  ion_factor,
+  pKa,
   log_lipophilicity,
-  concentration_microsomes
+  conc_mic_mgml
 )
 }
 \arguments{
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
-\item{pka}{vector of length of 2 with pkA of the compound}
-
-\item{ion_factor}{ionization factor}
+\item{pKa}{vector of length of 2 with pKa of the compound}
 
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
-\item{concentration_microsomes}{concentration of microsomes (in mg/mL)}
+\item{conc_mic_mgml}{concentration of microsomes (in mg/mL)}
 }
 \value{
 fuInvitro
@@ -30,5 +27,6 @@ fuInvitro
 The Austin algorithm for calculating Fu in vitro for microsomes
 }
 \examples{
-calculate_fu_austin_microsomes("base",3,100,3,1)
+calculate_fu_austin_microsomes(c("base",0),c(8,0),3,1)
+
 }

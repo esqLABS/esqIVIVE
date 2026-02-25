@@ -1,4 +1,6 @@
-#' QSARs for plasma components
+#' Predict affinity constant to plasma components based on QSARs
+#' 
+#' @name predict_plasma_affinities
 #'
 #' @description
 #' Collection of QSAR to obtain affinity to the different components in serum, membrane lipids (memlip)
@@ -21,15 +23,16 @@
 #' For neutral chemicals with logP >4 use the logP QSAR
 #' For acidic phenols, carboxylic acids, pyridine and amines you can use the PPLFER.
 #' fup calculator (https://drumap.nibiohn.go.jp/fup/).
-#' To DO:
+#' To Do:
 #' PP-LFER QSARs.-need to check how ionization is considered
 #' make documentation
 #'
 #' @examples
 #'
-#' predict_plasma_affinities(QSAR="logP", logP=2, pka=c(3,0), ionization=c("acid",0))
+#' predict_plasma_affinities(QSAR="logP", logP=2, pKa=c(3,0), ionization=c("acid",0))
 #'
-#' predict_plasma_affinities(QSAR="PPLFER", logP=2, pka=c(3,0), ionization=c("acid",0), LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
+#' predict_plasma_affinities(QSAR="PPLFER", logP=2, pKa=c(3,0), ionization=c("acid",0), LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
+#' 
 #' @export
 
 predict_plasma_affinities <- function(
@@ -43,7 +46,7 @@ predict_plasma_affinities <- function(
   LFER_S = NULL,
   LFER_V = NULL
 ) {
-  fneutral = calculate_ionization_factors(ionization, pKa)
+  fneutral = ion_factors(ionization, pKa)
 
   X = fneutral["ion_factor_plasma"] #Interstitial tissue
 
@@ -68,6 +71,7 @@ predict_plasma_affinities <- function(
     kglob_Lkg_2 <- 10^(0.37 * logD - 0.29) #based on the eq used in the VCBA
 
     kglob_Lkg <- mean(kglob_Lkg_1, kglob_Lkg_2)
+    
   } else if (QSAR == "PPLFER") {
     #Add LFER_a
 

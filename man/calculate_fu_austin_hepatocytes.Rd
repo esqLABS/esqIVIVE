@@ -6,22 +6,21 @@
 \usage{
 calculate_fu_austin_hepatocytes(
   ionization,
-  pka,
-  ion_factor,
+  pKa,
   log_lipophilicity,
-  concentration_cells
+  conc_cell_millionml
 )
 }
 \arguments{
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
-\item{pka}{vector of length of 2 with pkA of the compound}
-
-\item{ion_factor}{ionization factor}
+\item{pKa}{vector of length of 2 with pKa of the compound}
 
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
-\item{concentration_cells}{concentration of hepatocytes (in million cells/mL)}
+\item{conc_cell_millionml}{concentration of hepatocytes (in million cells/mL)}
+
+\item{ion_factor}{ionization factor}
 }
 \value{
 fuInvitro
