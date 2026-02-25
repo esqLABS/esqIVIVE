@@ -140,6 +140,7 @@ calculate_fu_in_vitro <- function(
 
   cCellNL <- as.double(in_vitro_compartment["cCellNL_vvmedium"])
   cCellNPL <- as.double(in_vitro_compartment["cCellNPL_vvmedium"])
+  concentration_cell_neutral_lipids<-cCellNL+ cCellNPL
   cCellAPL <- as.double(in_vitro_compartment["cCellAPL_vvmedium"])
   cCellPro <- as.double(in_vitro_compartment["cCellPro_vvmedium"])
   cMediumNL <- as.double(in_vitro_compartment["cMediumNL_vvmedium"])
