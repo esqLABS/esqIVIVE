@@ -1,4 +1,4 @@
-#' calculate_ionization_factors
+#' ion_factors
 #'
 #' @description
 #' Function to calculate fraction unionized
@@ -14,11 +14,11 @@
 #' @export
 #'
 #' @examples
-#' calculate_ionization_factors(ionization=c("neutral",0),pka<-c(0,0))
-#' calculate_ionization_factors(ionization=c("acid",0),pka<-c(14,0))
-#' calculate_ionization_factors(ionization=c("base","acid"),pka<-c(5,7))
+#' ion_factors(ionization=c("neutral",0),pka<-c(0,0))
+#' ion_factors(ionization=c("acid",0),pka<-c(14,0))
+#' ion_factors(ionization=c("base","acid"),pka<-c(5,7))
 
-calculate_ionization_factors <- function(ionization, pka) {
+ion_factors <- function(ionization, pka) {
   # confirm##################
   pH <- 7.4
   pH_cell <- 7.22
