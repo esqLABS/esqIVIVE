@@ -10,7 +10,7 @@ pint_peff_empir(Peff_cms)
 \item{Peff_cms}{Peff as obtained in vivo or QSARs in cms}
 }
 \value{
-pint in units cms
+pint in units cm/s
 }
 \description{
 Function to convert from Papp to Pint transcellular permeability from a empirical regression

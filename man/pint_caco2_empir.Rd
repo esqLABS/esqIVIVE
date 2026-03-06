@@ -10,7 +10,7 @@ pint_caco2_empir(Papp_cms)
 \item{Papp_cms}{, permeability from Caco-2 in cms}
 }
 \value{
-pint in units cms
+pint in units cm/s
 }
 \description{
 Function to convert from Papp to Pint transcellular permeability from a empirical regression
