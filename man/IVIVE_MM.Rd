@@ -35,10 +35,9 @@ of the enzyme of interest in pksim needs to be 1 uM}
 Vmax in umol/min/L and Km_unb in uM
 }
 \description{
-Title
+function that scales Vmax and correct km for fraction unbound
 }
 \examples{
-
 IVIVE_MM (typeSystem="hepatocytes",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
 IVIVE_MM (typeSystem="microsomes",fu_invitro=0.2,vmax=2,km_micromolar=1)
 }

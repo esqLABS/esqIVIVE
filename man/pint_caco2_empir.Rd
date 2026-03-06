@@ -16,6 +16,6 @@ pint in units cm/s
 Function to convert from Papp to Pint transcellular permeability from a empirical regression
 }
 \examples{
-pint_peff_empir(Pint_cms=2.3E-6)
+pint_caco2_empir(Papp_cms=2.3E-6)
  
 }
