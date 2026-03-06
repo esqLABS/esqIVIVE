@@ -1,4 +1,4 @@
-#' @name calculate_fu_turner 
+#' @name calculate_fu_mic_turner 
 #' @title Turner algorithm for Fu calculation
 #' @description The Turner algorithm for calculating Fu in vitro
 #' 
@@ -9,11 +9,11 @@
 #'
 #' @return fuInvitro
 #' @examples
-#' calculate_fu_turner("acid",3,3,1)
+#' calculate_fu_mic_turner("acid",3,3,1)
 #' 
 #' @export
 
-calculate_fu_turner <- function(
+calculate_fu_mic_turner <- function(
   ionization,
   pKa,
   log_lipophilicity,
@@ -35,7 +35,7 @@ calculate_fu_turner <- function(
   return(fu_invitro)
 }
 
-#' @name calculate_fu_halifax
+#' @name calculate_fu_mic_halifax
 #' @title Halifax algorithm for Fu calculation
 #' @description The Halifax algorithm for calculating Fu in vitro
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
@@ -45,9 +45,9 @@ calculate_fu_turner <- function(
 #' @return fuInvitro
 #' @export
 #' @examples
-#' calculate_fu_halifax(c("base",0),c(3,0),3,1)
+#' calculate_fu_mic_halifax(c("base",0),c(3,0),3,1)
 #' 
-calculate_fu_halifax <- function(
+calculate_fu_mic_halifax <- function(
   ionization,
   pKa,
   log_lipophilicity,
@@ -68,7 +68,7 @@ calculate_fu_halifax <- function(
   return(fu_invitro)
 }
 
-#' @name calculate_fu_austin_microsomes
+#' @name calculate_fu_mic_austin
 #' @title Austin algorithm for microsomes Fu calculation
 #' @description The Austin algorithm for calculating Fu in vitro for microsomes
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
@@ -78,9 +78,9 @@ calculate_fu_halifax <- function(
 #' @return fuInvitro
 #' @export
 #' @examples
-#' calculate_fu_austin_microsomes(c("base",0),c(8,0),3,1)
+#' calculate_fu_mic_austin(c("base",0),c(8,0),3,1)
 #' 
-calculate_fu_austin_microsomes <- function(
+calculate_fu_mic_austin<- function(
   ionization,
   pKa,
   log_lipophilicity,
@@ -99,7 +99,7 @@ calculate_fu_austin_microsomes <- function(
   return(fu_invitro)
 }
 
-#' @name calculate_fu_austin_hepatocytes
+#' @name calculate_fu_hep_austin
 #' @title Austin algorithm for hepatocytes Fu calculation
 #' @description The Austin algorithm for calculating Fu in vitro for hepatocytes
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
@@ -109,8 +109,9 @@ calculate_fu_austin_microsomes <- function(
 #' @param conc_cell_millionml concentration of hepatocytes (in million cells/mL)
 #' @return fuInvitro
 #' @export
-#' @example calculate_fu_austin_hepatocytes(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
-calculate_fu_austin_hepatocytes <- function(
+#' @example calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+
+calculate_fu_hep_austin <- function(
   ionization,
   pKa,
   log_lipophilicity,
@@ -128,7 +129,7 @@ calculate_fu_austin_hepatocytes <- function(
   return(fu_invitro)
 }
 
-#' @name calculate_fu_kilford
+#' @name calculate_fu_hep_kilford
 #' @title Kilford algorithm for Fu calculation
 #' @description The Kilford algorithm for calculating Fu in vitro
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
@@ -137,8 +138,9 @@ calculate_fu_austin_hepatocytes <- function(
 #' @param conc_cell_millionml concentration of hepatocytes (in million cells/mL)
 #' @return fuInvitro
 #' @export
-#' @example calculate_fu_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
-calculate_fu_kilford <- function(
+#' @example calculate_fu_hep_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+
+calculate_fu_hep_kilford <- function(
   ionization,
   pKa,
   log_lipophilicity,
@@ -160,7 +162,7 @@ calculate_fu_kilford <- function(
   return(fu_invitro)
 }
 
-#' @name calculate_fu_poulin
+#' @name calculate_fu_hep_poulin
 #' @title Poulin algorithm for Fu calculation
 #' @description The Poulin algorithm for calculating Fu in vitro
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
@@ -174,9 +176,9 @@ calculate_fu_kilford <- function(
 #' @return fuInvitro
 #' @export
 #' @examples
-#' calculate_fu_poulin(ionization=c("base",0),pKa=c(6,0),blood_plasma=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
-#' calculate_fu_poulin(ionization=c("neutral",0),pKa=c(0,0),concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
-calculate_fu_poulin <- function(
+#' calculate_fu_hep_poulin(ionization=c("base",0),pKa=c(6,0),blood_plasma=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
+#' calculate_fu_hep_poulin(ionization=c("neutral",0),pKa=c(0,0),concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
+calculate_fu_hep_poulin <- function(
   ionization,
   pKa,
   blood_plasma=NULL,

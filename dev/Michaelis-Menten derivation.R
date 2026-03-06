@@ -1,21 +1,27 @@
-#Code to derive in vitro michaelis menten clearance and perform IVIVE
-#Main author:Susana Proenca
-#Needs to be converted in a function
+#Code to derive convert Michaelis-Menten
+#' Title
+#'
+#' @param typeValue typeValue, default is Vmax&Km but can be exp_curve
+#' @param typeSystem if hepatocytes or microsomes
+#' @param fu_invitro value of f 
+#' @param vmax 
+#' @param km_micromolar 
+#' @param expData 
+#' @param tissue 
+#' @param species 
+#' @param volume_medium 
+#' @param REF 
+#' @param concentration_microsomes 
+#' @param concentration_cells 
+#'
+#' @returns Vmax and Km
+#' @export
+#'
+#' @examples
 
-#libraries
-#Load in vitro data
-data_path<-system.file("data","test_michaelis_menten_curve.csv",package="esqIVIVE")
-mm_exp_curve<-read.csv(data_path,header=TRUE)
 
-#example 
-IVIVE_MM()
-
-
-
-#Describe in vitro experiment---------------------------------------------------
 IVIVE_MM <- function(
-  typeValue,
-  units,
+  typeValue=Vmax&Km,
   typeSystem,
   fu_invitro,
   vmax = NULL,
@@ -56,7 +62,9 @@ IVIVE_MM <- function(
     MM <- get_MM("mm_exp_curve_xy" = mm_exp_curve)
     km_micromolar <- MM[1, 1]
     vmax <- MM[2, 1]
+    
   } else {
+    
     km_micromolar <- km_micromolar
     vmax <- vmax
   }
@@ -83,7 +91,4 @@ IVIVE_MM <- function(
 
   return(list(Vmax, Km_unb_uM))
 }
-
-
-#Calculate in vitro intrinsic clearance values---------------------------------
 

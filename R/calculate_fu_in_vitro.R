@@ -20,7 +20,7 @@
 #' @param concentration_cells concentration of cells (in million cells/mL)
 #'
 #' @return  fuInvitro and possible warning for evaporation
-#' @export
+#'
 #'
 #' @examples
 #'calculate_fu_in_vitro(
@@ -84,7 +84,7 @@ calculate_fu_in_vitro <- function(
   if (
     type_system == "hepatocytes" && !is.null(concentration_cells)
   ) {} else if (
-    type_system == "microsomes" && !is.null(concentration_microsomes)
+    type_system == "microsomes" && !is.null(conc_mic_mgml)
   ) {} else {
     warning("input Type system not matching with cCells or cMicro input")
   }
@@ -126,7 +126,7 @@ calculate_fu_in_vitro <- function(
       FBS_fraction = FBS_fraction,
       microplateType = microplate_type,
       volMedium_mL = volume_medium,
-      cMicro_mgml = concentration_microsomes
+      cMicro_mgml = conc_mic_mgml
     )
   } else if (type_system == "hepatocytes") {
     in_vitro_compartment <- calculate_in_vitro_compartments(
@@ -296,7 +296,7 @@ calculate_fu_in_vitro <- function(
       pka = pka,
       ion_factor = ion_factor_plasma,
       log_lipophilicity = log_lipophilicity,
-      concentration_microsomes = concentration_microsomes
+      conc_mic_mgml = conc_mic_mgml
     )
   } else if (partition_qspr == "Halifax" && type_system == "microsomes") {
     fraction_unbound_in_vitro <- calculate_fu_halifax(
@@ -304,7 +304,7 @@ calculate_fu_in_vitro <- function(
       pka = pka,
       ion_factor = ion_factor_plasma,
       log_lipophilicity = log_lipophilicity,
-      concentration_microsomes = concentration_microsomes
+      conc_mic_mgml = conc_mic_mgml
     )
   } else if (partition_qspr == "Turner" && type_system == "microsomes") {
     fraction_unbound_in_vitro <- calculate_fu_turner(
@@ -312,7 +312,7 @@ calculate_fu_in_vitro <- function(
       pka = pka,
       ion_factor = ion_factor_plasma,
       log_lipophilicity = log_lipophilicity,
-      concentration_microsomes = concentration_microsomes
+      conc_mic_mgml = conc_mic_mgml
     )
   } else if (
     partition_qspr == "All_literature" && type_system == "microsomes"
@@ -331,21 +331,21 @@ calculate_fu_in_vitro <- function(
         pka = pka,
         ion_factor = ion_factor_plasma,
         log_lipophilicity = log_lipophilicity,
-        concentration_microsomes = concentration_microsomes
+        conc_mic_mgml = conc_mic_mgml
       ),
       calculate_fu_halifax(
         ionization = ionization,
         pka = pka,
         ion_factor = ion_factor_plasma,
         log_lipophilicity = log_lipophilicity,
-        concentration_microsomes = concentration_microsomes
+        conc_mic_mgml = conc_mic_mgml
       ),
       calculate_fu_turner(
         ionization = ionization,
         pka = pka,
         ion_factor = ion_factor_plasma,
         log_lipophilicity = log_lipophilicity,
-        concentration_microsomes = concentration_microsomes
+        conc_mic_mgml = conc_mic_mgml
       )
     ))
   } else if (partition_qspr == "Austin" && type_system == "hepatocytes") {

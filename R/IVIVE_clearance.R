@@ -1,7 +1,7 @@
 #' IVIVE for clearance
-#'
+#' 
 #' @description
-#' IVIVE for clearance
+#' IVIVE for clearance based on different type of values
 #'
 #' @param typeValue describe what type of in vitro data for clearance it is
 #' @param units this are the units of the value. it does not matter typeValue is "decay experimentalcurve"
@@ -11,119 +11,54 @@
 #' @param empirical_scalar this is an option to include an extra empirical correction factor. Currently we are considering the scale factor of Wood 2017
 #' @param tissue tissue of interest, since scaling factors are dependent on the tissue, will default to liver
 #' @param species values can human and rat for now, defaulting to human
-#' @param volMedium volume of medium in the well (in mL)
+#' @param volMedium_mL volume of medium in the well (in mL)
 #' @param REF relative expression or activity factor
 #' @param cMicro_mgml concentration of microsome protein (in mg/mL)
 #' @param cCells_Mml concentration of hepatocytes used (in million cells/mL)
-#' @param partition_qspr type of assumption used for calculating fu_invitro (optional)
-#' @param log_lipophilicity LogP or LogMA of the compound (optional)
-#' @param ionization vector of length 2 with ionization class, acid, neutral and base (optional)
-#' @param fetal_bovine_serum_fraction fraction of serum concentration, values can only go from 0-1 (optional)
-#' @param microplate_type number of wells in the microplate (optional)
-#' @param volume_medium volume of medium in the well (in mL) (optional)
-#' @param pka vector of length 2 with pKa values of the compound (optional)
-#' @param henry_law_constant Henry's Law Constant (in atm/(m3*mol)) (optional)
-#' @param fraction_unbound In Vivo Fraction Unbound in plasma from literature (optional)
-#' @param blood_plasma_ratio Blood plasma ratio (optional)
 #'
-#' @return Specific clearance parameter to plug in PK-Sim
+#' @return Specific clearance parameter (/min) to plug in PK-Sim
 #' @export
 #' @examples
-#'
+#' exp_path<-system.file("extdata","clearance.csv",package="esqIVIVE")
+#' expData<-read.csv(exp_path)
 #' expData<-read.csv("tests/testthat/data/clearance.csv",header=TRUE)
-#' clearance_IVIVE(typeValue="decay experimentalcurve",typeSystem="hepatocytes",cCells_Mml=0.5,units="/minutes",
-#'                expData=expData,fu_invitro=0.5,empirical_scalar="No")
+#' IVIVE_clearance(typeValue="kcat",typeSystem="hepatocytes",cCells_Mml=0.5,units="/minutes",
+#'                expData=2,fu_invitro=0.5,empirical_scalar="No")
 #'
 #' # example hepatocytes
-#' clearance_IVIVE(typeValue="in vitro clearance parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/Millioncells",
+#' IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/Millioncells",
 #' expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #'
 #' # example microsomes
-#' predict_clearance_ivive(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
-#'                 expData=18.27,fu_invitro=0.5,cMicro_mgml=0.5,volMedium=0.5,empirical_scalar="No")
+#' IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
+#'                 expData=18.27,fu_invitro=0.5,cMicro_mgml=0.5,volMedium_mL=0.5,empirical_scalar="No")
 #'
 
-predict_clearance_ivive <- function(
+IVIVE_clearance <- function(
   typeValue,
   units,
   expData,
   typeSystem,
-  fu_invitro = NULL,
-  empirical_scalar = "No",
-  tissue = NULL,
-  species = NULL,
-  volMedium = NULL,
-  REF = NULL,
+  fu_invitro=1 ,
+  empirical_scalar="No",
+  tissue = "liver",
+  species = "human",
+  volMedium_mL = 1,
+  REF = 1,
   cMicro_mgml = NULL,
-  cCells_Mml = NULL,
-  # Additional parameters for calculating fu_invitro
-  partition_qspr = NULL,
-  log_lipophilicity = NULL,
-  ionization = NULL,
-  fetal_bovine_serum_fraction = NULL,
-  microplate_type = NULL,
-  volume_medium = NULL,
-  pka = NULL,
-  henry_law_constant = NULL,
-  fraction_unbound = NULL,
-  blood_plasma_ratio = NULL
+  cCells_Mml = NULL
 ) {
   # check if the arguments are valid
   rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
 
   rlang::arg_match(
     typeValue,
-    c("decay experimentalcurve", "halfLife", "in vitro clearance parameter")
+    c("kcat", "halfLife", "in vitro clearance parameter")
   )
 
-  # Calculate fu_invitro if parameters are provided
-  if (is.null(fu_invitro) && !is.null(partition_qspr)) {
-    # Set default values for ionization and pka if not provided
-    if (is.null(ionization)) {
-      ionization <- c("neutral", 0)
-    }
-    if (is.null(pka)) {
-      pka <- c(0, 0)
-    }
-    if (is.null(henry_law_constant)) {
-      henry_law_constant <- 0.000001
-    }
-
-    fu_invitro <- calculate_fu_in_vitro(
-      partition_qspr = partition_qspr,
-      log_lipophilicity = log_lipophilicity,
-      ionization = ionization,
-      type_system = typeSystem,
-      fetal_bovine_serum_fraction = fetal_bovine_serum_fraction,
-      microplate_type = microplate_type,
-      volume_medium = volume_medium,
-      pka = pka,
-      henry_law_constant = henry_law_constant,
-      fraction_unbound = fraction_unbound,
-      blood_plasma_ratio = blood_plasma_ratio,
-      concentration_microsomes = cMicro_mgml,
-      concentration_cells = cCells_Mml
-    )
-  }
-
-  #defaults for empty variable
-  if (is.null(fu_invitro)) {
-    fu_invitro <- 1
-  } else if (fu_invitro == 0) {
-    print("problem fu_invitro=0")
-  } else {}
-
-  if (is.null(REF)) {
-    REF <- 1
-  } else {}
-
-  if (is.null(species)) {
-    species <- "human"
-  } else {}
-
   #make it accordingly to microplate
-  if (is.null(volMedium)) {
-    volMedium <- 1
+  if (is.null(volMedium_mL)) {
+    volMedium_mL <- 1
   } else {}
 
   if (is.null(tissue)) {
@@ -176,9 +111,11 @@ predict_clearance_ivive <- function(
   SF2 <- 1 / fintcell * REF / fu_invitro
 
   #Derive the in vitro clearance value---------------------
-  if (typeValue == "decay experimentalcurve") {
-    kcat_min <- fit_clearance_from_curve(expData)[1]
+  if (typeValue == "kcat") {
+    
+    kcat_min <- expData
     ClspePermin <- kcat_min / cInvitro * SF
+    
   } else if (typeValue == "halfLife") {
     halfLife <- expData
 
@@ -198,15 +135,15 @@ predict_clearance_ivive <- function(
         "/minutes",
         "/hours",
         "/seconds",
-        "mL/minutes/Millioncells",
-        "uL/minutes/Millioncells",
-        "L/minutes/Millioncells",
-        "mL/hours/Millioncells",
-        "uL/hours/Millioncells",
-        "L/hours/Millioncells",
-        "mL/seconds/Millioncells",
-        "uL/seconds/Millioncells",
-        "L/seconds/Millioncells",
+        "mL/minutes/millioncells",
+        "uL/minutes/millioncells",
+        "L/minutes/millioncells",
+        "mL/hours/millioncells",
+        "uL/hours/millioncells",
+        "L/hours/millioncells",
+        "mL/seconds/millioncells",
+        "uL/seconds/millioncells",
+        "L/seconds/millioncells",
         "mL/minutes/cell",
         "uL/minutes/cell",
         "mL/hours/cell",
@@ -261,12 +198,12 @@ predict_clearance_ivive <- function(
         60,
         60 / 1000,
         60000,
-        1 / (cInvitro * volMedium),
-        1 / (cInvitro * volMedium) / 1000,
-        1 / (cInvitro * volMedium) * 60,
-        1 / (cInvitro * volMedium) * 60 / 1000,
-        1 / (cInvitro * volMedium) / 60,
-        1 / (cInvitro * volMedium) / 60000,
+        1 / (cInvitro * volMedium_mL),
+        1 / (cInvitro * volMedium_mL) / 1000,
+        1 / (cInvitro * volMedium_mL) * 60,
+        1 / (cInvitro * volMedium_mL) * 60 / 1000,
+        1 / (cInvitro * volMedium_mL) / 60,
+        1 / (cInvitro * volMedium_mL) / 60000,
         1 / liverkgBW,
         1 / liverkgBW / 1000,
         1 / liverkgBW / 60,
@@ -347,53 +284,4 @@ predict_clearance_ivive <- function(
   } else {}
 
   return("ClspePermin" = as.double(ClspePermin))
-}
-
-#function to determine clearance from experimental curve
-fit_clearance_from_curve <- function(expData) {
-  library(ggplot2)
-
-  #Load the depletion curve
-  clear_curve_xy <- expData
-  colnames(clear_curve_xy) <- c("x", "y")
-
-  #find the starting concentration
-  y0 = mean(clear_curve_xy$y[clear_curve_xy$x == 0])
-
-  #create clearance model
-  Kcat_function <- function(initial_concentration, time, clearance_rate_constant) {
-    y = initial_concentration * exp(-clearance_rate_constant * time)
-    return(y)
-  }
-
-  #fit model
-  fitKcat <- nls(
-    y ~ Kcat_function(initial_concentration, x, clearance_rate_constant),
-    data = clear_curve_xy,
-    start = list(clearance_rate_constant = 0.01),
-    trace = TRUE
-  )
-
-  colnames(clear_curve_xy) <- colnames(expData)
-  #Plot for evaluating if fit is reasonable
-  diag_plot <- ggplot(clear_curve_xy, aes(x = Time_min, y = Concentration_uM)) +
-    geom_point() +
-    labs(title = "fit curve") +
-    stat_function(
-      fun = function(x) Kcat_function(x, initial_concentration = y0, clearance_rate_constant = coefficients(fitKcat)),
-      colour = "blue"
-    )
-
-  print(diag_plot)
-
-  #Make table with fit Kcat
-  fit_95conf = confint(fitKcat)
-  kcat = as.double(data.frame(
-    "Kcat_permin" = coefficients(fitKcat)["clearance_rate_constant"],
-    fit_95conf[1],
-    fit_95conf[2]
-  ))
-  names(kcat) = c("Mean", "2.5%_CI", "95%_CI")
-
-  return(kcat)
 }

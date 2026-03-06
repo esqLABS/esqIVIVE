@@ -16,7 +16,7 @@ fitresults_vmax_km
 Function to derive micahelis-menten form raw data
 }
 \examples{
-mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv","esqIVIVE")
+mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv",package="esqIVIVE")
 mm_curve<-read.csv(mm_curve_path)
 get_MM(mm_curve)
 

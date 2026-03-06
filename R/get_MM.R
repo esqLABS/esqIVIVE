@@ -1,4 +1,5 @@
 #' Get michaelis-menten  parameters form experimental curves
+#' 
 #' @name get_MM
 #'
 #' @description
@@ -8,14 +9,13 @@
 #'
 #' @return fitresults_vmax_km
 #' @examples
-#' mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv","esqIVIVE")
+#' mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv",package="esqIVIVE")
 #' mm_curve<-read.csv(mm_curve_path)
 #' get_MM(mm_curve)
 #' 
 #' @export
-#' 
-#' #function to get MM form raw data
-  get_MM <- function(experimental_conc_velocity) {
+
+get_MM <- function(experimental_conc_velocity) {
     library(ggplot2)
     colnames(experimental_conc_velocity)<-c("Concentration","Velocity")
     
@@ -63,6 +63,10 @@
       "95%_percent" = c(fit_95conf["Km", 2], fit_95conf["Vmax", 2])
     )
     
+    if (r2<0.8){
+      warning("poor fit of MM curve")
+    }else{}
+
     row.names(fitresults_vmax_km) = c("Km_uM", "Vmax_umol_min_mgmicroORcells")
     print(plot_diagnosis)
     return(fitresults_vmax_km)
