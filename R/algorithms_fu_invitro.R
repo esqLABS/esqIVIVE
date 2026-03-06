@@ -99,7 +99,7 @@ calculate_fu_mic_austin<- function(
   return(fu_invitro)
 }
 
-#' @name calculate_fu_hep_austin
+#' @name calculate_fu_hep_austin 
 #' @title Austin algorithm for hepatocytes Fu calculation
 #' @description The Austin algorithm for calculating Fu in vitro for hepatocytes
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
@@ -109,7 +109,7 @@ calculate_fu_mic_austin<- function(
 #' @param conc_cell_millionml concentration of hepatocytes (in million cells/mL)
 #' @return fuInvitro
 #' @export
-#' @example calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+#' @examples calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
 
 calculate_fu_hep_austin <- function(
   ionization,
@@ -138,7 +138,7 @@ calculate_fu_hep_austin <- function(
 #' @param conc_cell_millionml concentration of hepatocytes (in million cells/mL)
 #' @return fuInvitro
 #' @export
-#' @example calculate_fu_hep_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+#' @examples calculate_fu_hep_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
 
 calculate_fu_hep_kilford <- function(
   ionization,

@@ -2,10 +2,9 @@
 % Please edit documentation in R/algorithms_fu_invitro.R
 \name{calculate_fu_hep_austin}
 \alias{calculate_fu_hep_austin}
-\alias{calculate_fu_hep_austin_hepatocytes}
 \title{Austin algorithm for hepatocytes Fu calculation}
 \usage{
-calculate_fu_hep_austin_hepatocytes(
+calculate_fu_hep_austin(
   ionization,
   pKa,
   log_lipophilicity,
@@ -28,4 +27,7 @@ fuInvitro
 }
 \description{
 The Austin algorithm for calculating Fu in vitro for hepatocytes
+}
+\examples{
+calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
 }
