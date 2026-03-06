@@ -1,6 +1,7 @@
 #Code to derive convert Michaelis-Menten
 #' Title
 #' @name IVIVE_MM
+#' @description function that scales Vmax and correct km for fraction unbound
 #' 
 #' @param typeSystem if hepatocytes or microsomes
 #' @param fu_invitro value of fractionunbound in vitro, the default is 1
@@ -15,7 +16,6 @@
 #' @export
 #'
 #' @examples
-#' 
 #' IVIVE_MM (typeSystem="hepatocytes",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
 #' IVIVE_MM (typeSystem="microsomes",fu_invitro=0.2,vmax=2,km_micromolar=1)
 

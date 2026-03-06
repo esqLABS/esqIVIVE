@@ -44,7 +44,8 @@ Currently there are available codes to calculate,
 
 [perform scaling for clearance:]{.underline}
 
--    IVIVE_clearance()
+-   IVIVE_clearance()
+-   IVIVE_MM()
 
 [calculate fu_plasma related parameters:]{.underline}
 
