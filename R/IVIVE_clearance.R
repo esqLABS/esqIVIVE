@@ -56,15 +56,6 @@ IVIVE_clearance <- function(
     c("kcat", "halfLife", "in vitro clearance parameter")
   )
 
-  #make it accordingly to microplate
-  if (is.null(volMedium_mL)) {
-    volMedium_mL <- 1
-  } else {}
-
-  if (is.null(tissue)) {
-    tissue <- "liver"
-  } else {}
-
   #Scaling factors
   path <- system.file("extdata", "scaling_factors.csv", package = "esqIVIVE")
   scaling_factors<-read.csv(path)
