@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-#'pint_peff_empir(Pint_cms=2.3E-6)
+#'pint_caco2_empir(Papp_cms=2.3E-6)
 #'  
 pint_caco2_empir<-function(Papp_cms){
   #based on calibration with high solubility
