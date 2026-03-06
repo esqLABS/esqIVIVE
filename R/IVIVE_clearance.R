@@ -66,43 +66,22 @@ IVIVE_clearance <- function(
   } else {}
 
   #Scaling factors
-
-  scaling_factors <- list()
-  scaling_factors[["human"]] <- data.frame(
-    "organs" = c("brain", "gonads", "heart", "kidney", "gut", "liver", "lung"),
-    "fcell" = c(0.96, 0.88, 0.76, 0.57, 0.88, 0.67, 0.23),
-    "weightorgankgBW" = c(22.5, 0.167, 5.5, 6.67, 18.5, 32, 15),
-    "MPGO" = rep(36, 7), #mg microsomal protein/g liver
-    "HGO" = rep(119, 7)
-  ) #million cells/g liver
-
-  scaling_factors[["rat"]] <- data.frame(
-    "organs" = c("brain", "gonads", "heart", "kidney", "gut", "liver", "lung"),
-    "fcell" = c(0.96, 0.79, 0.64, 0.7, 0.88, 0.72, 0.19),
-    "weightorgankgBW" = c(7.39, 10, 3.47, 10, 31, 43, 4.34),
-    "MPGO" = rep(50, 7), #mg microsomal protein/g liver
-    "HGO" = rep(122, 7)
-  ) #million cells/g liver
-
-  scaling_factors[["dog"]] <- data.frame(
-    "organs" = c("brain", "gonads", "heart", "kidney", "gut", "liver", "lung"),
-    "fcell" = c(0.96, 0.79, 0.64, 0.7, 0.88, 0.72, 0.19), #factor of the rat
-    "weightorgankgBW" = c(5.88, 0.36, 5.1, 11.7, 17.5, 25, 10.3),
-    "MPGO" = rep(50, 7), #mg microsomal protein/g liver
-    "HGO" = rep(201, 7)
-  ) #million cells/g liver
+  path <- system.file("extdata", "scaling_factors.csv", package = "esqIVIVE")
+  scaling_factors<-read.csv(path)
 
   #Get species scaling factor
-  SF_matrix <- scaling_factors[[species]]
-  fintcell <- SF_matrix[which(SF_matrix[, 1] == tissue), "fcell"]
-  liverkgBW <- SF_matrix[which(SF_matrix[, 1] == tissue), "weightorgankgBW"] #is only used in some cases
+  species_row<-which(scaling_factors[,"species"]==species)
+  organ_row<-which(scaling_factors[,"organ"]==tissue)
+  overlap_row<-intersect( species_row,organ_row)
+  fintcell <- scaling_factors[overlap_row, "fcell"]
+  organkgBW <- scaling_factors[overlap_row, "weightorgankgBW"]
 
   #chose the system specific scaling factors
   if (typeSystem == "microsomes") {
-    nLiver <- SF_matrix[which(SF_matrix[, 1] == tissue), "MPGO"] # mg/g liver
+    nLiver <- scaling_factors[overlap_row, "MicProtGO"] # mg protein/g liver
     cInvitro <- cMicro_mgml #mg/mL
   } else if (typeSystem == "hepatocytes") {
-    nLiver <- SF_matrix[which(SF_matrix[, 1] == tissue), "HGO"]
+    nLiver <- scaling_factors[overlap_row, "CellsGO"]
     cInvitro <- cCells_Mml # million cells/mL assay
   } else {}
 
@@ -204,10 +183,10 @@ IVIVE_clearance <- function(
         1 / (cInvitro * volMedium_mL) * 60 / 1000,
         1 / (cInvitro * volMedium_mL) / 60,
         1 / (cInvitro * volMedium_mL) / 60000,
-        1 / liverkgBW,
-        1 / liverkgBW / 1000,
-        1 / liverkgBW / 60,
-        1 / liverkgBW / 60000
+        1 / organkgBW,
+        1 / organkgBW / 1000,
+        1 / organkgBW / 60,
+        1 / organkgBW / 60000
       )
     ) #multiplying by the g liver weight per kilo BW
 
@@ -246,20 +225,20 @@ IVIVE_clearance <- function(
     # conditional to pick the right wood scalar
     # this scalar are empitical and they are based on in vitro data tending to overestimate slow clearance
     # and underpredict fast clearance
-    if (ClspePermin * liverkgBW < 10) {
+    if (ClspePermin * organkgBW < 10) {
       ClspePermin <- ClspePermin *
         wood_table[
           which(wood_table[, 1] == "<10"),
           which(colnames(wood_table) == typeSystem)
         ]
-    } else if (ClspePermin * liverkgBW < 100 && ClspePermin * liverkgBW > 10) {
+    } else if (ClspePermin * organkgBW < 100 && ClspePermin * organkgBW > 10) {
       ClspePermin <- ClspePermin *
         wood_table[
           which(wood_table[, 1] == "10-100"),
           which(colnames(wood_table) == typeSystem)
         ]
     } else if (
-      ClspePermin * liverkgBW < 1000 && ClspePermin * liverkgBW > 100
+      ClspePermin * organkgBW < 1000 && ClspePermin * organkgBW > 100
     ) {
       ClspePermin <- ClspePermin *
         wood_table[
@@ -267,14 +246,14 @@ IVIVE_clearance <- function(
           which(colnames(wood_table) == typeSystem)
         ]
     } else if (
-      ClspePermin * liverkgBW < 10000 && ClspePermin * liverkgBW > 1000
+      ClspePermin * organkgBW < 10000 && ClspePermin * organkgBW > 1000
     ) {
       ClspePermin <- ClspePermin *
         wood_table[
           which(wood_table[, 1] == "1000-10000"),
           which(colnames(wood_table) == typeSystem)
         ]
-    } else if (ClspePermin * liverkgBW > 10000) {
+    } else if (ClspePermin * organkgBW > 10000) {
       ClspePermin <- ClspePermin *
         wood_table[
           which(wood_table[, 1] == ">10000"),

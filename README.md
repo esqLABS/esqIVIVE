@@ -1,23 +1,66 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # esqIVIVE
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-The goal of esqIVIVE is to perform extrapolation of in vitro ADME parameters 
-and in vitro effect concentrations to in vivo. 
-The herein extrapolations have been developed focusing on the integration with OSP tools.
+The goal of esqIVIVE is to perform extrapolation of in vitro ADME
+parameters and derive ADME parameters to input for PBK models.
 
-In the near future the codes will be transformed in a package . 
-As of now the public can use the code as is, examples are provided.
-Currently there are available codes to calculate:
-- the fraction unbound in in vitro hepatic models (microsomes and hepatocytes)
-- the calculation or extrapolation of in vitro hepatic clearance : https://github.com/esqLABS/esqIVIVE/blob/main/R/clearance_IVIVE.R
-- the calculation or extrapolation of in vitro hepatic metabolic Vmax and Km
-- the calculation of fraction unbound in plasma using protein-specific affinity constant
+The functions in this package have been developed focusing on the
+integration with OSP tools.
 
+Currently there are available codes to calculate,
+
+[fraction unbound in microsomes]{.underline} :
+
+-   calculate_fu_mic_austin()
+
+-   calculate_fu_hep_halifax()
+
+-   calculate_fu_mic_turner()
+
+[fraction unbound in hepatocytes]{.underline}:
+
+-   calculate_fu_hep_austin()
+
+-   calculate_fu_hep_kilford()
+
+-   calculate_fu_hep_poulin()
+
+[derive metabolism parameters from experimental curves:]{.underline}
+
+-   fit_clearance_from_curve()
+
+-   get_MM()
+
+[perform scaling for clearance:]{.underline}
+
+-    IVIVE_clearance()
+
+[calculate fu_plasma related parameters:]{.underline}
+
+-   calculate_fu_pls_from_Ks()
+
+-   predict_plasma_affinities()
+
+-   correct_fu_pls_pearce()
+
+[perform IVIVE to derive Pint:]{.underline}
+
+-   pint_caco2_empir()
+
+-   pint_peff_empir()
+
+Examples of how to use the functions are provided for each.
 
 ## Installation
 
@@ -27,15 +70,6 @@ You can install the development version of esqIVIVE from
 ``` r
 # install.packages("devtools")
 devtools::install_github("esqLABS/esqIVIVE")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(esqIVIVE)
-## basic example code
 ```
 
 ## Contribute
@@ -56,7 +90,7 @@ renv::install()
 
 ### Testing
 
-To run packages tests, execute
+To run packages tests, execute ( dont do for now)
 
 ``` r
 devtools::test()
