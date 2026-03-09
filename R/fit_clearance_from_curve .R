@@ -14,7 +14,7 @@
 #' 
 #' 
 fit_clearance_from_curve <- function(expData_tmin_cuM) {
-  
+  library(ggplot2)
   #Load the depletion curve
   clear_curve_xy <- expData_tmin_cuM
   colnames(clear_curve_xy) <- c("x", "y")
