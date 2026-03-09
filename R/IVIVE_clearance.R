@@ -3,10 +3,10 @@
 #' @description
 #' IVIVE for clearance based on different type of values
 #'
-#' @param typeValue describe what type of in vitro data for clearance it is
-#' @param units this are the units of the value. it does not matter typeValue is "decay experimentalcurve"
+#' @param typeValue what type of value it is: kcat (directly form in vitro, half life, in vitro clearance parameter)
+#' @param units this are the units of the value. 
 #' @param typeSystem microsomes or hepatocytes
-#' @param expData depending on the type of value this can be a csv file or just one value
+#' @param expData experimental clearance value
 #' @param fu_invitro Fraction unbound in the in vitro hepatic system. if not known code will calculate it
 #' @param empirical_scalar this is an option to include an extra empirical correction factor. Currently we are considering the scale factor of Wood 2017
 #' @param tissue tissue of interest, since scaling factors are dependent on the tissue, will default to liver
@@ -19,14 +19,9 @@
 #' @return Specific clearance parameter (/min) to plug in PK-Sim
 #' @export
 #' @examples
-#' exp_path<-system.file("extdata","clearance.csv",package="esqIVIVE")
-#' expData<-read.csv(exp_path)
-#' expData<-read.csv("tests/testthat/data/clearance.csv",header=TRUE)
-#' IVIVE_clearance(typeValue="kcat",typeSystem="hepatocytes",cCells_Mml=0.5,units="/minutes",
-#'                expData=2,fu_invitro=0.5,empirical_scalar="No")
-#'
+
 #' # example hepatocytes
-#' IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/Millioncells",
+#' IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
 #' expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #'
 #' # example microsomes

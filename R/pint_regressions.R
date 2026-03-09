@@ -1,5 +1,5 @@
 #' Function to convert from Papp to Pint transcellular permeability from a empirical regression
-#'
+#' 
 #' @param Papp_cms , permeability from Caco-2 in cms
 #'
 #' @returns pint in units cm/s
