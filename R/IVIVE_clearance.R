@@ -5,6 +5,10 @@
 #'
 #' @param typeValue what type of value it is: kcat (directly form in vitro, half life, in vitro clearance parameter)
 #' @param units this are the units of the value. 
+#'  | Hepatocytes | Subcellular | Generic |
+#'  |-------------|-------------|---------|
+#'  |mL/minutes/millioncells|mL/minutes/mg protein|/minutes|
+#'  
 #' @param typeSystem microsomes or hepatocytes
 #' @param expData experimental clearance value
 #' @param fu_invitro Fraction unbound in the in vitro hepatic system. if not known code will calculate it
