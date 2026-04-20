@@ -28,7 +28,7 @@ pint_caco2_empir<-function(Papp_cms){
 #' 
 pint_peff_empir<-function(Peff_cms){
   #based on calibration with high solubility
-  pint_cms<-0.0001*10^((0.864*(log10(Papp_cms*1000)-3.1029)))
+  pint_cms<-0.0001*10^((0.864*(log10(Peff_cms*1000)-3.1029)))
   return(pint_cms)
   
 }

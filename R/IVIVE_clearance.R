@@ -3,11 +3,26 @@
 #' @description
 #' IVIVE for clearance based on different type of values
 #'
-#' @param typeValue what type of value it is: kcat (directly form in vitro, half life, in vitro clearance parameter)
-#' @param units this are the units of the value. 
-#'  | Hepatocytes | Subcellular | Generic |
-#'  |-------------|-------------|---------|
-#'  |mL/minutes/millioncells|mL/minutes/mg protein|/minutes|
+#' @param typeValue what type of value it is: kcat_min (directly from in vitro), halfLife or invitro_clearance_parameter)
+#' @param units this are the units of the value.
+#'  For kct 
+#'  | Hepatocytes | Subcellular      | Generic |
+#'  |-------------|------------------|---------|
+#'  | mL/minutes/millioncells | mL/minutes/mg protein | /minutes |
+#'  | uL/minutes/millioncells | uL/minutes/mg protein | /hours |
+#'  | L/minutes/millioncells| L/minutes/mg protein  | /seconds|
+#'  | mL/hours/millioncells| mL/hours/mg protein | mL/minutes |
+#'  | uL/hours/millioncells| uL/hours/mg protein | uL/minutes |
+#'  | L/hours/millioncells| L/hours/mg protein | mL/seconds |
+#'  | mL/seconds/millioncells | mL/seconds/mg protein | uL/seconds |
+#'  | uL/seconds/millioncells | mL/seconds/mg protein | mL/hours |
+#'  | L/seconds/millioncells | uL/seconds/mg protein | uL/hours |
+#'  | mL/minutes/cell | L/seconds/mg protein | mL/minutes/kg |
+#'  | uL/minutes/cell |      | uL/minutes/kg
+#'  | mL/hours/cell |      | mL/hours/kg
+#'  | uL/hours/cell |      | uL/hours/kg
+#'  | mL/seconds/cell |
+#'  | uL/seconds/cell |
 #'  
 #' @param typeSystem hepatocytes, microsomes 
 #' @param expData experimental clearance value
@@ -17,7 +32,7 @@
 #' @param species values can human and rat for now, defaulting to human
 #' @param volMedium_mL volume of medium in the well (in mL)
 #' @param REF relative expression or activity factor
-#' @param cMicro_mgml concentration of microsome protein (in mg/mL)
+#' @param cProtein_mgml concentration of subcellular protein (in mg/mL)
 #' @param cCells_Mml concentration of hepatocytes used (in million cells/mL)
 #'
 #' @return Specific clearance parameter (/min) to plug in PK-Sim
@@ -25,12 +40,17 @@
 #' @examples
 
 #' # example hepatocytes
-#' IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
+#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
 #' expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #'
+#'if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
+#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",units="mL/minutes/millioncells",
+#' expData=18.27,cCells_Mml=0.5)
+#' 
+#' 
 #' # example microsomes
-#' IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
-#'                 expData=18.27,fu_invitro=0.5,cMicro_mgml=0.5,volMedium_mL=0.5,empirical_scalar="No")
+#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",units="L/minutes/mg protein",
+#'                 expData=18.27,fu_invitro=0.5,cProtein_mgml=0.5,volMedium_mL=0.5,empirical_scalar="No")
 #'
 
 IVIVE_clearance <- function(
@@ -44,7 +64,7 @@ IVIVE_clearance <- function(
   species = "human",
   volMedium_mL = 1,
   REF = 1,
-  cMicro_mgml = NULL,
+  cProtein_mgml = NULL,
   cCells_Mml = NULL
 ) {
   # check if the arguments are valid
@@ -52,7 +72,7 @@ IVIVE_clearance <- function(
 
   rlang::arg_match(
     typeValue,
-    c("kcat", "halfLife", "in vitro clearance parameter")
+    c("kcat", "halfLife", "invitro_clearance_parameter")
   )
 
   #Scaling factors
@@ -69,7 +89,7 @@ IVIVE_clearance <- function(
   #chose the system specific scaling factors
   if (typeSystem == "microsomes") {
     nLiver <- scaling_factors[overlap_row, "MicProtGO"] # mg protein/g liver
-    cInvitro <- cMicro_mgml #mg/mL
+    cInvitro <- cProtein_mgml #mg/mL
   } else if (typeSystem == "hepatocytes") {
     nLiver <- scaling_factors[overlap_row, "CellsGO"]
     cInvitro <- cCells_Mml # million cells/mL assay
@@ -80,7 +100,7 @@ IVIVE_clearance <- function(
   SF2 <- 1 / fintcell * REF / fu_invitro
 
   #Derive the in vitro clearance value---------------------
-  if (typeValue == "kcat") {
+  if (typeValue == "kcat_min") {
     
     kcat_min <- expData
     ClspePermin <- kcat_min / cInvitro * SF
@@ -88,7 +108,7 @@ IVIVE_clearance <- function(
   } else if (typeValue == "halfLife") {
     halfLife <- expData
 
-    #make matrix of calculations depedning on the units
+    #make matrix of calculations depending on the units
     matrixCalcHalf <- cbind(c("minutes", "hours", "seconds"), c(1, 1 / 60, 60))
 
     multFactorHalf <- as.double(matrixCalcHalf[
@@ -97,7 +117,7 @@ IVIVE_clearance <- function(
     ])
     kcat_min <- 0.693 / halfLife * multFactorHalf
     ClspePermin <- kcat_min / cInvitro * SF
-  } else if (typeValue == "in vitro clearance parameter") {
+  } else if (typeValue == "invitro_clearance_parameter") {
     #make matrix of calculations depending on the units
     matrixCalClear <- cbind(
       c(
