@@ -9,7 +9,7 @@
 #'  |-------------|-------------|---------|
 #'  |mL/minutes/millioncells|mL/minutes/mg protein|/minutes|
 #'  
-#' @param typeSystem microsomes or hepatocytes
+#' @param typeSystem hepatocytes, microsomes 
 #' @param expData experimental clearance value
 #' @param fu_invitro Fraction unbound in the in vitro hepatic system. if not known code will calculate it
 #' @param empirical_scalar this is an option to include an extra empirical correction factor. Currently we are considering the scale factor of Wood 2017
