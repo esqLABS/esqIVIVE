@@ -15,18 +15,36 @@ IVIVE_clearance(
   species = "human",
   volMedium_mL = 1,
   REF = 1,
-  cMicro_mgml = NULL,
+  cProtein_mgml = NULL,
   cCells_Mml = NULL
 )
 }
 \arguments{
-\item{typeValue}{what type of value it is: kcat (directly form in vitro, half life, in vitro clearance parameter)}
+\item{typeValue}{what type of value it is: kcat_min (directly from in vitro), halfLife or invitro_clearance_parameter)}
 
-\item{units}{this are the units of the value.}
+\item{units}{this are the units of the value.
+For kct\tabular{lll}{
+   Hepatocytes \tab Subcellular \tab Generic \cr
+   mL/minutes/millioncells \tab mL/minutes/mg protein \tab /minutes \cr
+   uL/minutes/millioncells \tab uL/minutes/mg protein \tab /hours \cr
+   L/minutes/millioncells \tab L/minutes/mg protein \tab /seconds \cr
+   mL/hours/millioncells \tab mL/hours/mg protein \tab mL/minutes \cr
+   uL/hours/millioncells \tab uL/hours/mg protein \tab uL/minutes \cr
+   L/hours/millioncells \tab L/hours/mg protein \tab mL/seconds \cr
+   mL/seconds/millioncells \tab mL/seconds/mg protein \tab uL/seconds \cr
+   uL/seconds/millioncells \tab mL/seconds/mg protein \tab mL/hours \cr
+   L/seconds/millioncells \tab uL/seconds/mg protein \tab uL/hours \cr
+   mL/minutes/cell \tab L/seconds/mg protein \tab mL/minutes/kg \cr
+   uL/minutes/cell \tab  \tab uL/minutes/kg \cr
+   mL/hours/cell \tab  \tab mL/hours/kg \cr
+   uL/hours/cell \tab  \tab uL/hours/kg \cr
+   mL/seconds/cell \tab  \tab  \cr
+   uL/seconds/cell \tab  \tab  \cr
+}}
 
 \item{expData}{experimental clearance value}
 
-\item{typeSystem}{microsomes or hepatocytes}
+\item{typeSystem}{hepatocytes, microsomes}
 
 \item{fu_invitro}{Fraction unbound in the in vitro hepatic system. if not known code will calculate it}
 
@@ -40,7 +58,7 @@ IVIVE_clearance(
 
 \item{REF}{relative expression or activity factor}
 
-\item{cMicro_mgml}{concentration of microsome protein (in mg/mL)}
+\item{cProtein_mgml}{concentration of subcellular protein (in mg/mL)}
 
 \item{cCells_Mml}{concentration of hepatocytes used (in million cells/mL)}
 }
@@ -52,11 +70,16 @@ IVIVE for clearance based on different type of values
 }
 \examples{
 # example hepatocytes
-IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
 expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 
+if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",units="mL/minutes/millioncells",
+expData=18.27,cCells_Mml=0.5)
+
+
 # example microsomes
-IVIVE_clearance(typeValue="in vitro clearance parameter",typeSystem="microsomes",units="L/minutes/mg protein",
-                expData=18.27,fu_invitro=0.5,cMicro_mgml=0.5,volMedium_mL=0.5,empirical_scalar="No")
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",units="L/minutes/mg protein",
+                expData=18.27,fu_invitro=0.5,cProtein_mgml=0.5,volMedium_mL=0.5,empirical_scalar="No")
 
 }
