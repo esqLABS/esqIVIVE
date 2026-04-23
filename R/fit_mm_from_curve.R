@@ -1,6 +1,6 @@
 #' Get michaelis-menten  parameters form experimental curves
 #' 
-#' @name get_MM
+#' @name fit_mm_from_curve
 #'
 #' @description
 #' Function to derive micahelis-menten form raw data
@@ -15,7 +15,7 @@
 #' 
 #' @export
 
-get_MM <- function(experimental_conc_velocity) {
+fit_mm_from_curve <- function(experimental_conc_velocity) {
     library(ggplot2)
     colnames(experimental_conc_velocity)<-c("Concentration","Velocity")
     
