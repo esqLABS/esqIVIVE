@@ -1,7 +1,7 @@
 
 #' function to determine clearance from experimental curve
 #' @name fit_clearance_from_curve
-#' @param expData_tmin_cuM table with first column as time in minutes and second column as concetration in uM
+#' @param expData_tmin_cuM table with first column as time in minutes and second column as concentration in uM
 #' 
 #'
 #' @returns kcat in per min, this is not clearance ready for pksim
@@ -10,6 +10,9 @@
 #' @examples
 #' exp_path<-system.file("extdata","clearance.csv",package="esqIVIVE")
 #' expData<-read.csv(exp_path)
+#' #see that the first column is time and second is concentration
+#' expData
+#' 
 #' fit_clearance_from_curve(expData)
 #' 
 #' 
