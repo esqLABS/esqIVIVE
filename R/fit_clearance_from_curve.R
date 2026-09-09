@@ -4,6 +4,8 @@
 #' @param expData_tmin_cuM table with first column as time in minutes and second column as concentration in uM
 #' 
 #'
+#' @param verbose if TRUE, print the inputs and the resulting kcat
+#'
 #' @returns kcat in per min, this is not clearance ready for pksim
 #' @export
 #'
@@ -12,11 +14,11 @@
 #' expData<-read.csv(exp_path)
 #' #see that the first column is time and second is concentration
 #' expData
-#' 
+#'
 #' fit_clearance_from_curve(expData)
-#' 
-#' 
-fit_clearance_from_curve <- function(expData_tmin_cuM) {
+#'
+#'
+fit_clearance_from_curve <- function(expData_tmin_cuM, verbose = FALSE) {
   library(ggplot2)
   #Load the depletion curve
   clear_curve_xy <- expData_tmin_cuM
@@ -47,7 +49,11 @@ fit_clearance_from_curve <- function(expData_tmin_cuM) {
   }
   r2<-round(r_squared_nls(fitKcat),digits=3)
   
-  colnames(clear_curve_xy) <- colnames(expData)
+  if (r2<0.8){
+    warning("fitting does not support typical one-phase decay clearance or the suitability of the data")
+  } else {}
+  
+  colnames(clear_curve_xy) <- colnames(expData_tmin_cuM)
   #Plot for evaluating if fit is reasonable
   diag_plot <- ggplot(clear_curve_xy, aes(x = Time_min, y = Concentration_uM)) +
     geom_point() +
@@ -68,13 +74,21 @@ fit_clearance_from_curve <- function(expData_tmin_cuM) {
     fit_95conf[1],
     fit_95conf[2]
   ))
-  names(kcat) = c("Mean_min-1", "2.5%_CI", "95%_CI")
+  names(kcat) = c("Mean_kcat_min-1", "2.5%_CI_kcat", "95%_CI_kcat")
   
   if (r2<0.8){
     warning("poor fit of clearance curve")
   } else if (min(clear_curve_xy$Concentration_uM)>0.2*max(clear_curve_xy$Concentration_uM)){
     warning("little depletion, cannot be fit accuratly ")
   } else {}
-  
+
+  if (verbose) {
+    .print_ivive_result(
+      "fit_clearance_from_curve",
+      inputs = list(expData_tmin_cuM = expData_tmin_cuM),
+      result = kcat
+    )
+  }
+
   return(kcat)
 }
