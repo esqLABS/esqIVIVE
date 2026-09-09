@@ -1,7 +1,7 @@
 #' ion_factors
 #'
 #' @description
-#' Function to calculate fraction unionized
+#' Helper Function to calculate fraction unionized
 #' If there are multiple pKas for acidity just use the lower value
 #' If there are multiple pKas for basicity just use the lower value
 #' Mind that pKb is not the same as pKa !
@@ -9,6 +9,7 @@
 #'
 #' @param ionization vector of length 2 with ionization class, acid, neutral and base
 #' @param pKa vector of length 2 with pKa values of the compound
+#' @param verbose if TRUE, print the inputs and the resulting ionization factors
 #'
 #' @return factors that can be used to calculate the fraction neutral or ionized in plasma and intracellularly
 #' @export
@@ -18,7 +19,7 @@
 #' ion_factors(ionization=c("acid",0),pKa<-c(14,0))
 #' ion_factors(ionization=c("base","acid"),pKa<-c(5,7))
 
-ion_factors <- function(ionization, pKa) {
+ion_factors <- function(ionization, pKa, verbose = FALSE) {
   # confirm##################
   pH <- 7.4
   pH_cell <- 7.22
@@ -57,5 +58,16 @@ ion_factors <- function(ionization, pKa) {
     X <- 0
     Y <- 0
   }
-  return(c("ion_factor_plasma" = X, "ion_factor_cells" = Y))
+
+  result <- c("ion_factor_plasma" = X, "ion_factor_cells" = Y)
+
+  if (verbose) {
+    .print_ivive_result(
+      "ion_factors",
+      inputs = list(ionization = ionization, pKa = pKa),
+      result = result
+    )
+  }
+
+  return(result)
 }

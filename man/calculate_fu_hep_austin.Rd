@@ -8,7 +8,8 @@ calculate_fu_hep_austin(
   ionization,
   pKa,
   log_lipophilicity,
-  conc_cell_millionml
+  conc_cell_millionml,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -20,7 +21,7 @@ calculate_fu_hep_austin(
 
 \item{conc_cell_millionml}{concentration of hepatocytes (in million cells/mL)}
 
-\item{ion_factor}{ionization factor}
+\item{verbose}{if TRUE, print the inputs and the resulting fu_invitro}
 }
 \value{
 fuInvitro

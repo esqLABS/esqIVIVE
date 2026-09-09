@@ -8,7 +8,7 @@
 #'
 #' @param QSAR type of QSAR, it can be logP based or PPLFER based (still sorting the ionization)
 #' @param logP is the lipophilicity as given by logKow
-#' @param pka is a vector of length of 2
+#' @param pKa is a vector of length of 2
 #' @param ionization is a vector of length of 2 which should indicate if chemical is neutral, acid basic.
 #' There are spots for ionization in case chemical is zwitterion
 #' @param LFER_E LFER E parameter
@@ -16,6 +16,7 @@
 #' @param LFER_A LFER A parameter
 #' @param LFER_S LFER S parameter
 #' @param LFER_V abraham volume
+#' @param verbose if TRUE, print the inputs and the resulting partition coefficients
 #'
 #' @return partition_membrane_lipids (in L/L), partition_albumin (in L/kg) and partition_globulin (in L/kg)
 #' @details
@@ -44,8 +45,11 @@ predict_plasma_affinities <- function(
   LFER_B = NULL,
   LFER_A = NULL,
   LFER_S = NULL,
-  LFER_V = NULL
+  LFER_V = NULL,
+  verbose = FALSE
 ) {
+  rlang::arg_match(QSAR, c("logP", "PPLFER"))
+
   fneutral = ion_factors(ionization, pKa)
 
   X = fneutral["ion_factor_plasma"] #Interstitial tissue
@@ -59,7 +63,7 @@ predict_plasma_affinities <- function(
       kmemlip_LL <- 10^logD
     } else {
       #Yu et al  regression
-      kmemlip_LL <- 10^(1.294 + 0.304 * LogP)
+      kmemlip_LL <- 10^(1.294 + 0.304 * logP)
     }
 
     #for albumin we are not correcting for ionization since acid molecules also bind albumin
@@ -70,7 +74,7 @@ predict_plasma_affinities <- function(
 
     kglob_Lkg_2 <- 10^(0.37 * logD - 0.29) #based on the eq used in the VCBA
 
-    kglob_Lkg <- mean(kglob_Lkg_1, kglob_Lkg_2)
+    kglob_Lkg <- mean(c(kglob_Lkg_1, kglob_Lkg_2))
     
   } else if (QSAR == "PPLFER") {
     #Add LFER_a
@@ -114,9 +118,19 @@ predict_plasma_affinities <- function(
       2.51 * LFER_V
     kglob_Lkg = kmus_Lkg
   }
-  return(c(
+  result <- c(
     "partition_membrane_lipids" = kmemlip_LL,
     "partition_albumin" = kalb_Lkg,
     "partition_globulin" = kglob_Lkg
-  ))
+  )
+
+  if (verbose) {
+    .print_ivive_result(
+      "predict_plasma_affinities",
+      inputs = list(QSAR = QSAR, logP = logP, pKa = pKa, ionization = ionization),
+      result = result
+    )
+  }
+
+  return(result)
 }

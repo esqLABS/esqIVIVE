@@ -17,7 +17,8 @@ calculate_fu_in_vitro(
   fraction_unbound = NULL,
   blood_plasma_ratio = NULL,
   concentration_microsomes = NULL,
-  concentration_cells = NULL
+  concentration_cells = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -26,8 +27,7 @@ then from literature, Poulin, Turner, Austin and Halifax. See thevignette for mo
 
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
-\item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pka vector of length of 2 with pkA of the compound}
+\item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
 \item{type_system}{microsomes or hepatocytes}
 
@@ -36,6 +36,8 @@ then from literature, Poulin, Turner, Austin and Halifax. See thevignette for mo
 \item{microplate_type}{number of wells in the microplate}
 
 \item{volume_medium}{volume of medium in the well (in mL)}
+
+\item{pka}{vector of length of 2 with pkA of the compound}
 
 \item{henry_law_constant}{Henry's Law Constant (in atm/(m3*mol))}
 
@@ -46,6 +48,8 @@ then from literature, Poulin, Turner, Austin and Halifax. See thevignette for mo
 \item{concentration_microsomes}{concentration of microsomes (in mg/mL)}
 
 \item{concentration_cells}{concentration of cells (in million cells/mL)}
+
+\item{verbose}{if TRUE, print the inputs and the resulting fuInvitro}
 }
 \value{
 fuInvitro and possible warning for evaporation

@@ -10,7 +10,8 @@ in_vitro_compartments(
   microplateType,
   volMedium_mL,
   cCells_Mml = NULL,
-  cMicro_mgml = NULL
+  cMicro_mgml = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ in_vitro_compartments(
 \item{cCells_Mml}{cells concentration (in million cells/mL)}
 
 \item{cMicro_mgml}{concentration of microsome protein (in mg/mL)}
+
+\item{verbose}{if TRUE, print the inputs and the resulting compartment list}
 }
 \value{
 a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
@@ -34,7 +37,7 @@ Generates a list of values describing a liver in vitro compartment based on hepa
 This function is used inside the Fraction unbound function
 }
 \examples{
-in_vitro_compartments("hepatocytes", fetal_bovine_serum_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
-in_vitro_compartments("microsomes", fetal_bovine_serum_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
+in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
+in_vitro_compartments("microsomes", FBS_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
 
 }

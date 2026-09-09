@@ -10,7 +10,8 @@ calculate_fu_hep_poulin(
   blood_plasma = NULL,
   fraction_unbound = NULL,
   concentration_cell_neutral_lipids,
-  log_lipophilicity
+  log_lipophilicity,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -26,9 +27,7 @@ calculate_fu_hep_poulin(
 
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
-\item{ion_factor_plasma}{ionization factor}
-
-\item{ion_factor_cells}{intracellular ionization factor}
+\item{verbose}{if TRUE, print the inputs and the resulting fu_invitro}
 }
 \value{
 fuInvitro

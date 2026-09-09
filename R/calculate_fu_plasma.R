@@ -3,16 +3,26 @@
 #' @description Corrects the Fu based on Pearce correction factor for neutral lipids in plasma
 #' @param fraction_unbound Fraction unbound in plasma
 #' @param log_lipophilicity LogP or LogMA of the compound
+#' @param verbose if TRUE, print the inputs and the resulting Fu_plasma
 #' @return Corrected Fu_plasma value
 #' @export
 #' @examples
 #' correct_fu_pls_pearce(fraction_unbound=0.2, log_lipophilicity=4)
-#' 
-  correct_fu_pls_pearce <- function(fraction_unbound, log_lipophilicity) {
+#'
+  correct_fu_pls_pearce <- function(fraction_unbound, log_lipophilicity, verbose = FALSE) {
   fNL_plasma <- 7E-3 #fraction neutral lipids in plasma
   fu_corrected <- 1 /
     ((10^log_lipophilicity) * fNL_plasma + 1 / fraction_unbound)
-  return("Fu_plasma" = fu_corrected)
+
+  if (verbose) {
+    .print_ivive_result(
+      "correct_fu_pls_pearce",
+      inputs = list(fraction_unbound = fraction_unbound, log_lipophilicity = log_lipophilicity),
+      result = fu_corrected
+    )
+  }
+  result<-c("Fu_plasma" = fu_corrected)
+  return(result)
 }
 
 #' @name calculate_fu_pls_from_Ks
@@ -24,6 +34,7 @@
 #' @param partition_membrane_lipids partition to membrane lipids (in L/L)
 #' @param partition_lipids LogP or LogMA of the compound
 #' @param species species to be considered, now there is data for human, rat, dog, monkey, rabbit and mouse. Mind that this changes the composition in serum but the specific affinities to albumin still need to be used
+#' @param verbose if TRUE, print the inputs and the resulting Fu_plasma
 #' @return Fu_plasma value
 #' @export
 #' @examples
@@ -32,13 +43,14 @@
 #'                "partition_membrane_lipids"=10^3.51,
 #'                "partition_lipids"=100,
 #'                "species"="human")
-#'                
+#'
   calculate_fu_pls_from_Ks <- function(
   partition_albumin,
   partition_globulin,
   partition_membrane_lipids,
   partition_lipids,
-  species
+  species,
+  verbose = FALSE
 ) {
   # Average fraction in human plasma
   # values of protein from paper: Factors Influencing the Use and Interpretation of Animal Models
@@ -47,6 +59,7 @@
   # values for membrane lipids come form Absorption and lipoprotein transport of sphingomyelin
 
   species_types <- c("human", "rat", "dog", "monkey", "rabbit", "mouse")
+  rlang::arg_match(species, species_types)
   falb_kgL <- c(0.041, 0.031, 0.027, 0.049, 0.039, 0.033)
   fglob_kgL <- c(0.033, 0.035, 0.063, 0.038, 0.018, 0.0587)
   # I considered the rest of protein was globulin
@@ -69,12 +82,19 @@
   K_lip <- partition_lipids * flip_LL[nr_species]
   Fu_plasma <- as.double(1 / (fw + K_alb + K_lip + K_glob + K_memlip))
 
-  # just to see proportions in each container
-  print(c(
-    "falb" = K_alb * Fu_plasma,
-    "fglob" = K_glob * Fu_plasma,
-    "flip" = (K_lip + K_memlip) * Fu_plasma
-  ))
+  if (verbose) {
+    .print_ivive_result(
+      "calculate_fu_pls_from_Ks",
+      inputs = list(partition_albumin = partition_albumin, partition_globulin = partition_globulin, partition_membrane_lipids = partition_membrane_lipids, partition_lipids = partition_lipids, species = species),
+      result = c(
+        Fu_plasma = Fu_plasma,
+        falb = K_alb * Fu_plasma,
+        fglob = K_glob * Fu_plasma,
+        flip = (K_lip + K_memlip) * Fu_plasma
+      )
+    )
+  }
 
-  return("Fu_plasma" = Fu_plasma)
+  result<-c("Fu_plasma" = Fu_plasma)
+  return(result)
 }

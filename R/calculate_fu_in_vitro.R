@@ -8,7 +8,7 @@
 #' then from literature, Poulin, Turner, Austin and Halifax. See thevignette for more details)
 #' @param log_lipophilicity LogP or LogMA of the compound
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' #' @param pka vector of length of 2 with pkA of the compound
+#' @param pka vector of length of 2 with pkA of the compound
 #' @param type_system microsomes or hepatocytes
 #' @param FBS_fraction fraction of serum concentration, values can only go from 0-1
 #' @param microplate_type number of wells in the microplate
@@ -18,9 +18,11 @@
 #' @param blood_plasma_ratio Blood plasma ratio, this parameter is needed for Rodgers and Rowland and Poulin method for basic chemicals
 #' @param concentration_microsomes concentration of microsomes (in mg/mL)
 #' @param concentration_cells concentration of cells (in million cells/mL)
+#' @param verbose if TRUE, print the inputs and the resulting fuInvitro
 #'
 #' @return  fuInvitro and possible warning for evaporation
 #'
+#' @export
 #'
 #' @examples
 #'calculate_fu_in_vitro(
@@ -54,7 +56,8 @@ calculate_fu_in_vitro <- function(
   fraction_unbound = NULL,
   blood_plasma_ratio = NULL,
   concentration_microsomes = NULL,
-  concentration_cells = NULL
+  concentration_cells = NULL,
+  verbose = FALSE
 ) {
   # Have default value of medium volume considering the proportion of the common sim.
   # Have default value of fu
@@ -67,6 +70,7 @@ calculate_fu_in_vitro <- function(
       "Halifax",
       "Turner",
       "Poulin",
+      "Kilford",
       "All Poulin and Theil",
       "Poulin and Theil + fu",
       "All Berezhkovskiy",
@@ -79,12 +83,13 @@ calculate_fu_in_vitro <- function(
       "All_literature"
     )
   )
+  rlang::arg_match(type_system, c("hepatocytes", "microsomes"))
 
   #make warning that micro and hep should match
   if (
     type_system == "hepatocytes" && !is.null(concentration_cells)
   ) {} else if (
-    type_system == "microsomes" && !is.null(conc_mic_mgml)
+    type_system == "microsomes" && !is.null(concentration_microsomes)
   ) {} else {
     warning("input Type system not matching with cCells or cMicro input")
   }
@@ -121,15 +126,15 @@ calculate_fu_in_vitro <- function(
 
   # get in vitro compartments----------------------------------------------------
   if (type_system == "microsomes") {
-    in_vitro_compartment <- calculate_in_vitro_compartments(
+    in_vitro_compartment <- in_vitro_compartments(
       "microsomes",
       FBS_fraction = FBS_fraction,
       microplateType = microplate_type,
       volMedium_mL = volume_medium,
-      cMicro_mgml = conc_mic_mgml
+      cMicro_mgml = concentration_microsomes
     )
   } else if (type_system == "hepatocytes") {
-    in_vitro_compartment <- calculate_in_vitro_compartments(
+    in_vitro_compartment <- in_vitro_compartments(
       "hepatocytes",
       FBS_fraction = FBS_fraction,
       microplateType = microplate_type,
@@ -282,128 +287,132 @@ calculate_fu_in_vitro <- function(
           (1 / fraction_unbound - 1) * FBS_fraction)
     )
   } else if (partition_qspr == "Poulin" & type_system == "microsomes") {
-    fraction_unbound_in_vitro <- calculate_fu_poulin(
+    fuInvitro <- calculate_fu_hep_poulin(
       ionization = ionization,
-      pka = pka,
-      ion_factor_plasma = ion_factor_cells,
-      ion_factor_cells = ion_factor_cells,
+      pKa = pka,
+      blood_plasma = blood_plasma_ratio,
+      fraction_unbound = fraction_unbound,
       concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
       log_lipophilicity = log_lipophilicity
     )
   } else if (partition_qspr == "Austin" && type_system == "microsomes") {
-    fraction_unbound_in_vitro <- calculate_fu_austin_microsomes(
+    fuInvitro <- calculate_fu_mic_austin(
       ionization = ionization,
-      pka = pka,
-      ion_factor = ion_factor_plasma,
+      pKa = pka,
       log_lipophilicity = log_lipophilicity,
-      conc_mic_mgml = conc_mic_mgml
+      conc_mic_mgml = concentration_microsomes
     )
   } else if (partition_qspr == "Halifax" && type_system == "microsomes") {
-    fraction_unbound_in_vitro <- calculate_fu_halifax(
+    fuInvitro <- calculate_fu_mic_halifax(
       ionization = ionization,
-      pka = pka,
-      ion_factor = ion_factor_plasma,
+      pKa = pka,
       log_lipophilicity = log_lipophilicity,
-      conc_mic_mgml = conc_mic_mgml
+      conc_mic_mgml = concentration_microsomes
     )
   } else if (partition_qspr == "Turner" && type_system == "microsomes") {
-    fraction_unbound_in_vitro <- calculate_fu_turner(
+    fuInvitro <- calculate_fu_mic_turner(
       ionization = ionization,
-      pka = pka,
-      ion_factor = ion_factor_plasma,
+      pKa = pka,
       log_lipophilicity = log_lipophilicity,
-      conc_mic_mgml = conc_mic_mgml
+      conc_mic_mgml = concentration_microsomes
     )
   } else if (
     partition_qspr == "All_literature" && type_system == "microsomes"
   ) {
-    fraction_unbound_in_vitro <- mean(c(
-      calculate_fu_poulin(
+    fuInvitro <- mean(c(
+      calculate_fu_hep_poulin(
         ionization = ionization,
-        pka = pka,
-        ion_factor_plasma = ion_factor_cells,
-        ion_factor_cells = ion_factor_cells,
+        pKa = pka,
+        blood_plasma = blood_plasma_ratio,
+        fraction_unbound = fraction_unbound,
         concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
         log_lipophilicity = log_lipophilicity
       ),
-      calculate_fu_austin_microsomes(
+      calculate_fu_mic_austin(
         ionization = ionization,
-        pka = pka,
-        ion_factor = ion_factor_plasma,
+        pKa = pka,
         log_lipophilicity = log_lipophilicity,
-        conc_mic_mgml = conc_mic_mgml
+        conc_mic_mgml = concentration_microsomes
       ),
-      calculate_fu_halifax(
+      calculate_fu_mic_halifax(
         ionization = ionization,
-        pka = pka,
-        ion_factor = ion_factor_plasma,
+        pKa = pka,
         log_lipophilicity = log_lipophilicity,
-        conc_mic_mgml = conc_mic_mgml
+        conc_mic_mgml = concentration_microsomes
       ),
-      calculate_fu_turner(
+      calculate_fu_mic_turner(
         ionization = ionization,
-        pka = pka,
-        ion_factor = ion_factor_plasma,
+        pKa = pka,
         log_lipophilicity = log_lipophilicity,
-        conc_mic_mgml = conc_mic_mgml
+        conc_mic_mgml = concentration_microsomes
       )
     ))
   } else if (partition_qspr == "Austin" && type_system == "hepatocytes") {
-    fraction_unbound_in_vitro <- calculate_fu_austin_hepatocytes(
+    fuInvitro <- calculate_fu_hep_austin(
       ionization = ionization,
-      pka = pka,
-      ion_factor = ion_factor_plasma,
+      pKa = pka,
       log_lipophilicity = log_lipophilicity,
-      concentration_cells = concentration_cells
+      conc_cell_millionml = concentration_cells
     )
   } else if (partition_qspr == "Poulin" && type_system == "hepatocytes") {
-    fraction_unbound_in_vitro <- calculate_fu_poulin(
+    fuInvitro <- calculate_fu_hep_poulin(
       ionization = ionization,
-      pka = pka,
-      ion_factor_plasma = ion_factor_cells,
-      ion_factor_cells = ion_factor_cells,
+      pKa = pka,
+      blood_plasma = blood_plasma_ratio,
+      fraction_unbound = fraction_unbound,
       concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
       log_lipophilicity = log_lipophilicity
     )
   } else if (partition_qspr == "Kilford" && type_system == "hepatocytes") {
-    fraction_unbound_in_vitro <- calculate_fu_kilford(
+    fuInvitro <- calculate_fu_hep_kilford(
       ionization = ionization,
-      pka = pka,
-      ion_factor = ion_factor_plasma,
+      pKa = pka,
       log_lipophilicity = log_lipophilicity,
-      concentration_cells = concentration_cells
+      conc_cell_millionml = concentration_cells
     )
   } else if (
     partition_qspr == "All_literature" && type_system == "hepatocytes"
   ) {
-    fraction_unbound_in_vitro <- mean(c(
-      calculate_fu_kilford(
+    fuInvitro <- mean(c(
+      calculate_fu_hep_kilford(
         ionization = ionization,
-        pka = pka,
-        ion_factor = ion_factor_plasma,
+        pKa = pka,
         log_lipophilicity = log_lipophilicity,
-        concentration_cells = concentration_cells
+        conc_cell_millionml = concentration_cells
       ),
-      calculate_fu_poulin(
+      calculate_fu_hep_poulin(
         ionization = ionization,
-        pka = pka,
-        ion_factor_plasma = ion_factor_cells,
-        ion_factor_cells = ion_factor_cells,
+        pKa = pka,
+        blood_plasma = blood_plasma_ratio,
+        fraction_unbound = fraction_unbound,
         concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
         log_lipophilicity = log_lipophilicity
       ),
-      calculate_fu_austin_hepatocytes(
+      calculate_fu_hep_austin(
         ionization = ionization,
-        pka = pka,
-        ion_factor = ion_factor_plasma,
+        pKa = pka,
         log_lipophilicity = log_lipophilicity,
-        concentration_cells = concentration_cells
+        conc_cell_millionml = concentration_cells
       )
     ))
   } else {}
 
   # Warning for volatility
   calculate_volatility_correction(fuInvitro, kAir, volAir_L)
+
+  if (verbose) {
+    .print_ivive_result(
+      "calculate_fu_in_vitro",
+      inputs = list(
+        partition_qspr = partition_qspr,
+        type_system = type_system,
+        log_lipophilicity = log_lipophilicity,
+        ionization = ionization,
+        pka = pka
+      ),
+      result = c(fuInvitro = fuInvitro)
+    )
+  }
 
   return(fuInvitro)
 }

@@ -4,7 +4,13 @@
 \alias{calculate_fu_mic_austin}
 \title{Austin algorithm for microsomes Fu calculation}
 \usage{
-calculate_fu_mic_austin(ionization, pKa, log_lipophilicity, conc_mic_mgml)
+calculate_fu_mic_austin(
+  ionization,
+  pKa,
+  log_lipophilicity,
+  conc_mic_mgml,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
@@ -14,6 +20,8 @@ calculate_fu_mic_austin(ionization, pKa, log_lipophilicity, conc_mic_mgml)
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
 \item{conc_mic_mgml}{concentration of microsomes (in mg/mL)}
+
+\item{verbose}{if TRUE, print the inputs and the resulting fu_invitro}
 }
 \value{
 fuInvitro

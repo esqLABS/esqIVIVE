@@ -34,6 +34,7 @@
 #' @param REF relative expression or activity factor
 #' @param cProtein_mgml concentration of subcellular protein (in mg/mL)
 #' @param cCells_Mml concentration of hepatocytes used (in million cells/mL)
+#' @param verbose if TRUE, print the inputs and the resulting clearance
 #'
 #' @return Specific clearance parameter (/min) to plug in PK-Sim
 #' @export
@@ -45,7 +46,7 @@
 #'
 #'if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
 #' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",units="mL/minutes/millioncells",
-#' expData=18.27,cCells_Mml=0.5)
+#' expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 #' 
 #' 
 #' # example microsomes
@@ -65,7 +66,8 @@ IVIVE_clearance <- function(
   volMedium_mL = 1,
   REF = 1,
   cProtein_mgml = NULL,
-  cCells_Mml = NULL
+  cCells_Mml = NULL,
+  verbose = FALSE
 ) {
   # check if the arguments are valid
   rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
@@ -78,6 +80,10 @@ IVIVE_clearance <- function(
   #Scaling factors
   path <- system.file("extdata", "scaling_factors.csv", package = "esqIVIVE")
   scaling_factors<-read.csv(path)
+
+  # check if the arguments are valid
+  rlang::arg_match(species, unique(scaling_factors[,"species"]))
+  rlang::arg_match(tissue, unique(scaling_factors[,"organ"]))
 
   #Get species scaling factor
   species_row<-which(scaling_factors[,"species"]==species)
@@ -272,5 +278,14 @@ IVIVE_clearance <- function(
     }
   } else {}
 
-  return("ClspePermin" = as.double(ClspePermin))
+  if (verbose) {
+    .print_ivive_result(
+      "IVIVE_clearance",
+      inputs = list(typeValue = typeValue, units = units, expData = expData, typeSystem = typeSystem, fu_invitro = fu_invitro, empirical_scalar = empirical_scalar, tissue = tissue, species = species),
+      result = as.double(ClspePermin)
+    )
+  }
+  result<-c("ClspePermin" = as.double(ClspePermin))
+
+  return(result)
 }

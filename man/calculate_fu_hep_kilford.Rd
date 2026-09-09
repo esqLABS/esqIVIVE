@@ -8,7 +8,8 @@ calculate_fu_hep_kilford(
   ionization,
   pKa,
   log_lipophilicity,
-  conc_cell_millionml
+  conc_cell_millionml,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ calculate_fu_hep_kilford(
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
 \item{conc_cell_millionml}{concentration of hepatocytes (in million cells/mL)}
+
+\item{verbose}{if TRUE, print the inputs and the resulting fu_invitro}
 }
 \value{
 fuInvitro

@@ -4,10 +4,12 @@
 \alias{pint_peff_empir}
 \title{Function to convert from Papp to Pint transcellular permeability from a empirical regression}
 \usage{
-pint_peff_empir(Peff_cms)
+pint_peff_empir(Peff_cms, verbose = FALSE)
 }
 \arguments{
 \item{Peff_cms}{Peff as obtained in vivo or QSARs in cms}
+
+\item{verbose}{if TRUE, print the inputs and the resulting pint_cms}
 }
 \value{
 pint in units cm/s

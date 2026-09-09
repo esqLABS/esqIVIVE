@@ -4,12 +4,14 @@
 \alias{ion_factors}
 \title{ion_factors}
 \usage{
-ion_factors(ionization, pKa)
+ion_factors(ionization, pKa, verbose = FALSE)
 }
 \arguments{
 \item{ionization}{vector of length 2 with ionization class, acid, neutral and base}
 
 \item{pKa}{vector of length 2 with pKa values of the compound}
+
+\item{verbose}{if TRUE, print the inputs and the resulting ionization factors}
 }
 \value{
 factors that can be used to calculate the fraction neutral or ionized in plasma and intracellularly

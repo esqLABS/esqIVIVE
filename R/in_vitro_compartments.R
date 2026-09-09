@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Generates a list of values describing a liver in vitro compartment based on hepatocytes or microsomes
-#' This function is used inside the Fraction unbound function
+#' This function is used inside the Fraction unbound function but can also be used for general virtual hepatocyte systems
 #' 
 #' @param typeSystem if system is hepatocytes or microsomes
 #' @param FBS_fraction fraction of serum concentration, values can only go from 0-1
@@ -10,13 +10,14 @@
 #' @param volMedium_mL volume of medium in the well (in mL)
 #' @param cCells_Mml cells concentration (in million cells/mL)
 #' @param cMicro_mgml concentration of microsome protein (in mg/mL)
+#' @param verbose if TRUE, print the inputs and the resulting compartment list
 #'
 #' @return a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
 #' @export
 #'
 #' @examples
-#' in_vitro_compartments("hepatocytes", fetal_bovine_serum_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
-#' in_vitro_compartments("microsomes", fetal_bovine_serum_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
+#' in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
+#' in_vitro_compartments("microsomes", FBS_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
 #'
 in_vitro_compartments <- function(
   typeSystem,
@@ -24,7 +25,8 @@ in_vitro_compartments <- function(
   microplateType,
   volMedium_mL,
   cCells_Mml = NULL,
-  cMicro_mgml = NULL
+  cMicro_mgml = NULL,
+  verbose = FALSE
 ) {
   # check if the arguments are valid
   rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
@@ -90,7 +92,7 @@ in_vitro_compartments <- function(
 
   # calculate the concentration of protein in the system
   # From average protein content in medium from Fischer paper
-  cMediumPro_vvmedium <- fetal_bovine_serum_fraction * 0.040
+  cMediumPro_vvmedium <- FBS_fraction * 0.040
 
   inVitroCompartment <-
     list(
@@ -104,6 +106,21 @@ in_vitro_compartments <- function(
       saPlasticVolMedium_m2L = saPlasticVolMedium_m2L,
       volAir_L = volAir_L
     )
+
+  if (verbose) {
+    .print_ivive_result(
+      "in_vitro_compartments",
+      inputs = list(
+        typeSystem = typeSystem,
+        FBS_fraction = FBS_fraction,
+        microplateType = microplateType,
+        volMedium_mL = volMedium_mL,
+        cCells_Mml = cCells_Mml,
+        cMicro_mgml = cMicro_mgml
+      ),
+      result = inVitroCompartment
+    )
+  }
 
   return(inVitroCompartment)
 }

@@ -4,12 +4,14 @@
 \alias{correct_fu_pls_pearce}
 \title{Correct Fu based on Pearce correction factor}
 \usage{
-correct_fu_pls_pearce(fraction_unbound, log_lipophilicity)
+correct_fu_pls_pearce(fraction_unbound, log_lipophilicity, verbose = FALSE)
 }
 \arguments{
 \item{fraction_unbound}{Fraction unbound in plasma}
 
 \item{log_lipophilicity}{LogP or LogMA of the compound}
+
+\item{verbose}{if TRUE, print the inputs and the resulting Fu_plasma}
 }
 \value{
 Corrected Fu_plasma value

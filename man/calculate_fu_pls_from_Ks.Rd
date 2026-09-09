@@ -9,7 +9,8 @@ calculate_fu_pls_from_Ks(
   partition_globulin,
   partition_membrane_lipids,
   partition_lipids,
-  species
+  species,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ calculate_fu_pls_from_Ks(
 \item{partition_lipids}{LogP or LogMA of the compound}
 
 \item{species}{species to be considered, now there is data for human, rat, dog, monkey, rabbit and mouse. Mind that this changes the composition in serum but the specific affinities to albumin still need to be used}
+
+\item{verbose}{if TRUE, print the inputs and the resulting Fu_plasma}
 }
 \value{
 Fu_plasma value
@@ -36,5 +39,5 @@ calculate_fu_pls_from_Ks("partition_albumin"=10^4.48,
                "partition_membrane_lipids"=10^3.51,
                "partition_lipids"=100,
                "species"="human")
-               
+
 }

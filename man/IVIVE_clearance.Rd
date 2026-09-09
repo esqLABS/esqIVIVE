@@ -16,7 +16,8 @@ IVIVE_clearance(
   volMedium_mL = 1,
   REF = 1,
   cProtein_mgml = NULL,
-  cCells_Mml = NULL
+  cCells_Mml = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -61,6 +62,8 @@ For kct\tabular{lll}{
 \item{cProtein_mgml}{concentration of subcellular protein (in mg/mL)}
 
 \item{cCells_Mml}{concentration of hepatocytes used (in million cells/mL)}
+
+\item{verbose}{if TRUE, print the inputs and the resulting clearance}
 }
 \value{
 Specific clearance parameter (/min) to plug in PK-Sim

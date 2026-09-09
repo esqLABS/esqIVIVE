@@ -14,7 +14,7 @@ Currently there are available codes to calculate: fraction unbound in microsomes
 
 -   calculate_fu_mic_austin()
 
--   calculate_fu_hep_halifax()
+-   calculate_fu_mic_halifax()
 
 -   calculate_fu_mic_turner()
 
@@ -30,7 +30,7 @@ derive metabolism parameters from experimental curves:
 
 -   fit_clearance_from_curve()
 
--   get_MM()
+-   fit_mm_from_curve()
 
 perform scaling for clearance:
 

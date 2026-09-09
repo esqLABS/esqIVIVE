@@ -6,16 +6,17 @@
 #' Function to derive micahelis-menten form raw data
 #'
 #' @param experimental_conc_velocity is a experimental curve with concentration in the first column and velocity in the second column
+#' @param verbose if TRUE, print the inputs and the resulting Km/Vmax
 #'
 #' @return fitresults_vmax_km
 #' @examples
 #' mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv",package="esqIVIVE")
 #' mm_curve<-read.csv(mm_curve_path)
-#' get_MM(mm_curve)
-#' 
+#' fit_mm_from_curve(mm_curve)
+#'
 #' @export
 
-fit_mm_from_curve <- function(experimental_conc_velocity) {
+fit_mm_from_curve <- function(experimental_conc_velocity, verbose = FALSE) {
     library(ggplot2)
     colnames(experimental_conc_velocity)<-c("Concentration","Velocity")
     
@@ -29,7 +30,6 @@ fit_mm_from_curve <- function(experimental_conc_velocity) {
       ),
       trace = FALSE
     )
-    fit_95conf = confint(fitmm)
     
     r_squared_nls <- function(model) {
       rss <- sum(residuals(model)^2)
@@ -38,6 +38,12 @@ fit_mm_from_curve <- function(experimental_conc_velocity) {
       1 - (rss / tss)
     }
     r2<-round(r_squared_nls(fitmm),digits=3)
+    
+    if (r2<0.8){
+      warning("fitting does not support typical MM kinetics or the suitability of the data")
+    } else {}
+    
+    fit_95conf = confint(fitmm)
     
     #check if fitting is good
     mm_fuction <- function(Concentration) {
@@ -69,5 +75,15 @@ fit_mm_from_curve <- function(experimental_conc_velocity) {
 
     row.names(fitresults_vmax_km) = c("Km_uM", "Vmax_umol_min_mgmicroORcells")
     print(plot_diagnosis)
+
+    if (verbose) {
+      .print_ivive_result(
+        "fit_mm_from_curve",
+        inputs = list(experimental_conc_velocity = experimental_conc_velocity),
+        result = fitresults_vmax_km
+      )
+    }
+  
+      
     return(fitresults_vmax_km)
  }

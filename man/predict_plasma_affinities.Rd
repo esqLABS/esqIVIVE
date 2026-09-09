@@ -13,13 +13,16 @@ predict_plasma_affinities(
   LFER_B = NULL,
   LFER_A = NULL,
   LFER_S = NULL,
-  LFER_V = NULL
+  LFER_V = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
 \item{QSAR}{type of QSAR, it can be logP based or PPLFER based (still sorting the ionization)}
 
 \item{logP}{is the lipophilicity as given by logKow}
+
+\item{pKa}{is a vector of length of 2}
 
 \item{ionization}{is a vector of length of 2 which should indicate if chemical is neutral, acid basic.
 There are spots for ionization in case chemical is zwitterion}
@@ -34,7 +37,7 @@ There are spots for ionization in case chemical is zwitterion}
 
 \item{LFER_V}{abraham volume}
 
-\item{pka}{is a vector of length of 2}
+\item{verbose}{if TRUE, print the inputs and the resulting partition coefficients}
 }
 \value{
 partition_membrane_lipids (in L/L), partition_albumin (in L/kg) and partition_globulin (in L/kg)

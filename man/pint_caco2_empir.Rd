@@ -4,10 +4,12 @@
 \alias{pint_caco2_empir}
 \title{Function to convert from Papp to Pint transcellular permeability from a empirical regression}
 \usage{
-pint_caco2_empir(Papp_cms)
+pint_caco2_empir(Papp_cms, verbose = FALSE)
 }
 \arguments{
 \item{Papp_cms}{, permeability from Caco-2 in cms}
+
+\item{verbose}{if TRUE, print the inputs and the resulting pint_cms}
 }
 \value{
 pint in units cm/s
@@ -17,5 +19,5 @@ Function to convert from Papp to Pint transcellular permeability from a empirica
 }
 \examples{
 pint_caco2_empir(Papp_cms=2.3E-6)
- 
+
 }

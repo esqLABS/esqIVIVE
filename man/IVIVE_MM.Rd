@@ -11,7 +11,8 @@ IVIVE_MM(
   km_micromolar,
   tissue = "liver",
   species = "human",
-  REF = 1
+  REF = 1,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -21,7 +22,7 @@ IVIVE_MM(
 
 \item{vmax}{as umol/min/million hepatocytes or umol/min/mg microsomal protein}
 
-\item{km_micromolar}{}
+\item{km_micromolar}{Km of the enzyme reaction, in uM}
 
 \item{tissue}{liver, brain, lung, kidney, gonads and gut, default is liver}
 
@@ -30,6 +31,8 @@ IVIVE_MM(
 \item{REF}{relative expression or activity factor, default is 1.
 To use this option the reference concentration of
 of the enzyme of interest in pksim needs to be 1 uM}
+
+\item{verbose}{if TRUE, print the inputs and the resulting Vmax/Km}
 }
 \value{
 Vmax in umol/min/L and Km_unb in uM
