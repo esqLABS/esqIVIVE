@@ -43,8 +43,8 @@ fit_clearance_from_curve <- function(expData_tmin_cuM, verbose = FALSE) {
   
   r_squared_nls <- function(model) {
     rss <- sum(residuals(model)^2)
-    tss <- sum((clear_curve_xy$x- 
-                  mean(clear_curve_xy$x))^2)  # y - mean(y)
+    tss <- sum((clear_curve_xy$y- 
+                  mean(clear_curve_xy$y))^2)  # y - mean(y)
     1 - (rss / tss)
   }
   r2<-round(r_squared_nls(fitKcat),digits=3)
