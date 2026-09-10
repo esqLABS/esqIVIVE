@@ -21,7 +21,7 @@ IVIVE_clearance(
 )
 }
 \arguments{
-\item{typeValue}{what type of value it is: kcat_min (directly from in vitro), halfLife or invitro_clearance_parameter)}
+\item{typeValue}{what type of value it is: kcat (directly from in vitro), halfLife or invitro_clearance_parameter)}
 
 \item{units}{this are the units of the value.
 For kct\tabular{lll}{
@@ -76,9 +76,9 @@ IVIVE for clearance based on different type of values
 IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
 expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 
-if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
+# if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
 IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",units="mL/minutes/millioncells",
-expData=18.27,cCells_Mml=0.5)
+expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 
 
 # example microsomes

@@ -10,6 +10,7 @@ calculate_fu_hep_poulin(
   blood_plasma = NULL,
   fraction_unbound = NULL,
   concentration_cell_neutral_lipids,
+  cCellAPL,
   log_lipophilicity,
   verbose = FALSE
 )
@@ -25,6 +26,9 @@ calculate_fu_hep_poulin(
 
 \item{concentration_cell_neutral_lipids}{neutral lipid concentration}
 
+\item{cCellAPL}{acidic phospholipid concentration in the in vitro system (as fraction of medium volume);
+only used for strong bases (base ionization class with a pKa above 7)}
+
 \item{log_lipophilicity}{LogP or LogMA of the compound}
 
 \item{verbose}{if TRUE, print the inputs and the resulting fu_invitro}
@@ -36,6 +40,6 @@ fuInvitro
 The Poulin algorithm for calculating Fu in vitro
 }
 \examples{
-calculate_fu_hep_poulin(ionization=c("base",0),pKa=c(6,0),blood_plasma=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
+calculate_fu_hep_poulin(ionization=c("base",0),pKa=c(8,0),blood_plasma=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,cCellAPL=0.01,log_lipophilicity=3)
 calculate_fu_hep_poulin(ionization=c("neutral",0),pKa=c(0,0),concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
 }

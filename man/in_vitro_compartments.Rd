@@ -34,7 +34,7 @@ a list of values representing the  different in vitro compartments, concentratio
 }
 \description{
 Generates a list of values describing a liver in vitro compartment based on hepatocytes or microsomes
-This function is used inside the Fraction unbound function
+This function is used inside the Fraction unbound function but can also be used for general virtual hepatocyte systems
 }
 \examples{
 in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)

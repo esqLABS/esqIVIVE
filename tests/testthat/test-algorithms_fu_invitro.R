@@ -57,8 +57,21 @@ test_that("calculate_fu_hep_poulin", {
     0.032258064516129,
     tolerance = 1e-6
   )
+  # Strong base (ionization[1]=="base" & pKa[1]>7): this branch used to
+  # reference an undefined `cCellAPL` and error; it's now a proper parameter.
+  expect_equal(
+    calculate_fu_hep_poulin(
+      ionization = c("base", 0), pKa = c(8, 0), blood_plasma = 1, fraction_unbound = 0.2,
+      concentration_cell_neutral_lipids = 0.03, cCellAPL = 0.01, log_lipophilicity = 3
+    ),
+    0.0203691900058836,
+    tolerance = 1e-6
+  )
+  # cCellAPL is required for the strong-base branch; omitting it errors clearly.
+  expect_error(
+    calculate_fu_hep_poulin(
+      ionization = c("base", 0), pKa = c(8, 0), blood_plasma = 1, fraction_unbound = 0.2,
+      concentration_cell_neutral_lipids = 0.03, log_lipophilicity = 3
+    )
+  )
 })
-
-# KNOWN ISSUE: calculate_fu_hep_poulin() with a strong base (ionization[1]=="base"
-# and pKa[1] > 7) references an undefined `cCellAPL` and errors - not asserted
-# here. See plan Known Issues #2.

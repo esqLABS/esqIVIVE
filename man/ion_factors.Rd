@@ -17,7 +17,7 @@ ion_factors(ionization, pKa, verbose = FALSE)
 factors that can be used to calculate the fraction neutral or ionized in plasma and intracellularly
 }
 \description{
-Function to calculate fraction unionized
+Helper Function to calculate fraction unionized
 If there are multiple pKas for acidity just use the lower value
 If there are multiple pKas for basicity just use the lower value
 Mind that pKb is not the same as pKa !

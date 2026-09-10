@@ -3,7 +3,7 @@
 #' @description
 #' IVIVE for clearance based on different type of values
 #'
-#' @param typeValue what type of value it is: kcat_min (directly from in vitro), halfLife or invitro_clearance_parameter)
+#' @param typeValue what type of value it is: kcat (directly from in vitro), halfLife or invitro_clearance_parameter)
 #' @param units this are the units of the value.
 #'  For kct 
 #'  | Hepatocytes | Subcellular      | Generic |
@@ -44,7 +44,7 @@
 #' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
 #' expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #'
-#'if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
+#' # if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
 #' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",units="mL/minutes/millioncells",
 #' expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 #' 
@@ -106,12 +106,7 @@ IVIVE_clearance <- function(
   SF2 <- 1 / fintcell * REF / fu_invitro
 
   #Derive the in vitro clearance value---------------------
-  if (typeValue == "kcat_min") {
-    
-    kcat_min <- expData
-    ClspePermin <- kcat_min / cInvitro * SF
-    
-  } else if (typeValue == "halfLife") {
+  if  (typeValue == "halfLife") {
     halfLife <- expData
 
     #make matrix of calculations depending on the units
@@ -123,7 +118,14 @@ IVIVE_clearance <- function(
     ])
     kcat_min <- 0.693 / halfLife * multFactorHalf
     ClspePermin <- kcat_min / cInvitro * SF
-  } else if (typeValue == "invitro_clearance_parameter") {
+    
+  } else if (typeValue == "invitro_clearance_parameter"||typeValue == "kcat") {
+    if (typeValue == "kcat" && !(units %in% c("/minutes", "/hours", "/seconds"))) {
+      warning(
+        "typeValue = \"kcat\" expects units of \"/minutes\", \"/hours\" or \"/seconds\" ",
+        "(kcat is already a rate constant); got \"", units, "\"."
+      )
+    }
     #make matrix of calculations depending on the units
     matrixCalClear <- cbind(
       c(
@@ -226,12 +228,12 @@ IVIVE_clearance <- function(
   #Add scalars from Wood et al 2017-https://doi.org/10.1124/dmd.117.077040.
   wood_sf <- list()
   wood_sf[["human"]] <- data.frame(
-    Cl_ranges = c("<10", "10-100", "100-1000", "1000-1000", ">10000"),
+    Cl_ranges = c("<10", "10-100", "100-1000", "1000-10000", ">10000"),
     microsomes = c(0.7, 1.8, 4.6, 7.5, 58),
     hepatocytes = c(0.61, 3.9, 7.1, 22, 1200)
   )
   wood_sf[["rat"]] <- data.frame(
-    Cl_ranges = c("<10", "10-100", "100-1000", "1000-1000", ">10000"),
+    Cl_ranges = c("<10", "10-100", "100-1000", "1000-10000", ">10000"),
     microsomes = c(0.086, 0.83, 1.7, 2.5, 230),
     hepatocytes = c(0.13, 1.6, 3.2, 7.2, 180)
   )

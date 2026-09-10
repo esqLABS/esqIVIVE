@@ -95,14 +95,14 @@ calculate_fu_in_vitro <- function(
   }
 
   # run function to get ionization factors
-
+  
   ionization_factors <- ion_factors(ionization, pka)
   ion_factor_plasma <- ionization_factors["ion_factor_plasma"] # Interstitial tissue
   ion_factor_cells <- ionization_factors["ion_factor_cells"] # intracellular
-
+  
   protein_partition_1 <- 0.73 * 10^log_lipophilicity - 0.39 # from Endo 2012,dx.doi.org/10.1021/es303379y partition to chicken muscle, R2=0.86
   protein_partition_2 <- 0.163 + 0.0221 * 10^log_lipophilicity #from Schmitt 2008, doi:10.1016/j.tiv.2007.09.010
-  kPro <- mean(protein_partition_1, protein_partition_2)
+  kPro <- mean(c(protein_partition_1, protein_partition_2))
 
   # Calculate air-water partition coefficient
   #default to a low hlc if it is not given
@@ -119,9 +119,9 @@ calculate_fu_in_vitro <- function(
   plastic_partition_fischer <- 10**(log_lipophilicity * 0.47 - 4.64)
   plastic_partition_kramer <- 10**(log_lipophilicity * 0.97 - 6.94)
   kPlastic <- as.double(
-    mean(plastic_partition_fischer, plastic_partition_kramer) *
+    mean(c(plastic_partition_fischer, plastic_partition_kramer) *
       1 /
-      (1 + ion_factor_cells)
+      (1 + ion_factor_cells))
   )
 
   # get in vitro compartments----------------------------------------------------
@@ -215,9 +215,17 @@ calculate_fu_in_vitro <- function(
     # RR can only be used by using fu
     # partition into acid phospholipids is only considered if chemical is a strong base
     # this is done by considering X as 0 for acids and neutral chemic.
+    if (!(ionization[1] == "base" & pka[1] > 7)) {
+      stop(
+        "\"Rodgers & Rowland + fu\" currently only supports strong bases ",
+        "(ionization[1] == \"base\" and pka[1] > 7). PK-Sim uses a different, ",
+        "protein-binding-based pathway (Ka_PR) for acids, neutrals and weak ",
+        "bases that is not yet implemented here."
+      )
+    }
 
     kOW <- 10^log_lipophilicity
-    kNL <- kOW * (1 / (1 + blood_plasma_ratio))
+    kNL <- kOW * (1 / (1 + ion_factor_plasma))
     Hema <- 0.45
     kpuBC <- (Hema - 1 + blood_plasma_ratio) / (Hema * fraction_unbound)
     fiwBC <- 0.63
@@ -228,18 +236,18 @@ calculate_fu_in_vitro <- function(
     KAPL_1 <- max(
       0,
       kpuBC -
-        (1 + blood_plasma_ratio) / (1 + X) * fiwBC -
-        (kNL * fnlBC + (0.3 * kNL + 0.7) * fnpBC)
+        (1 + ion_factor_cells) / (1 + ion_factor_plasma) * fiwBC -
+        (kNL * fnlBC + (0.3 * kNL + 0.7 / (1 + ion_factor_plasma)) * fnpBC)
     )
 
-    kAPL <- KAPL_1 * (1 + blood_plasma_ratio) / APbc / blood_plasma_ratio
+    kAPL <- KAPL_1 * (1 + ion_factor_plasma) / APbc / ion_factor_cells
 
     fuInvitro <- as.double(
       1 /
         (1 +
           kNL * (cCellNL + cMediumNL) +
-          (kNL * 0.3 + 0.7) * (cCellNPL + cMediumNPL) +
-          kAPL * (cCellAPL) * X / (1 + X) +
+          (kNL * 0.3 + 0.7 / (1 + ion_factor_plasma)) * (cCellNPL + cMediumNPL) +
+          kAPL * (cCellAPL) * ion_factor_plasma / (1 + ion_factor_plasma) +
           kPlastic * saPlasticVolMedium)
     )
   } else if (partition_qspr == "All Schmitt") {
@@ -293,6 +301,7 @@ calculate_fu_in_vitro <- function(
       blood_plasma = blood_plasma_ratio,
       fraction_unbound = fraction_unbound,
       concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
+      cCellAPL=cCellAPL,
       log_lipophilicity = log_lipophilicity
     )
   } else if (partition_qspr == "Austin" && type_system == "microsomes") {
@@ -326,6 +335,7 @@ calculate_fu_in_vitro <- function(
         blood_plasma = blood_plasma_ratio,
         fraction_unbound = fraction_unbound,
         concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
+        cCellAPL=cCellAPL,
         log_lipophilicity = log_lipophilicity
       ),
       calculate_fu_mic_austin(
@@ -361,6 +371,7 @@ calculate_fu_in_vitro <- function(
       blood_plasma = blood_plasma_ratio,
       fraction_unbound = fraction_unbound,
       concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
+      cCellAPL=cCellAPL,
       log_lipophilicity = log_lipophilicity
     )
   } else if (partition_qspr == "Kilford" && type_system == "hepatocytes") {
@@ -386,6 +397,7 @@ calculate_fu_in_vitro <- function(
         blood_plasma = blood_plasma_ratio,
         fraction_unbound = fraction_unbound,
         concentration_cell_neutral_lipids = concentration_cell_neutral_lipids,
+        cCellAPL=cCellAPL,
         log_lipophilicity = log_lipophilicity
       ),
       calculate_fu_hep_austin(
@@ -419,9 +431,10 @@ calculate_fu_in_vitro <- function(
 
 
 calculate_ionization_schmitt <- function(ionization, pka) {
+  # Supports up to 2 ionizable groups (ionization/pka of length 2)
   pH <- 7.4
 
-  ionParam <- c(0, 0, 0)
+  ionParam <- c(0, 0)
   for (i in seq(1, 2)) {
     if (ionization[i] == "acid") {
       ionParam[i] <- 1
@@ -446,53 +459,28 @@ calculate_ionization_schmitt <- function(ionization, pka) {
     F2 <- 1
   }
 
-  if (abs(ionParam[2]) == 1) {
-    F3 <- 1 / (1 + 10^(ionParam[3] * (pka[3] - pH)))
-  } else {
-    F3 <- 1
-  }
-
-  # fraction neutral
-  K1 <- F1 * F2 * F3
-  # fraction with one ionized group
-  K2 <- (1 - F1) * F2 * F3
-  # fraction with one ionized group
-  K3 <- F1 * (1 - F2) * F3
-  # fraction with one ionized group
-  K4 <- F1 * F2 * (1 - F3)
-  # fraction ionized with two groups
-  K5 <- (1 - F1) * (1 - F2) * F3
-  # fraction ionized with two groups
-  K6 <- (1 - F1) * F2 * (1 - F3)
-  # fraction ionized with two groups
-  K7 <- F1 * (1 - F2) * (1 - F3)
-  # Fraction fully ionized
-  K8 <- (1 - F1) * (1 - F2) * (1 - F3)
+  # fraction neutral (both groups uncharged)
+  K1 <- F1 * F2
+  # fraction with only the first group ionized
+  K2 <- (1 - F1) * F2
+  # fraction with only the second group ionized
+  K3 <- F1 * (1 - F2)
+  # fraction with both groups ionized
+  K4 <- (1 - F1) * (1 - F2)
 
   # taken from schmitt paper
   alpha <- 0.001 # ratio of lipophilciity between the neutral and the charged species of a molecule
   # check eq 9 from Schmitt paper
   logD_Factor <- K1 +
-    (K2 + K3 + K4) * alpha^1 +
-    K5 * alpha^max(ionParam[1] + ionParam[2], -ionParam[1] - ionParam[2]) +
-    K6 * alpha^max(ionParam[1] + ionParam[3], -ionParam[1] - ionParam[3]) +
-    K7 * alpha^max(ionParam[3] + ionParam[2], -ionParam[3] - ionParam[2]) +
-    K8 *
-      alpha^max(
-        ionParam[1] + ionParam[2] + ionParam[3],
-        -ionParam[1] - ionParam[2] - ionParam[3]
-      )
+    (K2 + K3) * alpha^1 +
+    K4 * alpha^max(ionParam[1] + ionParam[2], -ionParam[1] - ionParam[2])
 
   # check equation 17 and 18 of Schmitt paper
   proportFactorAPL <- 20
   kAPLpHFactor <- K1 +
     K2 * proportFactorAPL^ionParam[1] +
     K3 * proportFactorAPL^ionParam[2] +
-    K4 * proportFactorAPL^ionParam[3] +
-    K5 * proportFactorAPL^(ionParam[1] + ionParam[2]) +
-    K6 * proportFactorAPL^(ionParam[1] + ionParam[3]) +
-    K7 * proportFactorAPL^(ionParam[3] + ionParam[2]) +
-    K8 * proportFactorAPL^(ionParam[1] + ionParam[2] + ionParam[3])
+    K4 * proportFactorAPL^(ionParam[1] + ionParam[2])
 
   return(c("logD_Factor" = logD_Factor, "kAPLpHFactor" = kAPLpHFactor))
 }

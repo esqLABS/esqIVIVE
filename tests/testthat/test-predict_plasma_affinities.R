@@ -5,7 +5,7 @@ test_that("predict_plasma_affinities: logP QSAR, ionized compound", {
   # does not resolve by exact name.
   result <- predict_plasma_affinities(QSAR = "logP", logP = 2, pKa = c(3, 0), ionization = c("acid", 0))
 
-  expect_equal(unname(as.double(result))[1:3], c(1.000183344634427, 0.185104051916421, 0.185104051916421), tolerance = 1e-6)
+  expect_equal(unname(as.double(result))[1:3], c(1.000183344634427, 0.185104051916421, 0.349000112570181), tolerance = 1e-6)
 })
 
 test_that("predict_plasma_affinities: PPLFER QSAR", {
@@ -26,7 +26,3 @@ test_that("predict_plasma_affinities rejects an invalid QSAR", {
     predict_plasma_affinities(QSAR = "bogus", logP = 2, pKa = c(3, 0), ionization = c("acid", 0))
   )
 })
-
-# KNOWN ISSUE: the logP QSAR branch for a neutral compound (pKa[1]==0) uses
-# mean(kglob_Lkg_1, kglob_Lkg_2), which R interprets as mean(x, trim) and
-# silently drops kglob_Lkg_2 - not asserted here. See plan Known Issues #3.
