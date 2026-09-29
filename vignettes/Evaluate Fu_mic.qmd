@@ -43,13 +43,21 @@ $$ Where Fw is the fraction ofwater is the system( very close to 1), Im is the i
 
 For basic chemicals the affintiy to acidic phospholipids is also accounted.Here Papla is the partition to acidic phospholipids and Faplm is the fraction of acidic phospholipids.
 
-$$ 
+$$
 fu_{inc} = \frac{1}{Fw+\frac{Pnla\cdot Fnlm+Im\cdot Papla\cdot Faplm}{1+Im}}
-$$ Pnla is parameterized with logPow at 37 C. Since logKow values are often for 20 °C, the authors used a linear regression that corrects for the temperature difference. Papla is parameterized based on a similar regression form Rodgers and Rowland where they use the red blood cells plasma partition coefficient and fraction unbound in plasma.
+$$ Pnla is parameterized with logPow at 37 C. Since logKow values are often for 20 °C, the authors used a linear regression that corrects for the temperature difference. Papla is parameterized based on a similar regression from Rodgers and Rowland where they use the red blood cells plasma partition coefficient and fraction unbound in plasma.
+
+**Rodgers & Rowland**
+
+Adapts the same mechanistic (neutral lipid / neutral and acidic phospholipid) partitioning approach Rodgers & Rowland use for whole-organ tissue partitioning to the in vitro incubation compartments instead. The acidic-phospholipid affinity constant is calibrated from the compound's blood-cell partitioning (fraction unbound in plasma and blood:plasma ratio), so it is currently only implemented for strong bases (ionization class "base" with pKa \> 7) - for every other class PK-Sim itself switches to a different, protein-binding-based term that this package does not implement yet.
+
+**All_literature**
+
+A simple average of the four empirical/literature regressions above (Poulin, Halifax and Houston, Austin, Turner), computed with this package's own implementation of each rather than the papers' originally reported values.
 
 ```{r}
 #| label: load functions and data
-#| echo: false
+#| include: false
 
 #install_local()
 
@@ -61,11 +69,13 @@ library(here)
 devtools::load_all()
 
 
-data_path<-system.file("data","test_fu_microsomes.csv",package="esqIVIVE")
+data_path<-system.file("extdata","test_fu_microsomes.csv",package="esqIVIVE")
 testFuData<-read.csv(data_path)
 ```
 
-#### Calculate Fu_mic for all
+We used the Fu_mic from this dataset to evaluate the predictions
+
+#### alculate Fu_mic for all
 
 ```{r}
 #| echo: false
@@ -74,27 +84,52 @@ QSARs <- c(
   "All Poulin and Theil",
   "All Berezhkovskiy",
   "All PK-Sim Standard",
-  # "Rodgers & Rowland + fu",
-  "All Schmitt"
+  "Rodgers & Rowland + fu",
+  "All Schmitt",
+  "All_literature"
 )
-
-for (j in seq(1:length(QSARs))) {
-  for (i in seq(1:nrow(testFuData))) {
-    testFuData[i, 13 + j] <- FractionUnbound(
-      partitionQSPR = QSARs[j], logLipo = as.double(testFuData[i, "LogP37C"]),
-      ionization = c(testFuData[i, "Class"], 0),
-      typeSystem = "microsomes", FBS_fraction  = 0, microplateType = 96,
-      volMedium = 0.22, pKa = c(as.double(testFuData[i, "pKa"]), 0),
-      BP = 1, fu = 0.2,
-      cMicro_mgml = as.double(testFuData[i, "Cp.mg.mL."]))
-  }
-}
-colnames(testFuData)[seq(14, 17)] <- c(
+QSAR_colnames <- c(
   "All_Poulin_and_Theil",
   "All_Berezhkovskiy",
   "All_PK_Sim_Standard",
-  # "Rodgers_Rowland_fu",
-  "All_Schmitt"
+  "Rodgers_Rowland_fu",
+  "All_Schmitt",
+  "All_literature"
+)
+
+# Rodgers & Rowland only supports strong bases (ionization == "base" and
+# pKa > 7) - for every other compound it errors by design, since PK-Sim
+# itself switches to a different, protein-binding-based pathway for those
+# that we don't implement. We also don't have per-compound fraction unbound
+# in plasma / blood:plasma ratio for this microsomal dataset, so a generic
+# literature default (fraction_unbound = 0.2, blood_plasma_ratio = 1) is used
+# where Rodgers & Rowland and All_literature (which uses Poulin internally)
+# need it - a real limitation, not a substitute for compound-specific values.
+safe_fu <- function(...) tryCatch(calculate_fu_in_vitro(...), error = function(e) NA_real_)
+
+for (j in seq_along(QSARs)) {
+  testFuData[[QSAR_colnames[j]]] <- sapply(seq_len(nrow(testFuData)), function(i) {
+    # pKa is not numeric for neutral compounds (no ionizable group); this is
+    # fine since none of the QSARs above use pka when the compound is neutral.
+    suppressWarnings(safe_fu(
+      partition_qspr = QSARs[j],
+      log_lipophilicity = as.double(testFuData[i, "LogP37C"]),
+      ionization = c(testFuData[i, "Class"], 0),
+      type_system = "microsomes",
+      FBS_fraction = 0,
+      microplate_type = 96,
+      volume_medium = 0.22,
+      pka = c(as.double(testFuData[i, "pKa"]), 0),
+      concentration_microsomes = as.double(testFuData[i, "Cp.mg.mL."]),
+      blood_plasma_ratio = 1,
+      fraction_unbound = 0.2
+    ))
+  })
+}
+
+cat(
+  "Rodgers & Rowland computed for", sum(!is.na(testFuData$Rodgers_Rowland_fu)),
+  "of", nrow(testFuData), "compounds (strong bases only)\n"
 )
 
 head(testFuData)
@@ -103,122 +138,161 @@ head(testFuData)
 Mind that experimental values also have intrinsic variability and Wang et al 2024, it is described how chemicals with lower Fu_microsomes tend to have higher coeficients of variation. Specifically for Verapamil 1 mg/mL microsomes concentration different analytical methods 0.43 with RED device, 0.58 wuth ultrafiltration, 0.41 with HLM-beads, 0.45 with Ultracentrifugation and 0.89 Transil and 0.3 with linear extrapolation stability assay.
 
 ```{r}
-Verapamil<-testFuData[which(testFuData$Compound=="Verapamil")[4],10:17]
+verapamil_row <- which(testFuData$Compound == "Verapamil")[4]
+verapamil_predictions <- as.double(testFuData[verapamil_row, 10:ncol(testFuData)])
 
-plot(x=rep(1,8),y=as.double(Verapamil),xlim=c(0,3),xlab="Fu_Verapamil")
-points(x=rep(2,6),c(0.43,0.58,0.41,0.45,0.89,0.3),col="red")
-legend(x=2.5,y=0.3, legend=c("exp","predicted"),col=c("red","black"),pch=19)
+verapamil_df <- data.frame(
+  fu = c(verapamil_predictions, c(0.43, 0.58, 0.41, 0.45, 0.89, 0.3)),
+  type = c(
+    rep("predicted (all methods)", length(verapamil_predictions)),
+    rep("experimental (different assays)", 6)
+  )
+)
 
+ggplot(verapamil_df, aes(x = type, y = fu, color = type)) +
+  geom_jitter(width = 0.05, height = 0, size = 3) +
+  labs(
+    x = NULL, y = "Fu_mic",
+    title = "Verapamil, 1 mg/mL microsomes",
+    subtitle = "prediction spread vs. experimental assay spread"
+  ) +
+  theme_bw() +
+  theme(legend.position = "none")
 ```
 
 ### Plots
 
 ```{r}
-Poulin_paper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_Poulin,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
+#| fig.width: 12
+#| fig.height: 10
 
-Halifax_paper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_HalifaxHouston,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
+# First 4 columns are the original papers' own reported predictions (from the
+# dataset itself); the rest are computed by this package above.
+plot_cols <- c(
+  "Fu_Poulin", "Fu_HalifaxHouston", "Fu_Turner", "Fu_Austin",
+  QSAR_colnames
+)
 
+make_fu_plot <- function(data, ycol) {
+  ggplot(data, aes(x = Obs_Fumic, y = .data[[ycol]], col = Class)) +
+    geom_smooth(method = "lm", se = FALSE) +
+    geom_point() +
+    theme_bw() +
+    labs(title = ycol, y = "Predicted Fu_mic") +
+    stat_regline_equation(aes(label = after_stat(rr.label)))
+}
 
-Turner_paper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_Turner,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
-
-Austinpaper<-ggplot(testFuData, aes(x = Obs_Fumic, y = Fu_Austin,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
-
-Poulin_Theil<-ggplot(testFuData, aes(x = Obs_Fumic, y = All_Poulin_and_Theil,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
-
-Schmitt<-ggplot(testFuData, aes(x = Obs_Fumic, y = All_Schmitt,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
-
-PKsimstand<-ggplot(testFuData, aes(x = Obs_Fumic, y = All_PK_Sim_Standard,col = Class)) +
-  # geom_point(aes(x=Obs,y=Pred.Poulin))+
-  # geom_point(aes(x=Obs,y=All_PK_Sim_Standard))
-  geom_smooth(method = "lm", se = FALSE)+
-  geom_point()+
-  theme_bw()+
-  stat_regline_equation(aes(label = ..rr.label..)) 
-
-ggarrange(Poulin_paper,Halifax_paper,Turner_paper,Austinpaper,Poulin_Theil,
-          Schmitt,PKsimstand,common.legend = TRUE)
+fu_plots <- lapply(plot_cols, make_fu_plot, data = testFuData)
+ggarrange(plotlist = fu_plots, common.legend = TRUE)
 ```
 
 ### Error Table
 
-Calculate how many is within 1.5 % fold , 2 folder, 5 fold, AFE and AAFE.
+For each method and each chemical class (acid/base/neutral), we calculate:
+
+-   `percent_within_2fold` / `percent_within_5fold`: the percentage of predictions within 2-fold / 5-fold of the observed value
+-   `afe_method` (Average Fold Error) and `aafe_method` (Average Absolute Fold Error): overall magnitude of error, direction-agnostic
+-   `bias_fold`: the signed geometric-mean fold error - values \>1 indicate the method tends to over-predict on average, \<1 under-predict; this complements AAFE, which only captures magnitude, not direction
+-   `rmse`: root mean squared error, on the same 0-1 scale as Fu, easy to interpret in absolute terms
+-   `r2`: Pearson r², the strength of the *linear* relationship between predicted and observed
+-   `spearman_rho`: Spearman rank correlation, robust to nonlinearity and outliers - useful when what matters is whether the method ranks compounds correctly rather than matching the exact scale
+-   `ccc`: Lin's Concordance Correlation Coefficient - unlike r² this penalizes any systematic deviation from the line of identity (y = x), so a method can be well correlated (high r²) yet still score poorly here if it is systematically biased or mis-scaled
+
+Rodgers & Rowland only has predictions for strong bases (see above), so all metrics for that method are computed only over its available (non-`NA`) subset - `n` reports how many compounds contributed to each row.
 
 ```{r}
-error_table<-data.frame((matrix(ncol = 6, nrow = 7)))
-  
-#error functions
+# All metrics below are computed only on rows where both observed and
+# predicted are finite, since Rodgers & Rowland only has results for strong
+# bases and would otherwise silently drop out of every summary.
+complete_pairs <- function(observed, predicted) {
+  ok <- is.finite(observed) & is.finite(predicted)
+  list(observed = observed[ok], predicted = predicted[ok])
+}
+
 # % within fold function
 percent_within_fold <- function(observed, predicted, fold) {
-  mean(predicted >= observed / fold & predicted <= observed * fold) * 100
+  cp <- complete_pairs(observed, predicted)
+  mean(cp$predicted >= cp$observed / fold & cp$predicted <= cp$observed * fold) * 100
 }
 
 # Average Fold Error (AFE) function
 afe <- function(observed, predicted) {
-  mean(abs(predicted / observed))
+  cp <- complete_pairs(observed, predicted)
+  mean(abs(cp$predicted / cp$observed))
 }
 
+# Average Absolute Fold Error (AAFE) function
 aafe <- function(observed, predicted) {
-  mean(abs(log10(predicted / observed)))
+  cp <- complete_pairs(observed, predicted)
+  mean(abs(log10(cp$predicted / cp$observed)))
 }
 
-error_table<-list()
-
-
-for (i in 1:8){
-  
- predi<-colnames(testFuData)[9+i]
- error_table[[predi]] <- testFuData %>%
-  group_by(Class) %>%
-  summarize(
-    percent_within_2fold = percent_within_fold(Obs_Fumic, .data[[predi]], 2),
-    percent_within_5fold = percent_within_fold(Obs_Fumic, .data[[predi]], 5),
-    afe_method= afe(Obs_Fumic, .data[[predi]]),
-    aafe_method = aafe(Obs_Fumic, .data[[predi]]),
-    .groups = 'drop'
-  ) 
-  
+# Bias: signed geometric-mean fold error
+bias_fold <- function(observed, predicted) {
+  cp <- complete_pairs(observed, predicted)
+  10^(mean(log10(cp$predicted / cp$observed)))
 }
 
-#View(error_table[["Fu_Poulin"]])
+# RMSE: average error magnitude on the same 0-1 scale as Fu
+rmse <- function(observed, predicted) {
+  cp <- complete_pairs(observed, predicted)
+  sqrt(mean((cp$predicted - cp$observed)^2))
+}
 
-  
+# Pearson r^2: strength of the linear relationship
+pearson_r2 <- function(observed, predicted) {
+  cp <- complete_pairs(observed, predicted)
+  if (length(cp$observed) < 3) {
+    return(NA_real_)
+  }
+  cor(cp$observed, cp$predicted, method = "pearson")^2
+}
 
+# Spearman rho: strength of the rank relationship
+spearman_rho <- function(observed, predicted) {
+  cp <- complete_pairs(observed, predicted)
+  if (length(cp$observed) < 3) {
+    return(NA_real_)
+  }
+  cor(cp$observed, cp$predicted, method = "spearman")
+}
+
+# Lin's Concordance Correlation Coefficient: penalizes deviation from the
+# line of identity (y = x), not just correlation
+lin_ccc <- function(observed, predicted) {
+  cp <- complete_pairs(observed, predicted)
+  if (length(cp$observed) < 2) {
+    return(NA_real_)
+  }
+  mean_o <- mean(cp$observed)
+  mean_p <- mean(cp$predicted)
+  var_o <- mean((cp$observed - mean_o)^2)
+  var_p <- mean((cp$predicted - mean_p)^2)
+  covar <- mean((cp$observed - mean_o) * (cp$predicted - mean_p))
+  (2 * covar) / (var_o + var_p + (mean_o - mean_p)^2)
+}
+
+error_table <- list()
+
+for (predi in plot_cols) {
+  error_table[[predi]] <- testFuData %>%
+    group_by(Class) %>%
+    summarize(
+      n = sum(is.finite(.data[[predi]])),
+      percent_within_2fold = percent_within_fold(Obs_Fumic, .data[[predi]], 2),
+      percent_within_5fold = percent_within_fold(Obs_Fumic, .data[[predi]], 5),
+      afe_method = afe(Obs_Fumic, .data[[predi]]),
+      aafe_method = aafe(Obs_Fumic, .data[[predi]]),
+      bias_fold = bias_fold(Obs_Fumic, .data[[predi]]),
+      rmse = rmse(Obs_Fumic, .data[[predi]]),
+      r2 = pearson_r2(Obs_Fumic, .data[[predi]]),
+      spearman_rho = spearman_rho(Obs_Fumic, .data[[predi]]),
+      ccc = lin_ccc(Obs_Fumic, .data[[predi]]),
+      .groups = "drop"
+    )
+}
+
+# error_table[["All_literature"]]
 ```
 
 Calculate liver partitioning for all is it more proportional to any specific ..
