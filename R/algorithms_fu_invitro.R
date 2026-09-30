@@ -141,7 +141,9 @@ calculate_fu_mic_austin<- function(
 #' @param verbose if TRUE, print the inputs and the resulting fu_invitro
 #' @return fuInvitro
 #' @export
-#' @examples calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+#' @examples
+#' calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,
+#'                         conc_cell_millionml=0.5)
 
 calculate_fu_hep_austin <- function(
   ionization,
@@ -181,7 +183,9 @@ calculate_fu_hep_austin <- function(
 #' @param verbose if TRUE, print the inputs and the resulting fu_invitro
 #' @return fuInvitro
 #' @export
-#' @examples calculate_fu_hep_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+#' @examples
+#' calculate_fu_hep_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,
+#'                          conc_cell_millionml=0.5)
 
 calculate_fu_hep_kilford <- function(
   ionization,
@@ -229,8 +233,10 @@ calculate_fu_hep_kilford <- function(
 #' @return fuInvitro
 #' @export
 #' @examples
-#' calculate_fu_hep_poulin(ionization=c("base",0),pKa=c(8,0),blood_plasma=1,fraction_unbound=0.2,concentration_cell_neutral_lipids=0.03,cCellAPL=0.01,log_lipophilicity=3)
-#' calculate_fu_hep_poulin(ionization=c("neutral",0),pKa=c(0,0),concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
+#' calculate_fu_hep_poulin(ionization=c("base",0),pKa=c(8,0),blood_plasma=1,fraction_unbound=0.2,
+#'                         concentration_cell_neutral_lipids=0.03,cCellAPL=0.01,log_lipophilicity=3)
+#' calculate_fu_hep_poulin(ionization=c("neutral",0),pKa=c(0,0),
+#'                         concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
 calculate_fu_hep_poulin <- function(
   ionization,
   pKa,

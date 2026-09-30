@@ -16,8 +16,10 @@
 #' @export
 #'
 #' @examples
-#' in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96, volMedium_mL = 0.15, cCells_Mml = 0.1)
-#' in_vitro_compartments("microsomes", FBS_fraction=0, microplateType = 24, volMedium_mL = 0.5, cMicro_mgml = 1)
+#' in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96,
+#'                       volMedium_mL = 0.15, cCells_Mml = 0.1)
+#' in_vitro_compartments("microsomes", FBS_fraction=0, microplateType = 24,
+#'                       volMedium_mL = 0.5, cMicro_mgml = 1)
 #'
 in_vitro_compartments <- function(
   typeSystem,
