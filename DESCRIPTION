@@ -1,24 +1,42 @@
 Package: esqIVIVE
-Title: What the Package Does (One Line, Title Case)
+Title: IVIVE of ADME Parameters for PBK Models
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Authors@R: c(
+    person("Susana", "Proença", , "susana.proenca@esqlabs.com", role = c("aut", "cre")),
+    person("Felix", "Mil", , "felix.mil@esqlabs.com", role = "ctb"),
+    person("ESQlabs GmbH", role = c("cph", "fnd"))
+  )
+Description: In vitro to in vivo extrapolation (IVIVE) of absorption,
+    distribution, metabolism and excretion (ADME) parameters, to derive
+    inputs for physiologically based kinetic (PBK) models. Predicts the
+    fraction unbound in microsomal and hepatocyte incubations and in plasma,
+    looks up measured fraction unbound values, fits substrate depletion and
+    Michaelis-Menten curves, scales in vitro clearance to in vivo, and
+    derives intestinal permeability from Caco-2 and effective permeability
+    values. The functions are developed for use with the Open Systems
+    Pharmacology Suite ('PK-Sim' and 'MoBi').
 License: MIT + file LICENSE
+URL: https://github.com/esqLABS/esqIVIVE, https://esqlabs.github.io/esqIVIVE/
+BugReports: https://github.com/esqLABS/esqIVIVE/issues
 Imports:
     ggplot2,
     readxl,
-    rlang
-Suggests: 
+    rlang,
+    stats,
+    utils
+Suggests:
     devtools,
-    dplyr,
-    ggpubr,
-    here,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+Config/Needs/website:
+    dplyr,
+    ggpubr,
+    here,
+    openxlsx,
+    ospsuite,
+    tidyr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.0
