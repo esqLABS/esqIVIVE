@@ -45,7 +45,7 @@ IVIVE_MM <- function(
   #Calculate in vivo Vmax--------------------------------------------------------
   #Scaling factors
   path <- system.file("extdata", "scaling_factors.csv", package = "esqIVIVE")
-  scaling_factors<-read.csv(path)
+  scaling_factors<-utils::read.csv(path)
 
   # check if the arguments are valid
   rlang::arg_match(species, unique(scaling_factors[,"species"]))
