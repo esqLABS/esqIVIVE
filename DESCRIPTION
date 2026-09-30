@@ -25,7 +25,6 @@ Imports:
     stats,
     utils
 Suggests:
-    devtools,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)

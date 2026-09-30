@@ -214,3 +214,7 @@ renv::install()
 ``` r
 devtools::test()
 ```
+
+The Quarto documents in `vignettes/articles/` are pkgdown articles, excluded
+from the R package build. Rendering the clearance article additionally requires
+`ospsuite` and PK-Sim. Generated HTML, supporting files, and results are ignored.

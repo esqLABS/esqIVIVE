@@ -17,7 +17,7 @@ params:
 
 This vignette showcases and compares different IVIVE frameworks for clearance, and evaluates how the clearance predicted with the standard PK-Sim PBK model compares with observed plasma clearances. In vitro metabolism data are converted with `esqIVIVE` into a PK-Sim specific clearance, which is then simulated in batch mode with the `ospsuite` R package using the PBK models in `inst/extdata/pkml4htpbk`.
 
-The scenarios to run and the simulation time can be set in the YAML header (`params`) or from the command line, e.g. `quarto render "Clearance IVIVE check.qmd" -P scenarios:S1,S3,S5`.
+The scenarios to run and the simulation time can be set in the YAML header (`params`) or from the command line, e.g. `quarto render "clearance-ivive-check.qmd" -P scenarios:S1,S3,S5`.
 
 ![](images/clipboard-1227717430.png)
 
@@ -32,7 +32,7 @@ library(readxl)
 library(openxlsx)
 library(ospsuite)
 
-devtools::load_all()
+library(esqIVIVE)
 ```
 
 #### Import data
