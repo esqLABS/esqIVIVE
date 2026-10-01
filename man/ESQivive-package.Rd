@@ -11,9 +11,9 @@ In vitro to in vivo extrapolation (IVIVE) of absorption, distribution, metabolis
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/esqLABS/esqIVIVE}
-  \item \url{https://esqlabs.github.io/esqIVIVE/}
-  \item Report bugs at \url{https://github.com/esqLABS/esqIVIVE/issues}
+  \item \url{https://github.com/esqLABS/ESQivive}
+  \item \url{https://esqlabs.github.io/ESQivive/}
+  \item Report bugs at \url{https://github.com/esqLABS/ESQivive/issues}
 }
 
 }

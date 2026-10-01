@@ -1,6 +1,6 @@
 ^renv$
 ^renv\.lock$
-^esqIVIVE\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
 ^_pkgdown\.yml$
 ^docs$

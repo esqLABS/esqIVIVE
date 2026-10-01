@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/esqLABS/esqIVIVE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml)
+[![R-CMD-check](https://github.com/esqLABS/ESQivive/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/esqLABS/ESQivive/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/esqLABS/ESQivive/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/esqLABS/ESQivive/actions/workflows/pkgdown.yaml)
 <!-- badges: end -->
 
 The goal of ESQivive is to perform extrapolation of in vitro ADME
@@ -43,7 +43,7 @@ You can install the development version of ESQivive from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("esqLABS/esqIVIVE")
+devtools::install_github("esqLABS/ESQivive")
 ```
 
 ## Example: clearance IVIVE workflow for midazolam
