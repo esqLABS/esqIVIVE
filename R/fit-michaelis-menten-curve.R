@@ -8,7 +8,8 @@
 #' To scale the results to in vivo, pass them to [ivive_michaelis_menten()].
 #'
 #' @param data A data frame with the substrate concentration (uM) in the first
-#'   column and the velocity in the second column.
+#'   column and the velocity in the second column. Rows with a missing
+#'   concentration or velocity are left out.
 #' @param verbose If `TRUE`, print the inputs and the result.
 #'
 #' @returns A data frame with two rows, `parameter = "km"` (uM) and
@@ -25,6 +26,10 @@
 fit_michaelis_menten_curve <- function(data, verbose = FALSE) {
   experimental_conc_velocity <- data[, 1:2]
   colnames(experimental_conc_velocity) <- c("Concentration", "Velocity")
+  # use the same complete observations for the fit, the R-squared and the plot
+  experimental_conc_velocity <- experimental_conc_velocity[
+    stats::complete.cases(experimental_conc_velocity),
+  ]
 
   #fit model
   fitmm <- stats::nls(

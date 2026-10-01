@@ -11,6 +11,7 @@
 #'
 #' @param data A data frame with the time (min) in the first column and the
 #'   concentration (uM) in the second column. Include the time 0 samples.
+#'   Rows with a missing time or concentration are left out.
 #' @param verbose If `TRUE`, print the inputs and the result.
 #'
 #' @returns A data frame with one row, `parameter = "rate_constant"` (1/min),
@@ -28,6 +29,8 @@ fit_depletion_curve <- function(data, verbose = FALSE) {
   #Load the depletion curve
   clear_curve_xy <- data[, 1:2]
   colnames(clear_curve_xy) <- c("x", "y")
+  # use the same complete observations for the fit, the R-squared and the plot
+  clear_curve_xy <- clear_curve_xy[stats::complete.cases(clear_curve_xy), ]
 
   #find the starting concentration
   y0 <- mean(clear_curve_xy$y[clear_curve_xy$x == 0])

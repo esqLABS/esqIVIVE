@@ -8,7 +8,8 @@ fit_depletion_curve(data, verbose = FALSE)
 }
 \arguments{
 \item{data}{A data frame with the time (min) in the first column and the
-concentration (uM) in the second column. Include the time 0 samples.}
+concentration (uM) in the second column. Include the time 0 samples.
+Rows with a missing time or concentration are left out.}
 
 \item{verbose}{If \code{TRUE}, print the inputs and the result.}
 }

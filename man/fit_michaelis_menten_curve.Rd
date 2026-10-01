@@ -8,7 +8,8 @@ fit_michaelis_menten_curve(data, verbose = FALSE)
 }
 \arguments{
 \item{data}{A data frame with the substrate concentration (uM) in the first
-column and the velocity in the second column.}
+column and the velocity in the second column. Rows with a missing
+concentration or velocity are left out.}
 
 \item{verbose}{If \code{TRUE}, print the inputs and the result.}
 }
