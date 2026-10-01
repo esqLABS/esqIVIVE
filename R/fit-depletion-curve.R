@@ -70,7 +70,7 @@ fit_depletion_curve <- function(data, verbose = FALSE) {
       "text",
       y = max(clear_curve_xy$y) * 0.8,
       x = max(clear_curve_xy$x) * 0.8,
-      label = paste("R²=", r2),
+      label = paste("R\u00b2=", r2),
       size = 5
     )
 

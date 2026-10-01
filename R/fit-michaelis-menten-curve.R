@@ -71,7 +71,7 @@ fit_michaelis_menten_curve <- function(data, verbose = FALSE) {
       "text",
       x = max(experimental_conc_velocity$Concentration) * 0.8,
       y = max(experimental_conc_velocity$Velocity) * 0.8,
-      label = paste("R²=", r2),
+      label = paste("R\u00b2=", r2),
       size = 5
     )
 
