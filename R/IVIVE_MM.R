@@ -3,9 +3,9 @@
 #' @name IVIVE_MM
 #' @description function that scales Vmax and correct km for fraction unbound
 #' 
-#' @param typeSystem if hepatocytes or microsomes
+#' @param typeSystem "cells" or "microsomes"
 #' @param fu_invitro value of fractionunbound in vitro, the default is 1
-#' @param vmax as umol/min/million hepatocytes or umol/min/mg microsomal protein
+#' @param vmax as umol/min/million cells or umol/min/mg microsomal protein
 #' @param km_micromolar Km of the enzyme reaction, in uM
 #' @param tissue liver, brain, lung, kidney, gonads and gut, default is liver
 #' @param species human, rat or dog, default human
@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-#' IVIVE_MM (typeSystem="hepatocytes",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
+#' IVIVE_MM (typeSystem="cells",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
 #' IVIVE_MM (typeSystem="microsomes",fu_invitro=0.2,vmax=2,km_micromolar=1)
 
 IVIVE_MM <- function(
@@ -31,7 +31,7 @@ IVIVE_MM <- function(
   verbose = FALSE
 ) {
   # check if the arguments are valid
-  rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
+  rlang::arg_match(typeSystem, c("cells", "microsomes"))
 
   if (fu_invitro == 0) {
     print("problem fu_invitro=0")
@@ -60,10 +60,10 @@ IVIVE_MM <- function(
   #chose the system specific scaling factors
   if (typeSystem == "microsomes") {
     scfactor <- scaling_factors[overlap_row, "MicProtGO"] # mg protein/g liver
- } else if (typeSystem == "hepatocytes") {
+ } else if (typeSystem == "cells") {
    scfactor <- scaling_factors[overlap_row, "CellsGO"]
  } else {
-    warning("typeSystem not identified, only hepatocytes or microsomes allowed")
+    warning("typeSystem not identified, only cells or microsomes allowed")
  }
   dens<-1000 #g/L
   vmax_umol_minL  <- vmax*scfactor*REF/fintcell*dens

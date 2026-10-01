@@ -16,11 +16,11 @@ IVIVE_MM(
 )
 }
 \arguments{
-\item{typeSystem}{if hepatocytes or microsomes}
+\item{typeSystem}{"cells" or "microsomes"}
 
 \item{fu_invitro}{value of fractionunbound in vitro, the default is 1}
 
-\item{vmax}{as umol/min/million hepatocytes or umol/min/mg microsomal protein}
+\item{vmax}{as umol/min/million cells or umol/min/mg microsomal protein}
 
 \item{km_micromolar}{Km of the enzyme reaction, in uM}
 
@@ -41,6 +41,6 @@ Vmax in umol/min/L and Km_unb in uM
 function that scales Vmax and correct km for fraction unbound
 }
 \examples{
-IVIVE_MM (typeSystem="hepatocytes",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
+IVIVE_MM (typeSystem="cells",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
 IVIVE_MM (typeSystem="microsomes",fu_invitro=0.2,vmax=2,km_micromolar=1)
 }

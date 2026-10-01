@@ -15,7 +15,7 @@ in_vitro_compartments(
 )
 }
 \arguments{
-\item{typeSystem}{if system is hepatocytes or microsomes}
+\item{typeSystem}{"cells" or "microsomes"}
 
 \item{FBS_fraction}{fraction of serum concentration, values can only go from 0-1}
 
@@ -33,11 +33,11 @@ in_vitro_compartments(
 a list of values representing the  different in vitro compartments, concentrations are given as fraction of volume
 }
 \description{
-Generates a list of values describing a liver in vitro compartment based on hepatocytes or microsomes
-This function is used inside the Fraction unbound function but can also be used for general virtual hepatocyte systems
+Generates a list of values describing a liver in vitro compartment based on cells (e.g. hepatocytes) or microsomes
+This function is used inside the Fraction unbound function but can also be used for general virtual cell systems
 }
 \examples{
-in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96,
+in_vitro_compartments("cells", FBS_fraction=0.05, microplateType = 96,
                       volMedium_mL = 0.15, cCells_Mml = 0.1)
 in_vitro_compartments("microsomes", FBS_fraction=0, microplateType = 24,
                       volMedium_mL = 0.5, cMicro_mgml = 1)

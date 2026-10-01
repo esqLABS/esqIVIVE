@@ -6,7 +6,7 @@
 #' @param typeValue what type of value it is: kcat (directly from in vitro), halfLife or invitro_clearance_parameter)
 #' @param units this are the units of the value.
 #'  For kct 
-#'  | Hepatocytes | Subcellular      | Generic |
+#'  | Cells       | Subcellular      | Generic |
 #'  |-------------|------------------|---------|
 #'  | mL/minutes/millioncells | mL/minutes/mg protein | /minutes |
 #'  | uL/minutes/millioncells | uL/minutes/mg protein | /hours |
@@ -24,7 +24,9 @@
 #'  | mL/seconds/cell |
 #'  | uL/seconds/cell |
 #'  
-#' @param typeSystem hepatocytes, microsomes 
+#' @param typeSystem "cells", "microsomes" or "cytosolF" (cytosolic fraction). Cells are scaled with
+#'  the cells per gram organ (CellsGO), microsomes with the microsomal protein per gram organ (MicProtGO)
+#'  and the cytosolic fraction with the cytosolic protein per gram organ (CytosProtGO)
 #' @param expData experimental clearance value
 #' @param fu_invitro Fraction unbound in the in vitro hepatic system. if not known code will calculate it
 #' @param empirical_scalar this is an option to include an extra empirical correction factor. Currently we are considering the scale factor of Wood 2017
@@ -32,19 +34,19 @@
 #' @param species values can human and rat for now, defaulting to human
 #' @param volMedium_mL volume of medium in the well (in mL)
 #' @param REF relative expression or activity factor
-#' @param cProtein_mgml concentration of subcellular protein (in mg/mL)
-#' @param cCells_Mml concentration of hepatocytes used (in million cells/mL)
+#' @param cProtein_mgml concentration of subcellular (microsomal or cytosolic) protein (in mg/mL)
+#' @param cCells_Mml concentration of cells used (in million cells/mL)
 #' @param verbose if TRUE, print the inputs and the resulting clearance
 #'
 #' @return Specific clearance parameter (/min) to plug in PK-Sim
 #' @export
 #' @examples
-#' # example hepatocytes
-#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",
+#' # example cells (e.g. hepatocytes)
+#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cells",species="human",
 #' units="mL/minutes/millioncells",expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #'
 #' # if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
-#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",
+#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cells",
 #' units="mL/minutes/millioncells",expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 #' 
 #' 
@@ -52,6 +54,10 @@
 #' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",
 #'                 units="L/minutes/mg protein",expData=18.27,fu_invitro=0.5,cProtein_mgml=0.5,
 #'                 volMedium_mL=0.5,empirical_scalar="No")
+#'
+#' # example cytosolic fraction
+#' IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cytosolF",
+#'                 units="mL/minutes/mg protein",expData=0.05,fu_invitro=0.8,cProtein_mgml=1)
 #'
 
 IVIVE_clearance <- function(
@@ -70,7 +76,7 @@ IVIVE_clearance <- function(
   verbose = FALSE
 ) {
   # check if the arguments are valid
-  rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
+  rlang::arg_match(typeSystem, c("cells", "microsomes", "cytosolF"))
 
   rlang::arg_match(
     typeValue,
@@ -96,7 +102,10 @@ IVIVE_clearance <- function(
   if (typeSystem == "microsomes") {
     nLiver <- scaling_factors[overlap_row, "MicProtGO"] # mg protein/g liver
     cInvitro <- cProtein_mgml #mg/mL
-  } else if (typeSystem == "hepatocytes") {
+  } else if (typeSystem == "cytosolF") {
+    nLiver <- scaling_factors[overlap_row, "CytosProtGO"] # mg protein/g liver
+    cInvitro <- cProtein_mgml #mg/mL
+  } else if (typeSystem == "cells") {
     nLiver <- scaling_factors[overlap_row, "CellsGO"]
     cInvitro <- cCells_Mml # million cells/mL assay
   } else {}
@@ -230,14 +239,18 @@ IVIVE_clearance <- function(
   wood_sf[["human"]] <- data.frame(
     Cl_ranges = c("<10", "10-100", "100-1000", "1000-10000", ">10000"),
     microsomes = c(0.7, 1.8, 4.6, 7.5, 58),
-    hepatocytes = c(0.61, 3.9, 7.1, 22, 1200)
+    cells = c(0.61, 3.9, 7.1, 22, 1200)
   )
   wood_sf[["rat"]] <- data.frame(
     Cl_ranges = c("<10", "10-100", "100-1000", "1000-10000", ">10000"),
     microsomes = c(0.086, 0.83, 1.7, 2.5, 230),
-    hepatocytes = c(0.13, 1.6, 3.2, 7.2, 180)
+    cells = c(0.13, 1.6, 3.2, 7.2, 180)
   )
   wood_table <- wood_sf[[species]]
+
+  if (empirical_scalar == "Yes" && typeSystem == "cytosolF") {
+    stop("The Wood 2017 empirical scalars are only available for cells and microsomes, not for cytosolF.")
+  }
 
   if (empirical_scalar == "Yes") {
     # conditional to pick the right wood scalar

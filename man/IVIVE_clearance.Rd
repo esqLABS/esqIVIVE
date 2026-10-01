@@ -25,7 +25,7 @@ IVIVE_clearance(
 
 \item{units}{this are the units of the value.
 For kct\tabular{lll}{
-   Hepatocytes \tab Subcellular \tab Generic \cr
+   Cells \tab Subcellular \tab Generic \cr
    mL/minutes/millioncells \tab mL/minutes/mg protein \tab /minutes \cr
    uL/minutes/millioncells \tab uL/minutes/mg protein \tab /hours \cr
    L/minutes/millioncells \tab L/minutes/mg protein \tab /seconds \cr
@@ -45,7 +45,9 @@ For kct\tabular{lll}{
 
 \item{expData}{experimental clearance value}
 
-\item{typeSystem}{hepatocytes, microsomes}
+\item{typeSystem}{"cells", "microsomes" or "cytosolF" (cytosolic fraction). Cells are scaled with
+the cells per gram organ (CellsGO), microsomes with the microsomal protein per gram organ (MicProtGO)
+and the cytosolic fraction with the cytosolic protein per gram organ (CytosProtGO)}
 
 \item{fu_invitro}{Fraction unbound in the in vitro hepatic system. if not known code will calculate it}
 
@@ -59,9 +61,9 @@ For kct\tabular{lll}{
 
 \item{REF}{relative expression or activity factor}
 
-\item{cProtein_mgml}{concentration of subcellular protein (in mg/mL)}
+\item{cProtein_mgml}{concentration of subcellular (microsomal or cytosolic) protein (in mg/mL)}
 
-\item{cCells_Mml}{concentration of hepatocytes used (in million cells/mL)}
+\item{cCells_Mml}{concentration of cells used (in million cells/mL)}
 
 \item{verbose}{if TRUE, print the inputs and the resulting clearance}
 }
@@ -72,12 +74,12 @@ Specific clearance parameter (/min) to plug in PK-Sim
 IVIVE for clearance based on different type of values
 }
 \examples{
-# example hepatocytes
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",
+# example cells (e.g. hepatocytes)
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cells",species="human",
 units="mL/minutes/millioncells",expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 
 # if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cells",
 units="mL/minutes/millioncells",expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 
 
@@ -85,5 +87,9 @@ units="mL/minutes/millioncells",expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",
                 units="L/minutes/mg protein",expData=18.27,fu_invitro=0.5,cProtein_mgml=0.5,
                 volMedium_mL=0.5,empirical_scalar="No")
+
+# example cytosolic fraction
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cytosolF",
+                units="mL/minutes/mg protein",expData=0.05,fu_invitro=0.8,cProtein_mgml=1)
 
 }

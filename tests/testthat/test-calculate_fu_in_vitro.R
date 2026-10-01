@@ -2,7 +2,7 @@ test_that("calculate_fu_in_vitro: All PK-Sim Standard", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "All PK-Sim Standard", log_lipophilicity = 3, ionization = c("acid", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2
     ),
     0.563008780871692,
@@ -14,7 +14,7 @@ test_that("calculate_fu_in_vitro: PK-Sim Standard + fu", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "PK-Sim Standard + fu", log_lipophilicity = 3, ionization = c("acid", 0),
-      type_system = "hepatocytes", FBS_fraction = 0.05, microplate_type = 96, fraction_unbound = 0.2,
+      type_system = "cells", FBS_fraction = 0.05, microplate_type = 96, fraction_unbound = 0.2,
       volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2
     ),
     0.506029024084582,
@@ -26,7 +26,7 @@ test_that("calculate_fu_in_vitro: Poulin and Theil + fu", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "Poulin and Theil + fu", log_lipophilicity = 3, ionization = c("acid", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96, fraction_unbound = 0.01, blood_plasma_ratio = 2,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96, fraction_unbound = 0.01, blood_plasma_ratio = 2,
       volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2
     ),
     0.783309951145294,
@@ -124,11 +124,11 @@ test_that("calculate_fu_in_vitro: literature methods, microsomes", {
   )
 })
 
-test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
+test_that("calculate_fu_in_vitro: literature methods, cells", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "Austin", log_lipophilicity = 3, ionization = c("base", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(3, 0), concentration_cells = 1
     ),
     0.602158093174717,
@@ -137,7 +137,7 @@ test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "Kilford", log_lipophilicity = 3, ionization = c("base", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(3, 0), concentration_cells = 1
     ),
     0.751722412716774,
@@ -147,7 +147,7 @@ test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "Poulin", log_lipophilicity = 3, ionization = c("neutral", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(0, 0), concentration_cells = 1
     ),
     0.835349309667331,
@@ -157,7 +157,7 @@ test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "Poulin", log_lipophilicity = 3, ionization = c("base", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(8, 0), concentration_cells = 1,
       blood_plasma_ratio = 1, fraction_unbound = 0.2
     ),
@@ -179,7 +179,7 @@ test_that("calculate_fu_in_vitro: All_literature (neutral compound, avoids the P
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "All_literature", log_lipophilicity = 3, ionization = c("neutral", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(0, 0), concentration_cells = 1
     ),
     0.72974327185294,
@@ -191,7 +191,7 @@ test_that("calculate_fu_in_vitro: Rodgers & Rowland + fu (strong base only)", {
   expect_equal(
     calculate_fu_in_vitro(
       partition_qspr = "Rodgers & Rowland + fu", log_lipophilicity = 3, ionization = c("base", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(8, 0), henry_law_constant = 1E-6,
       fraction_unbound = 0.2, blood_plasma_ratio = 1, concentration_cells = 2
     ),
@@ -205,7 +205,7 @@ test_that("calculate_fu_in_vitro: Rodgers & Rowland + fu (strong base only)", {
   expect_error(
     calculate_fu_in_vitro(
       partition_qspr = "Rodgers & Rowland + fu", log_lipophilicity = 2, ionization = c("neutral", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(0, 0), henry_law_constant = 1E-6,
       fraction_unbound = 0.3, blood_plasma_ratio = 1, concentration_cells = 2
     )
@@ -213,7 +213,7 @@ test_that("calculate_fu_in_vitro: Rodgers & Rowland + fu (strong base only)", {
   expect_error(
     calculate_fu_in_vitro(
       partition_qspr = "Rodgers & Rowland + fu", log_lipophilicity = 1, ionization = c("acid", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(4, 0), henry_law_constant = 1E-6,
       fraction_unbound = 0.5, blood_plasma_ratio = 0.8, concentration_cells = 2
     )
@@ -221,7 +221,7 @@ test_that("calculate_fu_in_vitro: Rodgers & Rowland + fu (strong base only)", {
   expect_error(
     calculate_fu_in_vitro(
       partition_qspr = "Rodgers & Rowland + fu", log_lipophilicity = 2, ionization = c("base", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6,
       fraction_unbound = 0.3, blood_plasma_ratio = 1, concentration_cells = 2
     )
@@ -232,7 +232,7 @@ test_that("calculate_fu_in_vitro rejects invalid partition_qspr and type_system"
   expect_error(
     calculate_fu_in_vitro(
       partition_qspr = "bogus", log_lipophilicity = 3, ionization = c("acid", 0),
-      type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+      type_system = "cells", FBS_fraction = 0, microplate_type = 96,
       volume_medium = 0.22, pka = c(6, 0), concentration_cells = 2
     )
   )

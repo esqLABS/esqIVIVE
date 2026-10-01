@@ -29,7 +29,7 @@ then from literature, Poulin, Turner, Austin and Halifax. See thevignette for mo
 
 \item{ionization}{Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)}
 
-\item{type_system}{microsomes or hepatocytes}
+\item{type_system}{"microsomes" or "cells"}
 
 \item{FBS_fraction}{fraction of serum concentration, values can only go from 0-1}
 
@@ -63,12 +63,12 @@ mayeb consider to have average data..
 \examples{
 calculate_fu_in_vitro(
  partition_qspr = "All PK-Sim Standard", log_lipophilicity = 3, ionization = c("acid", 0),
- type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+ type_system = "cells", FBS_fraction = 0, microplate_type = 96,
  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 
 calculate_fu_in_vitro(
  partition_qspr = "Poulin and Theil + fu", log_lipophilicity = 3, ionization = c("acid", 0),
- type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+ type_system = "cells", FBS_fraction = 0, microplate_type = 96,
  fraction_unbound=0.01,blood_plasma_ratio=2,
  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 

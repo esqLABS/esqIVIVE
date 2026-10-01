@@ -1,10 +1,10 @@
 #' in_vitro_compartments
 #'
 #' @description
-#' Generates a list of values describing a liver in vitro compartment based on hepatocytes or microsomes
-#' This function is used inside the Fraction unbound function but can also be used for general virtual hepatocyte systems
+#' Generates a list of values describing a liver in vitro compartment based on cells (e.g. hepatocytes) or microsomes
+#' This function is used inside the Fraction unbound function but can also be used for general virtual cell systems
 #' 
-#' @param typeSystem if system is hepatocytes or microsomes
+#' @param typeSystem "cells" or "microsomes"
 #' @param FBS_fraction fraction of serum concentration, values can only go from 0-1
 #' @param microplateType number of wells in the microplate
 #' @param volMedium_mL volume of medium in the well (in mL)
@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96,
+#' in_vitro_compartments("cells", FBS_fraction=0.05, microplateType = 96,
 #'                       volMedium_mL = 0.15, cCells_Mml = 0.1)
 #' in_vitro_compartments("microsomes", FBS_fraction=0, microplateType = 24,
 #'                       volMedium_mL = 0.5, cMicro_mgml = 1)
@@ -31,7 +31,7 @@ in_vitro_compartments <- function(
   verbose = FALSE
 ) {
   # check if the arguments are valid
-  rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
+  rlang::arg_match(typeSystem, c("cells", "microsomes"))
 
   # Plastic and headspace compartments------------------------------------------
   # calculate the plastic in the system
@@ -64,7 +64,7 @@ in_vitro_compartments <- function(
   # Protein and lipid compartments----------------------------------------------
   # density of lipids assumed 0.9 g/mL and of proteins 1.35 g/mL
 
-  if (typeSystem == "hepatocytes") {
+  if (typeSystem == "cells") {
     # see report on input parameters for refernces of values
     # these values are going to be lower than Poulin paper indicates
     cellVol_mLM <- 0.00254 # mL per million cells

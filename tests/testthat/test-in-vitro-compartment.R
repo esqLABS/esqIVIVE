@@ -1,6 +1,6 @@
 test_that("generating an in vitro compartment works", {
   comp <- in_vitro_compartments(
-    "hepatocytes",
+    "cells",
     0,
     96,
     0.392,
@@ -10,7 +10,7 @@ test_that("generating an in vitro compartment works", {
   expect_equal(comp$volAir_L, 0)
 })
 
-test_that("in_vitro_compartments gives regression-locked values for hepatocytes, all microplate sizes", {
+test_that("in_vitro_compartments gives regression-locked values for cells, all microplate sizes", {
   expected <- list(
     cCellNL_vvmedium = 1.1303e-05,
     cCellNPL_vvmedium = 8.4074e-06,
@@ -31,7 +31,7 @@ test_that("in_vitro_compartments gives regression-locked values for hepatocytes,
 
   for (mp in c(96, 48, 24, 12)) {
     comp <- in_vitro_compartments(
-      "hepatocytes",
+      "cells",
       FBS_fraction = 0.05,
       microplateType = mp,
       volMedium_mL = 0.2,

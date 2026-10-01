@@ -9,7 +9,7 @@
 #' @param log_lipophilicity LogP or LogMA of the compound
 #' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
 #' @param pka vector of length of 2 with pkA of the compound
-#' @param type_system microsomes or hepatocytes
+#' @param type_system "microsomes" or "cells"
 #' @param FBS_fraction fraction of serum concentration, values can only go from 0-1
 #' @param microplate_type number of wells in the microplate
 #' @param volume_medium volume of medium in the well (in mL)
@@ -27,12 +27,12 @@
 #' @examples
 #'calculate_fu_in_vitro(
 #'  partition_qspr = "All PK-Sim Standard", log_lipophilicity = 3, ionization = c("acid", 0),
-#'  type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+#'  type_system = "cells", FBS_fraction = 0, microplate_type = 96,
 #'  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 #'
 #'calculate_fu_in_vitro(
 #'  partition_qspr = "Poulin and Theil + fu", log_lipophilicity = 3, ionization = c("acid", 0),
-#'  type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+#'  type_system = "cells", FBS_fraction = 0, microplate_type = 96,
 #'  fraction_unbound=0.01,blood_plasma_ratio=2,
 #'  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 #'
@@ -85,11 +85,11 @@ calculate_fu_in_vitro <- function(
       "All_literature"
     )
   )
-  rlang::arg_match(type_system, c("hepatocytes", "microsomes"))
+  rlang::arg_match(type_system, c("cells", "microsomes"))
 
   #make warning that micro and hep should match
   if (
-    type_system == "hepatocytes" && !is.null(concentration_cells)
+    type_system == "cells" && !is.null(concentration_cells)
   ) {} else if (
     type_system == "microsomes" && !is.null(concentration_microsomes)
   ) {} else {
@@ -135,9 +135,9 @@ calculate_fu_in_vitro <- function(
       volMedium_mL = volume_medium,
       cMicro_mgml = concentration_microsomes
     )
-  } else if (type_system == "hepatocytes") {
+  } else if (type_system == "cells") {
     in_vitro_compartment <- in_vitro_compartments(
-      "hepatocytes",
+      "cells",
       FBS_fraction = FBS_fraction,
       microplateType = microplate_type,
       volMedium_mL = volume_medium,
@@ -359,14 +359,14 @@ calculate_fu_in_vitro <- function(
         conc_mic_mgml = concentration_microsomes
       )
     ))
-  } else if (partition_qspr == "Austin" && type_system == "hepatocytes") {
+  } else if (partition_qspr == "Austin" && type_system == "cells") {
     fuInvitro <- calculate_fu_hep_austin(
       ionization = ionization,
       pKa = pka,
       log_lipophilicity = log_lipophilicity,
       conc_cell_millionml = concentration_cells
     )
-  } else if (partition_qspr == "Poulin" && type_system == "hepatocytes") {
+  } else if (partition_qspr == "Poulin" && type_system == "cells") {
     fuInvitro <- calculate_fu_hep_poulin(
       ionization = ionization,
       pKa = pka,
@@ -376,7 +376,7 @@ calculate_fu_in_vitro <- function(
       cCellAPL=cCellAPL,
       log_lipophilicity = log_lipophilicity
     )
-  } else if (partition_qspr == "Kilford" && type_system == "hepatocytes") {
+  } else if (partition_qspr == "Kilford" && type_system == "cells") {
     fuInvitro <- calculate_fu_hep_kilford(
       ionization = ionization,
       pKa = pka,
@@ -384,7 +384,7 @@ calculate_fu_in_vitro <- function(
       conc_cell_millionml = concentration_cells
     )
   } else if (
-    partition_qspr == "All_literature" && type_system == "hepatocytes"
+    partition_qspr == "All_literature" && type_system == "cells"
   ) {
     fuInvitro <- mean(c(
       calculate_fu_hep_kilford(

@@ -1,7 +1,7 @@
 test_that("IVIVE_clearance: halfLife", {
   expect_equal(
     unname(IVIVE_clearance(
-      typeValue = "halfLife", units = "hours", expData = 3, typeSystem = "hepatocytes",
+      typeValue = "halfLife", units = "hours", expData = 3, typeSystem = "cells",
       fu_invitro = 0.5, cCells_Mml = 0.5
     )),
     2.73522388059702,
@@ -9,10 +9,10 @@ test_that("IVIVE_clearance: halfLife", {
   )
 })
 
-test_that("IVIVE_clearance: invitro_clearance_parameter, hepatocytes", {
+test_that("IVIVE_clearance: invitro_clearance_parameter, cells", {
   expect_equal(
     unname(IVIVE_clearance(
-      typeValue = "invitro_clearance_parameter", typeSystem = "hepatocytes", species = "human",
+      typeValue = "invitro_clearance_parameter", typeSystem = "cells", species = "human",
       units = "mL/minutes/millioncells", expData = 18.27, fu_invitro = 0.5, cCells_Mml = 0.5,
       empirical_scalar = "No"
     )),
@@ -36,7 +36,7 @@ test_that("IVIVE_clearance: invitro_clearance_parameter, microsomes", {
 test_that("IVIVE_clearance: kcat, correct rate-constant units", {
   expect_equal(
     unname(IVIVE_clearance(
-      typeValue = "kcat", units = "/minutes", expData = 0.02, typeSystem = "hepatocytes",
+      typeValue = "kcat", units = "/minutes", expData = 0.02, typeSystem = "cells",
       fu_invitro = 0.5, cCells_Mml = 0.5
     )),
     14.2089552238806,
@@ -47,7 +47,7 @@ test_that("IVIVE_clearance: kcat, correct rate-constant units", {
 test_that("IVIVE_clearance: kcat warns when given non-rate-constant units", {
   expect_warning(
     IVIVE_clearance(
-      typeValue = "kcat", units = "mL/minutes/millioncells", expData = 18.27, typeSystem = "hepatocytes",
+      typeValue = "kcat", units = "mL/minutes/millioncells", expData = 18.27, typeSystem = "cells",
       fu_invitro = 0.5, cCells_Mml = 0.5
     )
   )
@@ -56,7 +56,7 @@ test_that("IVIVE_clearance: kcat warns when given non-rate-constant units", {
 test_that("IVIVE_clearance: Wood 2017 empirical scalar, 1000-10000 decade", {
   expect_equal(
     unname(IVIVE_clearance(
-      typeValue = "invitro_clearance_parameter", typeSystem = "hepatocytes", species = "human",
+      typeValue = "invitro_clearance_parameter", typeSystem = "cells", species = "human",
       units = "mL/minutes/millioncells", expData = 0.5, fu_invitro = 0.5, cCells_Mml = 0.5,
       empirical_scalar = "Yes"
     )),
@@ -76,6 +76,38 @@ test_that("IVIVE_clearance rejects an invalid species or tissue", {
     IVIVE_clearance(
       typeValue = "halfLife", units = "hours", expData = 3, typeSystem = "microsomes",
       cProtein_mgml = 0.5, tissue = "bogus"
+    )
+  )
+})
+
+test_that("IVIVE_clearance: invitro_clearance_parameter, cytosolF uses CytosProtGO", {
+  # human liver: CytosProtGO = 50 mg/g, fcell = 0.67
+  expect_equal(
+    unname(IVIVE_clearance(
+      typeValue = "invitro_clearance_parameter", typeSystem = "cytosolF",
+      units = "mL/minutes/mg protein", expData = 0.05, fu_invitro = 0.8,
+      cProtein_mgml = 1
+    )),
+    0.05 * 50 / 0.67 / 0.8,
+    tolerance = 1e-6
+  )
+})
+
+test_that("IVIVE_clearance: Wood 2017 empirical scalar is not available for cytosolF", {
+  expect_error(
+    IVIVE_clearance(
+      typeValue = "invitro_clearance_parameter", typeSystem = "cytosolF",
+      units = "mL/minutes/mg protein", expData = 0.05, cProtein_mgml = 1,
+      empirical_scalar = "Yes"
+    )
+  )
+})
+
+test_that("IVIVE_clearance rejects the old hepatocytes typeSystem", {
+  expect_error(
+    IVIVE_clearance(
+      typeValue = "halfLife", units = "hours", expData = 3, typeSystem = "hepatocytes",
+      cCells_Mml = 0.5
     )
   )
 })

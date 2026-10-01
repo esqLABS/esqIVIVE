@@ -99,7 +99,7 @@ for (j in seq_along(QSARs)) {
       partition_qspr = QSARs[j],
       log_lipophilicity = as.double(testFuHepData[i, "LogP37C"]),
       ionization = c(testFuHepData[i, "Class"], 0),
-      type_system = "hepatocytes",
+      type_system = "cells",
       FBS_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
