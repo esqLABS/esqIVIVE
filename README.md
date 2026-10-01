@@ -214,3 +214,19 @@ renv::install()
 ``` r
 devtools::test()
 ```
+
+### Website
+
+With Quarto and the `ospsuite`/PK-Sim system prerequisites installed, run from
+the package root:
+
+```sh
+Rscript dev/build-website.R
+```
+
+The script installs pkgdown, the package, and its dependencies, including
+`DESCRIPTION`'s `Config/Needs/website`, before building the website.
+
+The Quarto documents in `vignettes/articles/` are pkgdown articles, excluded
+from the R package build. Rendering the clearance article additionally requires
+`ospsuite` and PK-Sim. Generated HTML, supporting files, and results are ignored.

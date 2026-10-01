@@ -19,7 +19,6 @@
 #'
 #'
 fit_clearance_from_curve <- function(expData_tmin_cuM, verbose = FALSE) {
-  library(ggplot2)
   #Load the depletion curve
   clear_curve_xy <- expData_tmin_cuM
   colnames(clear_curve_xy) <- c("x", "y")
@@ -34,7 +33,7 @@ fit_clearance_from_curve <- function(expData_tmin_cuM, verbose = FALSE) {
   }
   
   #fit model
-  fitKcat <- nls(
+  fitKcat <- stats::nls(
     y ~ Kcat_function(x, clearance_rate_constant),
     data = clear_curve_xy,
     start = list(clearance_rate_constant = 0.01),
@@ -42,7 +41,7 @@ fit_clearance_from_curve <- function(expData_tmin_cuM, verbose = FALSE) {
   )
   
   r_squared_nls <- function(model) {
-    rss <- sum(residuals(model)^2)
+    rss <- sum(stats::residuals(model)^2)
     tss <- sum((clear_curve_xy$y- 
                   mean(clear_curve_xy$y))^2)  # y - mean(y)
     1 - (rss / tss)
@@ -55,22 +54,25 @@ fit_clearance_from_curve <- function(expData_tmin_cuM, verbose = FALSE) {
   
   colnames(clear_curve_xy) <- colnames(expData_tmin_cuM)
   #Plot for evaluating if fit is reasonable
-  diag_plot <- ggplot(clear_curve_xy, aes(x = Time_min, y = Concentration_uM)) +
-    geom_point() +
-    labs(title = "fit curve") +
-    stat_function(
-      fun = function(x) Kcat_function(x, clearance_rate_constant = coefficients(fitKcat)),
+  diag_plot <- ggplot2::ggplot(
+    clear_curve_xy,
+    ggplot2::aes(x = .data$Time_min, y = .data$Concentration_uM)
+  ) +
+    ggplot2::geom_point() +
+    ggplot2::labs(title = "fit curve") +
+    ggplot2::stat_function(
+      fun = function(x) Kcat_function(x, clearance_rate_constant = stats::coefficients(fitKcat)),
       colour = "blue")+
-    annotate("text", y = max(clear_curve_xy$Concentration_uM)*0.8,
+    ggplot2::annotate("text", y = max(clear_curve_xy$Concentration_uM)*0.8,
              x = max(clear_curve_xy$Time_min)*0.8, 
-             label = paste("R²=",r2), size = 5)
+             label = paste("R\u00b2=",r2), size = 5)
   
   print(diag_plot)
   
   #Make table with fit Kcat
-  fit_95conf = confint(fitKcat)
+  fit_95conf = stats::confint(fitKcat)
   kcat = as.double(data.frame(
-    "Kcat_permin" = coefficients(fitKcat)["clearance_rate_constant"],
+    "Kcat_permin" = stats::coefficients(fitKcat)["clearance_rate_constant"],
     fit_95conf[1],
     fit_95conf[2]
   ))

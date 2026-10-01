@@ -17,11 +17,10 @@
 #' @export
 
 fit_mm_from_curve <- function(experimental_conc_velocity, verbose = FALSE) {
-    library(ggplot2)
     colnames(experimental_conc_velocity)<-c("Concentration","Velocity")
     
     #fit model
-    fitmm <- nls(
+    fitmm <- stats::nls(
       Velocity ~ Vmax * Concentration / (Km + Concentration),
       data = experimental_conc_velocity,
       start = list(
@@ -32,7 +31,7 @@ fit_mm_from_curve <- function(experimental_conc_velocity, verbose = FALSE) {
     )
     
     r_squared_nls <- function(model) {
-      rss <- sum(residuals(model)^2)
+      rss <- sum(stats::residuals(model)^2)
       tss <- sum((experimental_conc_velocity$Velocity- 
                   mean(experimental_conc_velocity$Velocity))^2)  # y - mean(y)
       1 - (rss / tss)
@@ -43,28 +42,28 @@ fit_mm_from_curve <- function(experimental_conc_velocity, verbose = FALSE) {
       warning("fitting does not support typical MM kinetics or the suitability of the data")
     } else {}
     
-    fit_95conf = confint(fitmm)
+    fit_95conf = stats::confint(fitmm)
     
     #check if fitting is good
     mm_fuction <- function(Concentration) {
-      Velocity = coefficients(fitmm)["Vmax"] * Concentration / 
-                (coefficients(fitmm)["Km"] + Concentration)
+      Velocity = stats::coefficients(fitmm)["Vmax"] * Concentration / 
+                (stats::coefficients(fitmm)["Km"] + Concentration)
       return(Velocity)
     }
     
-    plot_diagnosis <- ggplot(
+    plot_diagnosis <- ggplot2::ggplot(
       experimental_conc_velocity,
-      aes(x = Concentration, y = Velocity)
+      ggplot2::aes(x = .data$Concentration, y = .data$Velocity)
     ) +
-      geom_point() +
-      stat_function(fun = function(x) mm_fuction(x), colour = "blue")+
-      annotate("text", x = max(experimental_conc_velocity$Concentration)*0.8,
+      ggplot2::geom_point() +
+      ggplot2::stat_function(fun = function(x) mm_fuction(x), colour = "blue")+
+      ggplot2::annotate("text", x = max(experimental_conc_velocity$Concentration)*0.8,
                y = max(experimental_conc_velocity$Velocity)*0.8, 
-               label = paste("R²=",r2), size = 5)
+               label = paste("R\u00b2=",r2), size = 5)
     
     #Add fit values in dataframe for calculations
     fitresults_vmax_km = data.frame(
-      "Mean" = c(coefficients(fitmm)["Km"], coefficients(fitmm)["Vmax"]),
+      "Mean" = c(stats::coefficients(fitmm)["Km"], stats::coefficients(fitmm)["Vmax"]),
       "2.5_percent" = c(fit_95conf["Km", 1], fit_95conf["Vmax", 1]),
       "95%_percent" = c(fit_95conf["Km", 2], fit_95conf["Vmax", 2])
     )

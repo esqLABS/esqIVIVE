@@ -2,3 +2,7 @@
 docs
 *.Rproj
 *Rplots.pdf
+
+vignettes/**/*.html
+vignettes/**/*_files/
+vignettes/**/results/

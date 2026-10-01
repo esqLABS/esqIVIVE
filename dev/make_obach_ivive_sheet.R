@@ -1,4 +1,4 @@
-# Build the import sheet used by vignettes/Clearance IVIVE check.qmd
+# Build the import sheet used by vignettes/articles/clearance-ivive-check.qmd
 #
 # Source: Obach 1999, Drug Metab Dispos 27(11):1350-1359
 # (Prediction of human clearance of twenty-nine drugs from hepatic microsomal
@@ -68,9 +68,9 @@ scenarios <- data.frame(
   empirical_scalar = c("No", "No", "No", "Yes", "No", "No"),
   blood_plasma_ratio = "observed",
   pkml = c(
-    rep("single IV-PKSim.pkml", 4),
-    "single IV-R&R.pkml",
-    "single IV-PKSim.pkml"
+    rep("single-iv-pksim.pkml", 4),
+    "single-iv-rodgers-rowland.pkml",
+    "single-iv-pksim.pkml"
   )
 )
 
