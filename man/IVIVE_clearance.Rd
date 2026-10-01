@@ -73,16 +73,17 @@ IVIVE for clearance based on different type of values
 }
 \examples{
 # example hepatocytes
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",units="mL/minutes/millioncells",
-expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",
+units="mL/minutes/millioncells",expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 
 # if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",units="mL/minutes/millioncells",
-expData=18.27,cCells_Mml=0.5,verbose=TRUE)
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",
+units="mL/minutes/millioncells",expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 
 
 # example microsomes
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",units="L/minutes/mg protein",
-                expData=18.27,fu_invitro=0.5,cProtein_mgml=0.5,volMedium_mL=0.5,empirical_scalar="No")
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",
+                units="L/minutes/mg protein",expData=18.27,fu_invitro=0.5,cProtein_mgml=0.5,
+                volMedium_mL=0.5,empirical_scalar="No")
 
 }

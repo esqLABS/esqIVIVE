@@ -3,8 +3,6 @@ title: "Compare algorithms to predict Fu_hep"
 author: "Susana Proenca"
 format: html
 editor: visual
-project:
-  execute-dir: esqIVIVE
 ---
 
 ## Theory
@@ -44,9 +42,8 @@ Average of this package's own Austin, Kilford and Poulin predictions.
 library(dplyr)
 library(ggpubr)
 library(ggplot2)
-library(here)
 
-devtools::load_all()
+library(esqIVIVE)
 
 data_path <- system.file("extdata", "test_fu_hepatocytes.csv", package = "esqIVIVE")
 testFuHepData <- read.csv(data_path)

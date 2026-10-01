@@ -58,6 +58,7 @@ make documentation
 
 predict_plasma_affinities(QSAR="logP", logP=2, pKa=c(3,0), ionization=c("acid",0))
 
-predict_plasma_affinities(QSAR="PPLFER", logP=2, pKa=c(3,0), ionization=c("acid",0), LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
+predict_plasma_affinities(QSAR="PPLFER", logP=2, pKa=c(3,0), ionization=c("acid",0),
+                          LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
 
 }

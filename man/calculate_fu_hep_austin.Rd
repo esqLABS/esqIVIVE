@@ -30,5 +30,6 @@ fuInvitro
 The Austin algorithm for calculating Fu in vitro for hepatocytes
 }
 \examples{
-calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,conc_cell_millionml=0.5)
+calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,
+                        conc_cell_millionml=0.5)
 }

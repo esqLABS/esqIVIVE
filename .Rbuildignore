@@ -9,3 +9,4 @@
 ^LICENSE\.md$
 dev/
 ^\.github$
+^vignettes/articles$

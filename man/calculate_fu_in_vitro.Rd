@@ -68,12 +68,14 @@ calculate_fu_in_vitro(
 
 calculate_fu_in_vitro(
  partition_qspr = "Poulin and Theil + fu", log_lipophilicity = 3, ionization = c("acid", 0),
- type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,fraction_unbound=0.01,blood_plasma_ratio=2,
+ type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+ fraction_unbound=0.01,blood_plasma_ratio=2,
  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 
 calculate_fu_in_vitro(
  partition_qspr = "All Schmitt", log_lipophilicity = 0.42, ionization = c("acid", 0),
- type_system = "microsomes", FBS_fraction = 0, microplate_type = 96,fraction_unbound=0.2,blood_plasma_ratio=1,
+ type_system = "microsomes", FBS_fraction = 0, microplate_type = 96,
+ fraction_unbound=0.2,blood_plasma_ratio=1,
  volume_medium = 0.22, pka = c(6, 0), concentration_microsomes = 2)
 
 }
