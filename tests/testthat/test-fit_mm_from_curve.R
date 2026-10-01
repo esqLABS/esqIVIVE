@@ -2,7 +2,7 @@ test_that("fit_mm_from_curve fits the expected Km/Vmax from the michaelis_menten
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
 
-  mm_curve_path <- system.file("extdata", "michaelis_menten_curve.csv", package = "esqIVIVE")
+  mm_curve_path <- system.file("extdata", "michaelis_menten_curve.csv", package = "ESQivive")
   mm_curve <- read.csv(mm_curve_path)
 
   fit <- suppressMessages(suppressWarnings(fit_mm_from_curve(mm_curve)))

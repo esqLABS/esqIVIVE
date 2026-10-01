@@ -79,7 +79,7 @@ columns <- data.frame(
   column = c(names(compounds), names(scenarios)),
   description = c(
     "Drug name",
-    "Ionization class used by esqIVIVE (acid, base, neutral)",
+    "Ionization class used by ESQivive (acid, base, neutral)",
     "Most relevant pKa (0 for neutrals)",
     "Molecular weight",
     "Number of chlorine atoms (PK-Sim effective MW)",

@@ -43,13 +43,13 @@ library(dplyr)
 library(ggpubr)
 library(ggplot2)
 
-library(esqIVIVE)
+library(ESQivive)
 
-data_path <- system.file("extdata", "test_fu_hepatocytes.csv", package = "esqIVIVE")
+data_path <- system.file("extdata", "test_fu_hepatocytes.csv", package = "ESQivive")
 testFuHepData <- read.csv(data_path)
 
 # Class is coded as single letters (A/B/N) in this dataset rather than the
-# full words esqIVIVE expects.
+# full words ESQivive expects.
 class_map <- c(A = "acid", B = "base", N = "neutral")
 testFuHepData$Class <- class_map[testFuHepData$Class]
 ```
@@ -73,9 +73,9 @@ QSARs <- c(
   "All_literature"
 )
 QSAR_colnames <- c(
-  "esqIVIVE_Austin",
-  "esqIVIVE_Kilford",
-  "esqIVIVE_Poulin",
+  "ESQivive_Austin",
+  "ESQivive_Kilford",
+  "ESQivive_Poulin",
   "All_Poulin_and_Theil",
   "All_Berezhkovskiy",
   "All_PK_Sim_Standard",
@@ -119,18 +119,18 @@ cat(
 head(testFuHepData)
 ```
 
-This dataset also gives two literature-reported prediction columns (`Fuhep_Poulin`, `Fu_Austin`), letting us sanity-check this package's own `esqIVIVE_Poulin`/`esqIVIVE_Austin` against the originally reported values.
+This dataset also gives two literature-reported prediction columns (`Fuhep_Poulin`, `Fu_Austin`), letting us sanity-check this package's own `ESQivive_Poulin`/`ESQivive_Austin` against the originally reported values.
 
 ```{r}
-plot(testFuHepData$Fuhep_Poulin, testFuHepData$esqIVIVE_Poulin,
-  xlab = "Fuhep_Poulin (paper)", ylab = "esqIVIVE_Poulin (this package)"
+plot(testFuHepData$Fuhep_Poulin, testFuHepData$ESQivive_Poulin,
+  xlab = "Fuhep_Poulin (paper)", ylab = "ESQivive_Poulin (this package)"
 )
 abline(0, 1, col = "red")
 ```
 
 ```{r}
-plot(testFuHepData$Fu_Austin, testFuHepData$esqIVIVE_Austin,
-  xlab = "Fu_Austin (paper)", ylab = "esqIVIVE_Austin (this package)"
+plot(testFuHepData$Fu_Austin, testFuHepData$ESQivive_Austin,
+  xlab = "Fu_Austin (paper)", ylab = "ESQivive_Austin (this package)"
 )
 abline(0, 1, col = "red")
 ```

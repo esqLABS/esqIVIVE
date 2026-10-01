@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' exp_path<-system.file("extdata","clearance.csv",package="esqIVIVE")
+#' exp_path<-system.file("extdata","clearance.csv",package="ESQivive")
 #' expData<-read.csv(exp_path)
 #' #see that the first column is time and second is concentration
 #' expData

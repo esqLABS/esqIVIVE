@@ -78,7 +78,7 @@ IVIVE_clearance <- function(
   )
 
   #Scaling factors
-  path <- system.file("extdata", "scaling_factors.csv", package = "esqIVIVE")
+  path <- system.file("extdata", "scaling_factors.csv", package = "ESQivive")
   scaling_factors<-utils::read.csv(path)
 
   # check if the arguments are valid

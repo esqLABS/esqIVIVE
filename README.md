@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# esqIVIVE
+# ESQivive
 
 <!-- badges: start -->
 
@@ -9,7 +9,7 @@
 [![pkgdown](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml)
 <!-- badges: end -->
 
-The goal of esqIVIVE is to perform extrapolation of in vitro ADME
+The goal of ESQivive is to perform extrapolation of in vitro ADME
 parameters and derive ADME parameters to input for PBK models.
 
 The functions in this package have been developed focusing on the
@@ -62,7 +62,7 @@ Examples of how to use the functions are provided for each.
 
 ## Installation
 
-You can install the development version of esqIVIVE from
+You can install the development version of ESQivive from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -86,7 +86,7 @@ microsomal protein, in vitro half-life of 3.9 min) are from Obach
 (1999), Drug Metab Dispos 27(11):1350-1359.
 
 ``` r
-library(esqIVIVE)
+library(ESQivive)
 
 midazolam <- list(
   log_lipophilicity = 3.38, # logP at 37 C

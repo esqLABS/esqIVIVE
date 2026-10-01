@@ -15,7 +15,7 @@ params:
 
 ## Introduction
 
-This vignette showcases and compares different IVIVE frameworks for clearance, and evaluates how the clearance predicted with the standard PK-Sim PBK model compares with observed plasma clearances. In vitro metabolism data are converted with `esqIVIVE` into a PK-Sim specific clearance, which is then simulated in batch mode with the `ospsuite` R package using the PBK models in `inst/extdata/pkml4htpbk`.
+This vignette showcases and compares different IVIVE frameworks for clearance, and evaluates how the clearance predicted with the standard PK-Sim PBK model compares with observed plasma clearances. In vitro metabolism data are converted with `ESQivive` into a PK-Sim specific clearance, which is then simulated in batch mode with the `ospsuite` R package using the PBK models in `inst/extdata/pkml4htpbk`.
 
 The scenarios to run and the simulation time can be set in the YAML header (`params`) or from the command line at the package root, e.g. `quarto render "vignettes/articles/clearance-ivive-check.qmd" -P scenarios:S1,S3,S5`.
 
@@ -32,7 +32,7 @@ library(readxl)
 library(openxlsx)
 library(ospsuite)
 
-library(esqIVIVE)
+library(ESQivive)
 ```
 
 #### Import data
@@ -48,7 +48,7 @@ The data are stored in the import sheet `inst/extdata/Obach1999_IVIVE_input.xlsx
 ```{r}
 #| label: import
 
-input_file <- system.file("extdata", "Obach1999_IVIVE_input.xlsx", package = "esqIVIVE")
+input_file <- system.file("extdata", "Obach1999_IVIVE_input.xlsx", package = "ESQivive")
 compounds <- as.data.frame(read_excel(input_file, sheet = "Compounds"))
 scenarios <- as.data.frame(read_excel(input_file, sheet = "Scenarios"))
 
@@ -187,7 +187,7 @@ The clearance is taken from the PK analysis (dose/AUC~inf~). For compounds with 
 molecule <- "test_chemical"
 clearance_process <- "test_chemical-Total Hepatic Clearance-different sources"
 plasma_output <- "Organism|PeripheralVenousBlood|test_chemical|Plasma (Peripheral Venous Blood)"
-pkml_dir <- system.file("extdata", "pkml4htpbk", package = "esqIVIVE")
+pkml_dir <- system.file("extdata", "pkml4htpbk", package = "ESQivive")
 
 # All values in the pkml base units
 batch_parameters <- c(

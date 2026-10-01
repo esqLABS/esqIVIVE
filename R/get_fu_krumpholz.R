@@ -163,7 +163,7 @@ list_krumpholz_compounds <- function(system = "microsomes") {
   }
 
   info <- .krumpholz_sheets[[system]]
-  path <- system.file("extdata", "Krumpholz_et_al_fu_dataset.xlsx", package = "esqIVIVE")
+  path <- system.file("extdata", "Krumpholz_et_al_fu_dataset.xlsx", package = "ESQivive")
   raw <- as.data.frame(readxl::read_excel(path, sheet = info$sheet, col_types = "text"))
 
   column <- function(name) {

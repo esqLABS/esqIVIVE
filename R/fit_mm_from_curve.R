@@ -10,7 +10,7 @@
 #'
 #' @return fitresults_vmax_km
 #' @examples
-#' mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv",package="esqIVIVE")
+#' mm_curve_path<-system.file("extdata","michaelis_menten_curve.csv",package="ESQivive")
 #' mm_curve<-read.csv(mm_curve_path)
 #' fit_mm_from_curve(mm_curve)
 #'
