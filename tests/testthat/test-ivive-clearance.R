@@ -76,6 +76,74 @@ test_that("ivive_clearance: rate_constant", {
   )
 })
 
+test_that("ivive_clearance: rate constants per hour and per second are converted to per minute", {
+  # 0.02 /min is 1.2 /h and 0.02 / 60 /s
+  expect_equal(
+    ivive_clearance(
+      value_type = "rate_constant",
+      unit = "/hours",
+      value = 1.2,
+      system = "cells",
+      fu_in_vitro = 0.5,
+      concentration_cells = 0.5
+    ),
+    14.2089552238806,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    ivive_clearance(
+      value_type = "rate_constant",
+      unit = "/seconds",
+      value = 0.02 / 60,
+      system = "cells",
+      fu_in_vitro = 0.5,
+      concentration_cells = 0.5
+    ),
+    14.2089552238806,
+    tolerance = 1e-6
+  )
+})
+
+test_that(".apply_wood_correction applies a factor at the band boundaries", {
+  # human cells: 0.61, 3.9, 7.1, 22, 1200
+  expect_equal(
+    .apply_wood_correction(
+      10,
+      organkgBW = 1,
+      system = "cells",
+      species = "human"
+    ),
+    10 * 3.9
+  )
+  expect_equal(
+    .apply_wood_correction(
+      100,
+      organkgBW = 1,
+      system = "cells",
+      species = "human"
+    ),
+    100 * 7.1
+  )
+  expect_equal(
+    .apply_wood_correction(
+      1000,
+      organkgBW = 1,
+      system = "cells",
+      species = "human"
+    ),
+    1000 * 22
+  )
+  expect_equal(
+    .apply_wood_correction(
+      10000,
+      organkgBW = 1,
+      system = "cells",
+      species = "human"
+    ),
+    10000 * 1200
+  )
+})
+
 test_that("ivive_clearance: Wood 2017 empirical correction, 1000-10000 decade", {
   expect_equal(
     ivive_clearance(

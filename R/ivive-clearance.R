@@ -193,8 +193,8 @@ ivive_clearance <- function(
 # Unit conversion factors of ivive_clearance(), before the scaling factors.
 .clearance_rate_constants <- c(
   "/minutes" = 1,
-  "/hours" = 60,
-  "/seconds" = 1 / 60
+  "/hours" = 1 / 60,
+  "/seconds" = 60
 )
 
 .clearance_per_amount <- c(
@@ -291,16 +291,14 @@ ivive_clearance <- function(
   scaled <- ClspePermin * organkgBW
   band <- if (scaled < 10) {
     "<10"
-  } else if (scaled < 100 && scaled > 10) {
+  } else if (scaled < 100) {
     "10-100"
-  } else if (scaled < 1000 && scaled > 100) {
+  } else if (scaled < 1000) {
     "100-1000"
-  } else if (scaled < 10000 && scaled > 1000) {
+  } else if (scaled < 10000) {
     "1000-10000"
-  } else if (scaled > 10000) {
-    ">10000"
   } else {
-    return(ClspePermin)
+    ">10000"
   }
   ClspePermin * wood_table[wood_table$Cl_ranges == band, system]
 }
