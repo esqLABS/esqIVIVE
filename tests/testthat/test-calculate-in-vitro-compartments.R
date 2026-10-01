@@ -1,6 +1,6 @@
 test_that("calculate_in_vitro_compartments: no air when the well is full", {
   comp <- calculate_in_vitro_compartments(
-    "hepatocytes",
+    "cells",
     0,
     96,
     0.392,
@@ -10,7 +10,7 @@ test_that("calculate_in_vitro_compartments: no air when the well is full", {
   expect_equal(comp$volume_air, 0)
 })
 
-test_that("calculate_in_vitro_compartments gives regression-locked values for hepatocytes, all microplate sizes", {
+test_that("calculate_in_vitro_compartments gives regression-locked values for cells, all microplate sizes", {
   expected <- list(
     cell_neutral_lipids = 1.1303e-05,
     cell_neutral_phospholipids = 8.4074e-06,
@@ -36,7 +36,7 @@ test_that("calculate_in_vitro_compartments gives regression-locked values for he
 
   for (mp in c(96, 48, 24, 12)) {
     comp <- calculate_in_vitro_compartments(
-      "hepatocytes",
+      "cells",
       fbs_fraction = 0.05,
       microplate_type = mp,
       volume_medium = 0.2,

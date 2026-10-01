@@ -1,7 +1,7 @@
-test_that("ivive_michaelis_menten: hepatocytes", {
+test_that("ivive_michaelis_menten: cells", {
   expect_equal(
     ivive_michaelis_menten(
-      system = "hepatocytes",
+      system = "cells",
       vmax = 2,
       km = 1,
       tissue = "liver",
@@ -30,7 +30,7 @@ test_that("ivive_michaelis_menten rejects invalid inputs", {
   expect_snapshot(
     error = TRUE,
     ivive_michaelis_menten(
-      system = "hepatocytes",
+      system = "cells",
       vmax = 2,
       km = 1,
       species = "bogus"
@@ -39,7 +39,7 @@ test_that("ivive_michaelis_menten rejects invalid inputs", {
   expect_snapshot(
     error = TRUE,
     ivive_michaelis_menten(
-      system = "hepatocytes",
+      system = "cells",
       vmax = 2,
       km = 1,
       tissue = "bogus"
@@ -48,7 +48,7 @@ test_that("ivive_michaelis_menten rejects invalid inputs", {
   expect_snapshot(
     error = TRUE,
     ivive_michaelis_menten(
-      system = "hepatocytes",
+      system = "cells",
       vmax = 2,
       km = 1,
       fu_in_vitro = 1.2

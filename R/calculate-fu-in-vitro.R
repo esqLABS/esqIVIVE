@@ -1,8 +1,8 @@
 #' Calculate the fraction unbound in an in vitro incubation
 #'
 #' @description
-#' Predicts the fraction unbound of a compound in a microsomal or hepatocyte
-#' incubation. Two kinds of method are available:
+#' Predicts the fraction unbound of a compound in an incubation with
+#' microsomes or cells, such as hepatocytes. Two kinds of method are available:
 #'
 #' * literature regressions on lipophilicity (`austin`, `hallifax`, `turner`,
 #'   `kilford`, `poulin`, and their average `all_literature`), which need only
@@ -20,7 +20,7 @@
 #'   | `"austin"` | both | Austin et al. (2002) regression |
 #'   | `"hallifax"` | microsomes | Hallifax and Houston (2006) regression |
 #'   | `"turner"` | microsomes | Turner regression, with separate equations for acids, bases and neutral compounds |
-#'   | `"kilford"` | hepatocytes | Kilford et al. (2008) regression |
+#'   | `"kilford"` | cells | Kilford et al. (2008) regression |
 #'   | `"poulin"` | both | Poulin regression on the neutral lipid content, with acidic phospholipid binding for strong bases |
 #'   | `"all_literature"` | both | Average of the regressions available for the system |
 #'   | `"poulin_theil"`, `"poulin_theil_fu"` | both | Poulin and Theil partition model |
@@ -32,7 +32,8 @@
 #'   The partition models without the `_fu` suffix predict binding to serum in
 #'   the medium from the serum lipid and protein content. The `_fu` versions
 #'   use the measured `fu_plasma` instead.
-#' @param system Incubation system, `"microsomes"` or `"hepatocytes"`.
+#' @param system Incubation system, `"microsomes"` or `"cells"` (for
+#'   example hepatocytes).
 #' @param lipophilicity Lipophilicity of the compound (log units), as logP or
 #'   log membrane affinity.
 #' @param ionization Ionization class of up to two ionizable groups, as a
@@ -42,8 +43,8 @@
 #'   Defaults to `c(0, 0)`.
 #' @param concentration_microsomes Microsomal protein concentration (mg/mL).
 #'   Needed when `system = "microsomes"`.
-#' @param concentration_cells Hepatocyte concentration (million cells/mL).
-#'   Needed when `system = "hepatocytes"`.
+#' @param concentration_cells Cell concentration (million cells/mL).
+#'   Needed when `system = "cells"`.
 #' @param fbs_fraction Fraction of fetal bovine serum in the medium (0 to 1).
 #'   Needed by the partition models.
 #' @param microplate_type Number of wells of the microplate: 96, 48, 24 or 12.
@@ -93,7 +94,7 @@
 #'
 #' calculate_fu_in_vitro(
 #'   method = "pksim_standard",
-#'   system = "hepatocytes",
+#'   system = "cells",
 #'   lipophilicity = 3,
 #'   ionization = c("acid", "neutral"),
 #'   pka = c(6, 0),
@@ -105,7 +106,7 @@
 #'
 #' calculate_fu_in_vitro(
 #'   method = "poulin_theil_fu",
-#'   system = "hepatocytes",
+#'   system = "cells",
 #'   lipophilicity = 3,
 #'   ionization = c("acid", "neutral"),
 #'   pka = c(6, 0),
@@ -132,7 +133,7 @@ calculate_fu_in_vitro <- function(
   verbose = FALSE
 ) {
   method <- rlang::arg_match(method, names(.fu_in_vitro_methods))
-  system <- rlang::arg_match(system, c("microsomes", "hepatocytes"))
+  system <- rlang::arg_match(system, c("microsomes", "cells"))
   if (is.null(pka)) {
     pka <- c(0, 0)
   }
@@ -385,23 +386,23 @@ calculate_fu_in_vitro <- function(
   }
   partition <- function(requires = character()) {
     list(
-      systems = c("microsomes", "hepatocytes"),
+      systems = c("microsomes", "cells"),
       partition_model = TRUE,
       requires = c(.fu_in_vitro_partition_arguments, requires)
     )
   }
   list(
-    austin = regression(c("microsomes", "hepatocytes")),
+    austin = regression(c("microsomes", "cells")),
     hallifax = regression("microsomes"),
     turner = regression("microsomes"),
-    kilford = regression("hepatocytes"),
-    poulin = regression(c("microsomes", "hepatocytes")),
+    kilford = regression("cells"),
+    poulin = regression(c("microsomes", "cells")),
     all_literature = c(
-      regression(c("microsomes", "hepatocytes")),
+      regression(c("microsomes", "cells")),
       list(
         averages = list(
           microsomes = c("poulin", "austin", "hallifax", "turner"),
-          hepatocytes = c("kilford", "poulin", "austin")
+          cells = c("kilford", "poulin", "austin")
         )
       )
     ),

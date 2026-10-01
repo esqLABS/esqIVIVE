@@ -4,7 +4,7 @@ test_that("calculate_fu_in_vitro: pksim_standard", {
       method = "pksim_standard",
       lipophilicity = 3,
       ionization = c("acid", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -23,7 +23,7 @@ test_that("calculate_fu_in_vitro: pksim_standard_fu", {
       method = "pksim_standard_fu",
       lipophilicity = 3,
       ionization = c("acid", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0.05,
       microplate_type = 96,
       fu_plasma = 0.2,
@@ -43,7 +43,7 @@ test_that("calculate_fu_in_vitro: poulin_theil_fu", {
       method = "poulin_theil_fu",
       lipophilicity = 3,
       ionization = c("acid", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       fu_plasma = 0.01,
@@ -201,13 +201,13 @@ test_that("calculate_fu_in_vitro: literature methods, microsomes", {
   )
 })
 
-test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
+test_that("calculate_fu_in_vitro: literature methods, cells", {
   expect_equal(
     calculate_fu_in_vitro(
       method = "austin",
       lipophilicity = 3,
       ionization = c("base", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -222,7 +222,7 @@ test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
       method = "kilford",
       lipophilicity = 3,
       ionization = c("base", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -238,7 +238,7 @@ test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
       method = "poulin",
       lipophilicity = 3,
       ionization = c("neutral", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -254,7 +254,7 @@ test_that("calculate_fu_in_vitro: literature methods, hepatocytes", {
       method = "poulin",
       lipophilicity = 3,
       ionization = c("base", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -289,7 +289,7 @@ test_that("calculate_fu_in_vitro: all_literature, neutral compound", {
       method = "all_literature",
       lipophilicity = 3,
       ionization = c("neutral", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -307,7 +307,7 @@ test_that("calculate_fu_in_vitro: rodgers_rowland_fu, strong bases only", {
       method = "rodgers_rowland_fu",
       lipophilicity = 3,
       ionization = c("base", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -330,7 +330,7 @@ test_that("calculate_fu_in_vitro: rodgers_rowland_fu, strong bases only", {
       method = "rodgers_rowland_fu",
       lipophilicity = 2,
       ionization = c("neutral", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -346,7 +346,7 @@ test_that("calculate_fu_in_vitro: rodgers_rowland_fu, strong bases only", {
       method = "rodgers_rowland_fu",
       lipophilicity = 1,
       ionization = c("acid", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -362,7 +362,7 @@ test_that("calculate_fu_in_vitro: rodgers_rowland_fu, strong bases only", {
       method = "rodgers_rowland_fu",
       lipophilicity = 2,
       ionization = c("base", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
@@ -391,14 +391,14 @@ test_that("calculate_fu_in_vitro: the regressions do not need the well", {
   expect_equal(
     calculate_fu_in_vitro(
       method = "kilford",
-      system = "hepatocytes",
+      system = "cells",
       lipophilicity = 3,
       ionization = c("neutral", "neutral"),
       concentration_cells = 1
     ),
     calculate_fu_in_vitro(
       method = "kilford",
-      system = "hepatocytes",
+      system = "cells",
       lipophilicity = 3,
       ionization = c("neutral", "neutral"),
       pka = c(0, 0),
@@ -413,7 +413,7 @@ test_that("calculate_fu_in_vitro: berezhkovskiy_fu currently gives the poulin_th
       method = "berezhkovskiy_fu",
       lipophilicity = 3,
       ionization = c("acid", 0),
-      system = "hepatocytes",
+      system = "cells",
       fbs_fraction = 0,
       microplate_type = 96,
       fu_plasma = 0.01,
@@ -434,7 +434,7 @@ test_that("calculate_fu_in_vitro rejects invalid method and system", {
       method = "bogus",
       lipophilicity = 3,
       ionization = c("acid", 0),
-      system = "hepatocytes",
+      system = "cells",
       pka = c(6, 0),
       concentration_cells = 2
     )
@@ -467,7 +467,7 @@ test_that("calculate_fu_in_vitro rejects a method not available for the system",
     error = TRUE,
     calculate_fu_in_vitro(
       method = "hallifax",
-      system = "hepatocytes",
+      system = "cells",
       lipophilicity = 3,
       ionization = c("neutral", 0),
       concentration_cells = 1
@@ -480,7 +480,7 @@ test_that("calculate_fu_in_vitro names the missing arguments", {
     error = TRUE,
     calculate_fu_in_vitro(
       method = "austin",
-      system = "hepatocytes",
+      system = "cells",
       lipophilicity = 3,
       ionization = c("neutral", 0),
       concentration_microsomes = 1

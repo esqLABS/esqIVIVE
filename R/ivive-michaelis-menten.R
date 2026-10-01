@@ -4,8 +4,9 @@
 #' Scales an in vitro Vmax to the whole tissue with the physiological scaling
 #' factors of the species, and corrects Km for binding in the incubation.
 #'
-#' @param system Incubation system, `"microsomes"` or `"hepatocytes"`.
-#' @param vmax In vitro Vmax (umol/min/million cells for hepatocytes,
+#' @param system Incubation system, `"microsomes"` or `"cells"` (for
+#'   example hepatocytes).
+#' @param vmax In vitro Vmax (umol/min/million cells for cells,
 #'   umol/min/mg protein for microsomes), for example from
 #'   [fit_michaelis_menten_curve()].
 #' @param km In vitro Km (uM).
@@ -25,7 +26,7 @@
 #' @export
 #'
 #' @examples
-#' ivive_michaelis_menten(system = "hepatocytes", vmax = 2, km = 1)
+#' ivive_michaelis_menten(system = "cells", vmax = 2, km = 1)
 #'
 #' ivive_michaelis_menten(
 #'   system = "microsomes",
@@ -44,7 +45,7 @@ ivive_michaelis_menten <- function(
   verbose = FALSE
 ) {
   # check if the arguments are valid
-  system <- rlang::arg_match(system, c("microsomes", "hepatocytes"))
+  system <- rlang::arg_match(system, c("microsomes", "cells"))
   .check_fu_in_vitro_value(fu_in_vitro)
 
   #Correct Km for fraction unbound

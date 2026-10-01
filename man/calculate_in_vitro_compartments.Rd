@@ -15,7 +15,8 @@ calculate_in_vitro_compartments(
 )
 }
 \arguments{
-\item{system}{Incubation system, \code{"microsomes"} or \code{"hepatocytes"}.}
+\item{system}{Incubation system, \code{"microsomes"} or \code{"cells"} (for
+example hepatocytes).}
 
 \item{fbs_fraction}{Fraction of fetal bovine serum in the medium (0 to 1).}
 
@@ -23,8 +24,8 @@ calculate_in_vitro_compartments(
 
 \item{volume_medium}{Volume of medium in the well (mL).}
 
-\item{concentration_cells}{Hepatocyte concentration (million cells/mL).
-Needed when \code{system = "hepatocytes"}.}
+\item{concentration_cells}{Cell concentration (million cells/mL).
+Needed when \code{system = "cells"}.}
 
 \item{concentration_microsomes}{Microsomal protein concentration (mg/mL).
 Needed when \code{system = "microsomes"}.}
@@ -47,15 +48,15 @@ incubated in glass.
 }
 }
 \description{
-Describes a hepatocyte or microsomal incubation in a microplate well: the
-lipid and protein content of the cells or microsomes and of the serum in
-the medium, the plastic surface in contact with the medium, and the air
-above it. \code{\link[=calculate_fu_in_vitro]{calculate_fu_in_vitro()}} uses these values for its partition
+Describes an incubation of cells (such as hepatocytes) or microsomes in a
+microplate well: the lipid and protein content of the cells or microsomes
+and of the serum in the medium, the plastic surface in contact with the
+medium, and the air above it. \code{\link[=calculate_fu_in_vitro]{calculate_fu_in_vitro()}} uses these values for its partition
 models. You can also use them to describe a virtual incubation.
 }
 \examples{
 calculate_in_vitro_compartments(
-  system = "hepatocytes",
+  system = "cells",
   fbs_fraction = 0.05,
   microplate_type = 96,
   volume_medium = 0.15,

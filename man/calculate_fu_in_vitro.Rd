@@ -27,7 +27,7 @@ calculate_fu_in_vitro(
    \code{"austin"} \tab both \tab Austin et al. (2002) regression \cr
    \code{"hallifax"} \tab microsomes \tab Hallifax and Houston (2006) regression \cr
    \code{"turner"} \tab microsomes \tab Turner regression, with separate equations for acids, bases and neutral compounds \cr
-   \code{"kilford"} \tab hepatocytes \tab Kilford et al. (2008) regression \cr
+   \code{"kilford"} \tab cells \tab Kilford et al. (2008) regression \cr
    \code{"poulin"} \tab both \tab Poulin regression on the neutral lipid content, with acidic phospholipid binding for strong bases \cr
    \code{"all_literature"} \tab both \tab Average of the regressions available for the system \cr
    \code{"poulin_theil"}, \code{"poulin_theil_fu"} \tab both \tab Poulin and Theil partition model \cr
@@ -42,7 +42,8 @@ The partition models without the \verb{_fu} suffix predict binding to serum in
 the medium from the serum lipid and protein content. The \verb{_fu} versions
 use the measured \code{fu_plasma} instead.}
 
-\item{system}{Incubation system, \code{"microsomes"} or \code{"hepatocytes"}.}
+\item{system}{Incubation system, \code{"microsomes"} or \code{"cells"} (for
+example hepatocytes).}
 
 \item{lipophilicity}{Lipophilicity of the compound (log units), as logP or
 log membrane affinity.}
@@ -57,8 +58,8 @@ Defaults to \code{c(0, 0)}.}
 \item{concentration_microsomes}{Microsomal protein concentration (mg/mL).
 Needed when \code{system = "microsomes"}.}
 
-\item{concentration_cells}{Hepatocyte concentration (million cells/mL).
-Needed when \code{system = "hepatocytes"}.}
+\item{concentration_cells}{Cell concentration (million cells/mL).
+Needed when \code{system = "cells"}.}
 
 \item{fbs_fraction}{Fraction of fetal bovine serum in the medium (0 to 1).
 Needed by the partition models.}
@@ -88,8 +89,8 @@ to be in the air of the well; this check needs \code{microplate_type} and
 \code{volume_medium}.
 }
 \description{
-Predicts the fraction unbound of a compound in a microsomal or hepatocyte
-incubation. Two kinds of method are available:
+Predicts the fraction unbound of a compound in an incubation with
+microsomes or cells, such as hepatocytes. Two kinds of method are available:
 \itemize{
 \item literature regressions on lipophilicity (\code{austin}, \code{hallifax}, \code{turner},
 \code{kilford}, \code{poulin}, and their average \code{all_literature}), which need only
@@ -120,7 +121,7 @@ calculate_fu_in_vitro(
 
 calculate_fu_in_vitro(
   method = "pksim_standard",
-  system = "hepatocytes",
+  system = "cells",
   lipophilicity = 3,
   ionization = c("acid", "neutral"),
   pka = c(6, 0),
@@ -132,7 +133,7 @@ calculate_fu_in_vitro(
 
 calculate_fu_in_vitro(
   method = "poulin_theil_fu",
-  system = "hepatocytes",
+  system = "cells",
   lipophilicity = 3,
   ionization = c("acid", "neutral"),
   pka = c(6, 0),

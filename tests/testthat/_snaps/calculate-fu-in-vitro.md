@@ -2,7 +2,7 @@
 
     Code
       calculate_fu_in_vitro(method = "rodgers_rowland_fu", lipophilicity = 2,
-        ionization = c("neutral", 0), system = "hepatocytes", fbs_fraction = 0,
+        ionization = c("neutral", 0), system = "cells", fbs_fraction = 0,
         microplate_type = 96, volume_medium = 0.22, pka = c(0, 0),
         henry_law_constant = 1e-06, fu_plasma = 0.3, blood_plasma_ratio = 1,
         concentration_cells = 2)
@@ -15,7 +15,7 @@
 
     Code
       calculate_fu_in_vitro(method = "bogus", lipophilicity = 3, ionization = c(
-        "acid", 0), system = "hepatocytes", pka = c(6, 0), concentration_cells = 2)
+        "acid", 0), system = "cells", pka = c(6, 0), concentration_cells = 2)
     Condition
       Error in `calculate_fu_in_vitro()`:
       ! `method` must be one of "austin", "hallifax", "turner", "kilford", "poulin", "all_literature", "poulin_theil", "poulin_theil_fu", "berezhkovskiy", "berezhkovskiy_fu", "pksim_standard", "pksim_standard_fu", "rodgers_rowland_fu", "schmitt", or "schmitt_fu", not "bogus".
@@ -27,7 +27,7 @@
         "acid", 0), system = "bogus", pka = c(6, 0), concentration_cells = 2)
     Condition
       Error in `calculate_fu_in_vitro()`:
-      ! `system` must be one of "microsomes" or "hepatocytes", not "bogus".
+      ! `system` must be one of "microsomes" or "cells", not "bogus".
 
 # calculate_fu_in_vitro rejects a method not available for the system
 
@@ -36,13 +36,13 @@
         ionization = c("neutral", 0), concentration_microsomes = 1)
     Condition
       Error in `calculate_fu_in_vitro()`:
-      ! "kilford" is only available for hepatocytes.
+      ! "kilford" is only available for cells.
 
 ---
 
     Code
-      calculate_fu_in_vitro(method = "hallifax", system = "hepatocytes",
-        lipophilicity = 3, ionization = c("neutral", 0), concentration_cells = 1)
+      calculate_fu_in_vitro(method = "hallifax", system = "cells", lipophilicity = 3,
+        ionization = c("neutral", 0), concentration_cells = 1)
     Condition
       Error in `calculate_fu_in_vitro()`:
       ! "hallifax" is only available for microsomes.
@@ -50,11 +50,11 @@
 # calculate_fu_in_vitro names the missing arguments
 
     Code
-      calculate_fu_in_vitro(method = "austin", system = "hepatocytes", lipophilicity = 3,
+      calculate_fu_in_vitro(method = "austin", system = "cells", lipophilicity = 3,
         ionization = c("neutral", 0), concentration_microsomes = 1)
     Condition
       Error in `calculate_fu_in_vitro()`:
-      ! "austin" needs `concentration_cells` for hepatocytes.
+      ! "austin" needs `concentration_cells` for cells.
 
 ---
 

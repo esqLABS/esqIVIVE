@@ -12,6 +12,7 @@ ivive_clearance(
   fu_in_vitro = 1,
   concentration_microsomes = NULL,
   concentration_cells = NULL,
+  concentration_cytosol = NULL,
   volume_medium = 1,
   empirical_correction = FALSE,
   tissue = "liver",
@@ -45,7 +46,10 @@ or \code{"L/minutes/mg protein"}. \code{L} is not available per cell.
 \code{"uL/minutes/kg"}, \code{"mL/hours/kg"}, \code{"uL/hours/kg"}.
 }}
 
-\item{system}{Incubation system, \code{"microsomes"} or \code{"hepatocytes"}.}
+\item{system}{Incubation system: \code{"microsomes"}, \code{"cells"} (for example
+hepatocytes) or \code{"cytosol"} (cytosolic fraction). Microsomes are scaled
+with the microsomal protein per gram tissue, cells with the cells per gram
+tissue and the cytosol with the cytosolic protein per gram tissue.}
 
 \item{fu_in_vitro}{Fraction unbound in the incubation, for example from
 \code{\link[=calculate_fu_in_vitro]{calculate_fu_in_vitro()}}. Defaults to 1 (no binding).}
@@ -54,8 +58,11 @@ or \code{"L/minutes/mg protein"}. \code{L} is not available per cell.
 Needed for microsomes when \code{value_type} is \code{"half_life"} or
 \code{"rate_constant"}, or when \code{unit} is per incubation.}
 
-\item{concentration_cells}{Hepatocyte concentration (million cells/mL).
-Needed for hepatocytes in the same cases.}
+\item{concentration_cells}{Cell concentration (million cells/mL). Needed
+for cells in the same cases.}
+
+\item{concentration_cytosol}{Cytosolic protein concentration (mg/mL).
+Needed for the cytosol in the same cases.}
 
 \item{volume_medium}{Volume of medium in the incubation (mL), used for the
 per incubation units. Defaults to 1.}
@@ -63,7 +70,7 @@ per incubation units. Defaults to 1.}
 \item{empirical_correction}{If \code{TRUE}, apply the empirical correction
 factors of Wood et al. (2017), which correct the tendency of in vitro data
 to overpredict slow and underpredict fast clearances. Available for human
-and rat.}
+and rat, with microsomes or cells.}
 
 \item{tissue}{Tissue whose scaling factors are used. Defaults to \code{"liver"}.}
 
@@ -73,7 +80,7 @@ or \code{"dog"}. Defaults to \code{"human"}.}
 \item{relative_expression_factor}{Relative expression or activity factor of
 the enzyme in vivo compared with the incubation. Defaults to 1.}
 
-\item{verbose}{If \code{TRUE}, print the inputs and the result.}
+\item{verbose}{If \code{TRUE}, print the inputs.}
 }
 \value{
 The specific clearance (1/min), a single number.
@@ -85,12 +92,12 @@ value is corrected for binding in the incubation and scaled to the whole
 tissue with the physiological scaling factors of the species.
 }
 \examples{
-# hepatocytes
+# cells, for example hepatocytes
 ivive_clearance(
   value_type = "intrinsic_clearance",
   value = 18.27,
   unit = "mL/minutes/millioncells",
-  system = "hepatocytes",
+  system = "cells",
   fu_in_vitro = 0.5,
   concentration_cells = 0.5
 )
@@ -103,5 +110,15 @@ ivive_clearance(
   system = "microsomes",
   fu_in_vitro = 0.4,
   concentration_microsomes = 1
+)
+
+# cytosolic fraction
+ivive_clearance(
+  value_type = "intrinsic_clearance",
+  value = 0.05,
+  unit = "mL/minutes/mg protein",
+  system = "cytosol",
+  fu_in_vitro = 0.8,
+  concentration_cytosol = 1
 )
 }

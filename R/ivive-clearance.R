@@ -23,36 +23,41 @@
 #'     `"mL/seconds"`, `"uL/seconds"`, `"mL/hours"`, `"uL/hours"`.
 #'   * `"intrinsic_clearance"` per kg body weight: `"mL/minutes/kg"`,
 #'     `"uL/minutes/kg"`, `"mL/hours/kg"`, `"uL/hours/kg"`.
-#' @param system Incubation system, `"microsomes"` or `"hepatocytes"`.
+#' @param system Incubation system: `"microsomes"`, `"cells"` (for example
+#'   hepatocytes) or `"cytosol"` (cytosolic fraction). Microsomes are scaled
+#'   with the microsomal protein per gram tissue, cells with the cells per gram
+#'   tissue and the cytosol with the cytosolic protein per gram tissue.
 #' @param fu_in_vitro Fraction unbound in the incubation, for example from
 #'   [calculate_fu_in_vitro()]. Defaults to 1 (no binding).
 #' @param concentration_microsomes Microsomal protein concentration (mg/mL).
 #'   Needed for microsomes when `value_type` is `"half_life"` or
 #'   `"rate_constant"`, or when `unit` is per incubation.
-#' @param concentration_cells Hepatocyte concentration (million cells/mL).
-#'   Needed for hepatocytes in the same cases.
+#' @param concentration_cells Cell concentration (million cells/mL). Needed
+#'   for cells in the same cases.
+#' @param concentration_cytosol Cytosolic protein concentration (mg/mL).
+#'   Needed for the cytosol in the same cases.
 #' @param volume_medium Volume of medium in the incubation (mL), used for the
 #'   per incubation units. Defaults to 1.
 #' @param empirical_correction If `TRUE`, apply the empirical correction
 #'   factors of Wood et al. (2017), which correct the tendency of in vitro data
 #'   to overpredict slow and underpredict fast clearances. Available for human
-#'   and rat.
+#'   and rat, with microsomes or cells.
 #' @param tissue Tissue whose scaling factors are used. Defaults to `"liver"`.
 #' @param species Species whose scaling factors are used: `"human"`, `"rat"`
 #'   or `"dog"`. Defaults to `"human"`.
 #' @param relative_expression_factor Relative expression or activity factor of
 #'   the enzyme in vivo compared with the incubation. Defaults to 1.
-#' @param verbose If `TRUE`, print the inputs and the result.
+#' @param verbose If `TRUE`, print the inputs.
 #'
 #' @return The specific clearance (1/min), a single number.
 #' @export
 #' @examples
-#' # hepatocytes
+#' # cells, for example hepatocytes
 #' ivive_clearance(
 #'   value_type = "intrinsic_clearance",
 #'   value = 18.27,
 #'   unit = "mL/minutes/millioncells",
-#'   system = "hepatocytes",
+#'   system = "cells",
 #'   fu_in_vitro = 0.5,
 #'   concentration_cells = 0.5
 #' )
@@ -66,6 +71,16 @@
 #'   fu_in_vitro = 0.4,
 #'   concentration_microsomes = 1
 #' )
+#'
+#' # cytosolic fraction
+#' ivive_clearance(
+#'   value_type = "intrinsic_clearance",
+#'   value = 0.05,
+#'   unit = "mL/minutes/mg protein",
+#'   system = "cytosol",
+#'   fu_in_vitro = 0.8,
+#'   concentration_cytosol = 1
+#' )
 ivive_clearance <- function(
   value_type,
   value,
@@ -74,6 +89,7 @@ ivive_clearance <- function(
   fu_in_vitro = 1,
   concentration_microsomes = NULL,
   concentration_cells = NULL,
+  concentration_cytosol = NULL,
   volume_medium = 1,
   empirical_correction = FALSE,
   tissue = "liver",
@@ -86,7 +102,7 @@ ivive_clearance <- function(
     value_type,
     c("half_life", "rate_constant", "intrinsic_clearance")
   )
-  system <- rlang::arg_match(system, c("microsomes", "hepatocytes"))
+  system <- rlang::arg_match(system, c("microsomes", "cells", "cytosol"))
   unit <- rlang::arg_match(unit, .clearance_units[[value_type]])
   if (!rlang::is_bool(empirical_correction)) {
     cli::cli_abort(
@@ -105,6 +121,10 @@ ivive_clearance <- function(
     nLiver <- scaling_factors[["MicProtGO"]] # mg protein/g liver
     cInvitro <- concentration_microsomes #mg/mL
     concentration <- "concentration_microsomes"
+  } else if (system == "cytosol") {
+    nLiver <- scaling_factors[["CytosProtGO"]] # mg protein/g liver
+    cInvitro <- concentration_cytosol #mg/mL
+    concentration <- "concentration_cytosol"
   } else {
     nLiver <- scaling_factors[["CellsGO"]]
     cInvitro <- concentration_cells # million cells/mL assay
@@ -163,8 +183,7 @@ ivive_clearance <- function(
         empirical_correction = empirical_correction,
         tissue = tissue,
         species = species
-      ),
-      result = ClspePermin
+      )
     )
   }
 
@@ -245,17 +264,24 @@ ivive_clearance <- function(
   wood_sf[["human"]] <- data.frame(
     Cl_ranges = c("<10", "10-100", "100-1000", "1000-10000", ">10000"),
     microsomes = c(0.7, 1.8, 4.6, 7.5, 58),
-    hepatocytes = c(0.61, 3.9, 7.1, 22, 1200)
+    cells = c(0.61, 3.9, 7.1, 22, 1200)
   )
   wood_sf[["rat"]] <- data.frame(
     Cl_ranges = c("<10", "10-100", "100-1000", "1000-10000", ">10000"),
     microsomes = c(0.086, 0.83, 1.7, 2.5, 230),
-    hepatocytes = c(0.13, 1.6, 3.2, 7.2, 180)
+    cells = c(0.13, 1.6, 3.2, 7.2, 180)
   )
   if (!species %in% names(wood_sf)) {
     cli::cli_abort(
       "The empirical correction is only available for {names(wood_sf)}, not
        {.val {species}}.",
+      call = call
+    )
+  }
+  if (!system %in% colnames(wood_sf[[species]])) {
+    cli::cli_abort(
+      "The empirical correction is only available for microsomes and cells,
+       not {.val {system}}.",
       call = call
     )
   }

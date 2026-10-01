@@ -1,18 +1,19 @@
 #' Calculate the compartments of an in vitro incubation
 #'
 #' @description
-#' Describes a hepatocyte or microsomal incubation in a microplate well: the
-#' lipid and protein content of the cells or microsomes and of the serum in
-#' the medium, the plastic surface in contact with the medium, and the air
-#' above it. [calculate_fu_in_vitro()] uses these values for its partition
+#' Describes an incubation of cells (such as hepatocytes) or microsomes in a
+#' microplate well: the lipid and protein content of the cells or microsomes
+#' and of the serum in the medium, the plastic surface in contact with the
+#' medium, and the air above it. [calculate_fu_in_vitro()] uses these values for its partition
 #' models. You can also use them to describe a virtual incubation.
 #'
-#' @param system Incubation system, `"microsomes"` or `"hepatocytes"`.
+#' @param system Incubation system, `"microsomes"` or `"cells"` (for
+#'   example hepatocytes).
 #' @param fbs_fraction Fraction of fetal bovine serum in the medium (0 to 1).
 #' @param microplate_type Number of wells of the microplate: 96, 48, 24 or 12.
 #' @param volume_medium Volume of medium in the well (mL).
-#' @param concentration_cells Hepatocyte concentration (million cells/mL).
-#'   Needed when `system = "hepatocytes"`.
+#' @param concentration_cells Cell concentration (million cells/mL).
+#'   Needed when `system = "cells"`.
 #' @param concentration_microsomes Microsomal protein concentration (mg/mL).
 #'   Needed when `system = "microsomes"`.
 #' @param verbose If `TRUE`, print the inputs and the result.
@@ -32,7 +33,7 @@
 #'
 #' @examples
 #' calculate_in_vitro_compartments(
-#'   system = "hepatocytes",
+#'   system = "cells",
 #'   fbs_fraction = 0.05,
 #'   microplate_type = 96,
 #'   volume_medium = 0.15,
@@ -55,12 +56,12 @@ calculate_in_vitro_compartments <- function(
   concentration_microsomes = NULL,
   verbose = FALSE
 ) {
-  system <- rlang::arg_match(system, c("microsomes", "hepatocytes"))
+  system <- rlang::arg_match(system, c("microsomes", "cells"))
   if (system == "microsomes" && is.null(concentration_microsomes)) {
     cli::cli_abort("{.arg concentration_microsomes} is needed for microsomes.")
   }
-  if (system == "hepatocytes" && is.null(concentration_cells)) {
-    cli::cli_abort("{.arg concentration_cells} is needed for hepatocytes.")
+  if (system == "cells" && is.null(concentration_cells)) {
+    cli::cli_abort("{.arg concentration_cells} is needed for cells.")
   }
 
   compartments <- c(
@@ -98,7 +99,7 @@ calculate_in_vitro_compartments <- function(
   concentration_cells = NULL,
   concentration_microsomes = NULL
 ) {
-  if (system == "hepatocytes") {
+  if (system == "cells") {
     # see report on input parameters for refernces of values
     # these values are going to be lower than Poulin paper indicates
     cellVol_mLM <- 0.00254 # mL per million cells

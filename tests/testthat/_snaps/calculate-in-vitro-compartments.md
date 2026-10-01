@@ -5,7 +5,7 @@
         volume_medium = 0.2)
     Condition
       Error in `calculate_in_vitro_compartments()`:
-      ! `system` must be one of "microsomes" or "hepatocytes", not "bogus".
+      ! `system` must be one of "microsomes" or "cells", not "bogus".
 
 ---
 

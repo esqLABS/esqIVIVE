@@ -16,9 +16,10 @@ ivive_michaelis_menten(
 )
 }
 \arguments{
-\item{system}{Incubation system, \code{"microsomes"} or \code{"hepatocytes"}.}
+\item{system}{Incubation system, \code{"microsomes"} or \code{"cells"} (for
+example hepatocytes).}
 
-\item{vmax}{In vitro Vmax (umol/min/million cells for hepatocytes,
+\item{vmax}{In vitro Vmax (umol/min/million cells for cells,
 umol/min/mg protein for microsomes), for example from
 \code{\link[=fit_michaelis_menten_curve]{fit_michaelis_menten_curve()}}.}
 
@@ -50,7 +51,7 @@ Scales an in vitro Vmax to the whole tissue with the physiological scaling
 factors of the species, and corrects Km for binding in the incubation.
 }
 \examples{
-ivive_michaelis_menten(system = "hepatocytes", vmax = 2, km = 1)
+ivive_michaelis_menten(system = "cells", vmax = 2, km = 1)
 
 ivive_michaelis_menten(
   system = "microsomes",
