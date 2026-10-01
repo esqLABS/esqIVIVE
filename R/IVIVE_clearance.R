@@ -283,8 +283,7 @@ IVIVE_clearance <- function(
   if (verbose) {
     .print_ivive_result(
       "IVIVE_clearance",
-      inputs = list(typeValue = typeValue, units = units, expData = expData, typeSystem = typeSystem, fu_invitro = fu_invitro, empirical_scalar = empirical_scalar, tissue = tissue, species = species),
-      result = as.double(ClspePermin)
+      inputs = list(typeValue = typeValue, units = units, expData = expData, typeSystem = typeSystem, fu_invitro = fu_invitro, empirical_scalar = empirical_scalar, tissue = tissue, species = species)
     )
   }
   result<-c("ClspePermin" = as.double(ClspePermin))
