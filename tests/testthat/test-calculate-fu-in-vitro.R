@@ -536,3 +536,18 @@ test_that("calculate_fu_in_vitro warns when the compound probably evaporates", {
     )
   )
 })
+
+test_that("calculate_fu_in_vitro: the ionizable group can be in either position", {
+  expect_equal(
+    calculate_fu_in_vitro(
+      method = "austin",
+      system = "microsomes",
+      lipophilicity = 3,
+      ionization = c("neutral", "base"),
+      pka = c(0, 8),
+      concentration_microsomes = 1
+    ),
+    0.5689241999032,
+    tolerance = 1e-6
+  )
+})

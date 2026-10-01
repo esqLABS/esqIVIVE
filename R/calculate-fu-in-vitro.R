@@ -137,6 +137,9 @@ calculate_fu_in_vitro <- function(
   if (is.null(pka)) {
     pka <- c(0, 0)
   }
+  groups <- .order_ionizable_groups(ionization, pka)
+  ionization <- groups$ionization
+  pka <- groups$pka
 
   .check_fu_in_vitro_inputs(
     method = method,

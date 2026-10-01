@@ -58,3 +58,20 @@ test_that("calculate_plasma_partitions rejects invalid inputs", {
     )
   )
 })
+
+test_that("calculate_plasma_partitions: the ionizable group can be in either position", {
+  expect_equal(
+    calculate_plasma_partitions(
+      method = "logp",
+      lipophilicity = 2,
+      pka = c(0, 3),
+      ionization = c("neutral", "acid")
+    ),
+    list(
+      partition_albumin = 0.185104051916421,
+      partition_globulin = 0.349000112570181,
+      partition_membrane_lipids = 1.000183344634427
+    ),
+    tolerance = 1e-6
+  )
+})

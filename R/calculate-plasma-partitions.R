@@ -77,6 +77,10 @@ calculate_plasma_partitions <- function(
     }
   }
 
+  groups <- .order_ionizable_groups(ionization, pka)
+  ionization <- groups$ionization
+  pka <- groups$pka
+
   X <- .calculate_ionization_factors(ionization, pka)[["ion_factor_plasma"]] #Interstitial tissue
 
   if (method == "logp") {

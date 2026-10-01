@@ -37,3 +37,27 @@ test_that(".calculate_ionization_factors: base + acid (zwitterion-like)", {
     tolerance = 1e-6
   )
 })
+
+test_that(".calculate_ionization_factors: a single ionizable group can be in either position", {
+  expect_equal(
+    .calculate_ionization_factors(
+      ionization = c("neutral", "base"),
+      pka = c(0, 5)
+    ),
+    .calculate_ionization_factors(
+      ionization = c("base", "neutral"),
+      pka = c(5, 0)
+    )
+  )
+  expect_equal(
+    .calculate_ionization_factors(
+      ionization = c("neutral", "acid"),
+      pka = c(0, 14)
+    ),
+    c(
+      ion_factor_plasma = 2.51188643150958e-07,
+      ion_factor_cells = 1.65958690743756e-07
+    ),
+    tolerance = 1e-6
+  )
+})

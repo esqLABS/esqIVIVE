@@ -5,6 +5,9 @@
 # If there are multiple pKas for acidity or basicity, use the lower value.
 # pKb is not the same as pKa: pKa = 14 - pKb.
 .calculate_ionization_factors <- function(ionization, pka) {
+  groups <- .order_ionizable_groups(ionization, pka)
+  ionization <- groups$ionization
+  pka <- groups$pka
   # confirm##################
   pH <- 7.4
   pH_cell <- 7.22
@@ -45,4 +48,15 @@
   }
 
   c("ion_factor_plasma" = X, "ion_factor_cells" = Y)
+}
+
+# Put a single ionizable group first, so that c("neutral", "base") with
+# pka = c(0, 9) is treated like c("base", "neutral") with pka = c(9, 0).
+.order_ionizable_groups <- function(ionization, pka) {
+  ionizable <- ionization[1:2] %in% c("acid", "base")
+  if (!ionizable[1] && ionizable[2]) {
+    ionization <- ionization[c(2, 1)]
+    pka <- pka[c(2, 1)]
+  }
+  list(ionization = ionization, pka = pka)
 }
