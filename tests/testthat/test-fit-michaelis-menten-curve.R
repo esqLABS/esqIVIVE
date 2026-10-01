@@ -1,12 +1,26 @@
-test_that("fit_mm_from_curve fits the expected Km/Vmax from the michaelis_menten_curve.csv fixture", {
+test_that("fit_michaelis_menten_curve fits the expected Km/Vmax from the michaelis_menten_curve.csv fixture", {
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
 
-  mm_curve_path <- system.file("extdata", "michaelis_menten_curve.csv", package = "ESQivive")
+  mm_curve_path <- system.file(
+    "extdata",
+    "michaelis_menten_curve.csv",
+    package = "ESQivive"
+  )
   mm_curve <- read.csv(mm_curve_path)
 
-  fit <- suppressMessages(suppressWarnings(fit_mm_from_curve(mm_curve)))
+  fit <- suppressMessages(suppressWarnings(fit_michaelis_menten_curve(
+    mm_curve
+  )))
 
-  expect_equal(fit["Km_uM", "Mean"], 24.819410646102167, tolerance = 1e-6)
-  expect_equal(fit["Vmax_umol_min_mgmicroORcells", "Mean"], 0.148042324167861, tolerance = 1e-6)
+  expect_equal(
+    fit,
+    data.frame(
+      parameter = c("km", "vmax"),
+      estimate = c(24.819410646102167, 0.148042324167861),
+      lower = c(17.526963031269819, 0.130756491082109),
+      upper = c(35.521418822256344, 0.170050447145058)
+    ),
+    tolerance = 1e-6
+  )
 })

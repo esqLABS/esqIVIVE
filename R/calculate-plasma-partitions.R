@@ -1,70 +1,92 @@
-#' Predict affinity constant to plasma components based on QSARs
-#' 
-#' @name predict_plasma_affinities
+#' Calculate the partition coefficients to plasma components
 #'
 #' @description
-#' Collection of QSAR to obtain affinity to the different components in serum, membrane lipids (memlip)
-#' albumin (alb) and globulin (glob)
+#' Predicts the partition coefficients of a compound to the albumin, the
+#' globulins and the membrane lipids (such as those of lipoproteins) of
+#' plasma, from its lipophilicity or from its PP-LFER descriptors. Pass the
+#' results to [calculate_fu_plasma()] to predict the fraction unbound in
+#' plasma.
 #'
-#' @param QSAR type of QSAR, it can be logP based or PPLFER based (still sorting the ionization)
-#' @param logP is the lipophilicity as given by logKow
-#' @param pKa is a vector of length of 2
-#' @param ionization is a vector of length of 2 which should indicate if chemical is neutral, acid basic.
-#' There are spots for ionization in case chemical is zwitterion
-#' @param LFER_E LFER E parameter
-#' @param LFER_B LFER B parameter
-#' @param LFER_A LFER A parameter
-#' @param LFER_S LFER S parameter
-#' @param LFER_V abraham volume
-#' @param verbose if TRUE, print the inputs and the resulting partition coefficients
+#' @param method Prediction method: `"logp"` (regressions on lipophilicity)
+#'   or `"pplfer"` (poly-parameter linear free energy relationships).
+#' @param lipophilicity Lipophilicity of the compound as logP (log units).
+#' @param ionization Ionization class of up to two ionizable groups, as a
+#'   vector of length 2 with `"acid"`, `"base"` or `"neutral"`, for example
+#'   `c("acid", "neutral")`.
+#' @param pka pKa values of the two ionizable groups, a vector of length 2.
+#' @param lfer_e,lfer_b,lfer_a,lfer_s,lfer_v Abraham solute descriptors E, B,
+#'   A, S and V (the McGowan volume). Needed when `method = "pplfer"`.
+#' @param verbose If `TRUE`, print the inputs and the result.
 #'
-#' @return partition_membrane_lipids (in L/L), partition_albumin (in L/kg) and partition_globulin (in L/kg)
+#' @return A named list: `partition_albumin` (L/kg), `partition_globulin`
+#'   (L/kg) and `partition_membrane_lipids` (L/L).
+#'
 #' @details
+#' For neutral compounds with logP above 4, use `method = "logp"`. For acidic
+#' phenols, carboxylic acids, pyridines and amines you can use
+#' `method = "pplfer"`. Descriptors can be obtained, for example, from the fup
+#' calculator (<https://drumap.nibiohn.go.jp/fup/>).
 #'
-#' For neutral chemicals with logP >4 use the logP QSAR
-#' For acidic phenols, carboxylic acids, pyridine and amines you can use the PPLFER.
-#' fup calculator (https://drumap.nibiohn.go.jp/fup/).
-#' To Do:
-#' PP-LFER QSARs.-need to check how ionization is considered
-#' make documentation
+#' How ionization is taken into account by the PP-LFER method is still under
+#' review.
 #'
 #' @examples
+#' calculate_plasma_partitions(
+#'   method = "logp",
+#'   lipophilicity = 2,
+#'   ionization = c("acid", "neutral"),
+#'   pka = c(3, 0)
+#' )
 #'
-#' predict_plasma_affinities(QSAR="logP", logP=2, pKa=c(3,0), ionization=c("acid",0))
-#'
-#' predict_plasma_affinities(QSAR="PPLFER", logP=2, pKa=c(3,0), ionization=c("acid",0),
-#'                           LFER_E=1, LFER_B=0, LFER_A=1.5, LFER_S=0.8, LFER_V=2)
-#' 
+#' calculate_plasma_partitions(
+#'   method = "pplfer",
+#'   lipophilicity = 2,
+#'   ionization = c("acid", "neutral"),
+#'   pka = c(3, 0),
+#'   lfer_e = 1,
+#'   lfer_b = 0,
+#'   lfer_a = 1.5,
+#'   lfer_s = 0.8,
+#'   lfer_v = 2
+#' )
 #' @export
-
-predict_plasma_affinities <- function(
-  QSAR,
-  logP,
-  pKa,
+calculate_plasma_partitions <- function(
+  method,
+  lipophilicity,
   ionization,
-  LFER_E = NULL,
-  LFER_B = NULL,
-  LFER_A = NULL,
-  LFER_S = NULL,
-  LFER_V = NULL,
+  pka,
+  lfer_e = NULL,
+  lfer_b = NULL,
+  lfer_a = NULL,
+  lfer_s = NULL,
+  lfer_v = NULL,
   verbose = FALSE
 ) {
-  rlang::arg_match(QSAR, c("logP", "PPLFER"))
+  method <- rlang::arg_match(method, c("logp", "pplfer"))
+  if (method == "pplfer") {
+    descriptors <- list(
+      lfer_e = lfer_e,
+      lfer_b = lfer_b,
+      lfer_a = lfer_a,
+      lfer_s = lfer_s,
+      lfer_v = lfer_v
+    )
+    missing <- names(descriptors)[vapply(descriptors, is.null, logical(1))]
+    if (length(missing) > 0) {
+      cli::cli_abort("{.val pplfer} needs {.arg {missing}}.")
+    }
+  }
 
-  fneutral = ion_factors(ionization, pKa)
+  X <- .calculate_ionization_factors(ionization, pka)[["ion_factor_plasma"]] #Interstitial tissue
 
-  X = fneutral["ion_factor_plasma"] #Interstitial tissue
+  if (method == "logp") {
+    logD <- lipophilicity * 1 / (1 + X)
 
-  Y = fneutral["ion_factor_cells"] #intracellular
-
-  if (QSAR == "logP") {
-    logD <- logP * 1 / (1 + X)
-
-    if (pKa[1] != 0) {
+    if (pka[1] != 0) {
       kmemlip_LL <- 10^logD
     } else {
       #Yu et al  regression
-      kmemlip_LL <- 10^(1.294 + 0.304 * logP)
+      kmemlip_LL <- 10^(1.294 + 0.304 * lipophilicity)
     }
 
     #for albumin we are not correcting for ionization since acid molecules also bind albumin
@@ -76,62 +98,61 @@ predict_plasma_affinities <- function(
     kglob_Lkg_2 <- 10^(0.37 * logD - 0.29) #based on the eq used in the VCBA
 
     kglob_Lkg <- mean(c(kglob_Lkg_1, kglob_Lkg_2))
-    
-  } else if (QSAR == "PPLFER") {
+  } else {
     #Add LFER_a
 
-    LFER_Ei = 0.15 + LFER_E
+    LFER_Ei <- 0.15 + lfer_e
 
-    LFER_Vi = -0.0215 + LFER_V
+    LFER_Vi <- -0.0215 + lfer_v
 
-    LFER_Bi = 2.15 - 0.204 * LFER_S + 1.217 * LFER_B + 0.314 * LFER_V
+    LFER_Bi <- 2.15 - 0.204 * lfer_s + 1.217 * lfer_b + 0.314 * lfer_v
 
-    LFER_Si = 1.224 + 0.908 * LFER_E + 0.827 * LFER_S + 0.453 * LFER_V
+    LFER_Si <- 1.224 + 0.908 * lfer_e + 0.827 * lfer_s + 0.453 * lfer_v
 
-    LFER_Ai = -0.208 - 0.058 * LFER_S + 0.0354 * LFER_A + 0.076 * LFER_V
+    LFER_Ai <- -0.208 - 0.058 * lfer_s + 0.0354 * lfer_a + 0.076 * lfer_v
 
-    LFER_J = 1.793 + 0.267 * LFER_E - 0.195 * LFER_S + 0.35 * LFER_V
+    LFER_J <- 1.793 + 0.267 * lfer_e - 0.195 * lfer_s + 0.35 * lfer_v
 
     #check possibly appli limit, range chemicals...
-    kmemlip_LL = 10^(0.29 +
-      0.74 * LFER_E -
-      0.72 * LFER_S -
-      3.63 * LFER_B +
-      3.3 * LFER_V)
-    kbsa_kgL = 0.29 +
-      0.36 * LFER_E -
-      0.26 * LFER_S -
-      3.23 * LFER_B +
-      2.82 * LFER_V
+    kmemlip_LL <- 10^(0.29 +
+      0.74 * lfer_e -
+      0.72 * lfer_s -
+      3.63 * lfer_b +
+      3.3 * lfer_v)
     #equation for ions from https://pubs.acs.org/doi/10.1021/acs.est.5b06176
-    kbsa_Lkg = 0.85 +
+    kbsa_Lkg <- 0.85 +
       0.63 * LFER_Ei -
       0.63 * LFER_Si -
       0.05 * LFER_Ai +
       2.08 * LFER_Bi +
       2.06 * LFER_Vi +
       3.13 * LFER_J
-    kalb_Lkg = kbsa_Lkg
-    kmus_Lkg = -0.24 +
-      0.68 * LFER_E -
-      0.76 * LFER_S -
-      2.29 * LFER_B +
-      2.51 * LFER_V
-    kglob_Lkg = kmus_Lkg
+    kalb_Lkg <- kbsa_Lkg
+    kmus_Lkg <- -0.24 +
+      0.68 * lfer_e -
+      0.76 * lfer_s -
+      2.29 * lfer_b +
+      2.51 * lfer_v
+    kglob_Lkg <- kmus_Lkg
   }
-  result <- c(
-    "partition_membrane_lipids" = kmemlip_LL,
-    "partition_albumin" = kalb_Lkg,
-    "partition_globulin" = kglob_Lkg
+  result <- list(
+    partition_albumin = kalb_Lkg,
+    partition_globulin = kglob_Lkg,
+    partition_membrane_lipids = kmemlip_LL
   )
 
   if (verbose) {
     .print_ivive_result(
-      "predict_plasma_affinities",
-      inputs = list(QSAR = QSAR, logP = logP, pKa = pKa, ionization = ionization),
+      "calculate_plasma_partitions",
+      inputs = list(
+        method = method,
+        lipophilicity = lipophilicity,
+        ionization = ionization,
+        pka = pka
+      ),
       result = result
     )
   }
 
-  return(result)
+  result
 }

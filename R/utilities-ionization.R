@@ -1,25 +1,10 @@
-#' ion_factors
-#'
-#' @description
-#' Helper Function to calculate fraction unionized
-#' If there are multiple pKas for acidity just use the lower value
-#' If there are multiple pKas for basicity just use the lower value
-#' Mind that pKb is not the same as pKa !
-#' If you have pKb, just calculate pKa=14-pKb
-#'
-#' @param ionization vector of length 2 with ionization class, acid, neutral and base
-#' @param pKa vector of length 2 with pKa values of the compound
-#' @param verbose if TRUE, print the inputs and the resulting ionization factors
-#'
-#' @return factors that can be used to calculate the fraction neutral or ionized in plasma and intracellularly
-#' @export
-#'
-#' @examples
-#' ion_factors(ionization=c("neutral",0),pKa<-c(0,0))
-#' ion_factors(ionization=c("acid",0),pKa<-c(14,0))
-#' ion_factors(ionization=c("base","acid"),pKa<-c(5,7))
-
-ion_factors <- function(ionization, pKa, verbose = FALSE) {
+# Ionization factors in plasma (pH 7.4) and in cells (pH 7.22), used to
+# calculate the fraction neutral or ionized. Supports a monoprotic acid, a
+# monoprotic base and a zwitterion (one acidic and one basic group); any other
+# combination is treated as neutral.
+# If there are multiple pKas for acidity or basicity, use the lower value.
+# pKb is not the same as pKa: pKa = 14 - pKb.
+.calculate_ionization_factors <- function(ionization, pka) {
   # confirm##################
   pH <- 7.4
   pH_cell <- 7.22
@@ -39,35 +24,25 @@ ion_factors <- function(ionization, pKa, verbose = FALSE) {
   if (identical(ionParam, c(-1, 0))) {
     # Monoprotic base
 
-    X <- 10^(pKa[1] - pH)
-    Y <- 10^(pKa[1] - pH_cell)
+    X <- 10^(pka[1] - pH)
+    Y <- 10^(pka[1] - pH_cell)
   } else if (identical(ionParam, c(-1, 1)) | identical(ionParam, c(1, -1))) {
     # monoproticBaseMonoproticAcid
 
-    X <- 10^(pKa[which(ionParam %in% -1)] - pH) +
-      10^(pH - pKa[which(ionParam %in% 1)])
+    X <- 10^(pka[which(ionParam %in% -1)] - pH) +
+      10^(pH - pka[which(ionParam %in% 1)])
 
-    Y <- 10^(pKa[which(ionParam %in% -1)] - pH_cell) +
-      10^(pH_cell - pKa[which(ionParam %in% 1)])
+    Y <- 10^(pka[which(ionParam %in% -1)] - pH_cell) +
+      10^(pH_cell - pka[which(ionParam %in% 1)])
   } else if (identical(ionParam, c(1, 0))) {
     # monoprotic acid
 
-    X <- 10^(pH - pKa[1])
-    Y <- 10^(pH_cell - pKa[1])
+    X <- 10^(pH - pka[1])
+    Y <- 10^(pH_cell - pka[1])
   } else {
     X <- 0
     Y <- 0
   }
 
-  result <- c("ion_factor_plasma" = X, "ion_factor_cells" = Y)
-
-  if (verbose) {
-    .print_ivive_result(
-      "ion_factors",
-      inputs = list(ionization = ionization, pKa = pKa),
-      result = result
-    )
-  }
-
-  return(result)
+  c("ion_factor_plasma" = X, "ion_factor_cells" = Y)
 }

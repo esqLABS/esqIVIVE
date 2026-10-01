@@ -1,28 +1,60 @@
-test_that("predict_plasma_affinities: logP QSAR, ionized compound", {
-  # Positional indexing: for an ionized compound, kmemlip_LL/kalb_Lkg inherit a
-  # stray name from the ion_factors() lookup (a pre-existing cosmetic quirk,
-  # unrelated to the rename fixes made here), so result[["partition_..."]]
-  # does not resolve by exact name.
-  result <- predict_plasma_affinities(QSAR = "logP", logP = 2, pKa = c(3, 0), ionization = c("acid", 0))
-
-  expect_equal(unname(as.double(result))[1:3], c(1.000183344634427, 0.185104051916421, 0.349000112570181), tolerance = 1e-6)
-})
-
-test_that("predict_plasma_affinities: PPLFER QSAR", {
-  result <- predict_plasma_affinities(
-    QSAR = "PPLFER", logP = 2, pKa = c(3, 0), ionization = c("acid", 0),
-    LFER_E = 1, LFER_B = 0, LFER_A = 1.5, LFER_S = 0.8, LFER_V = 2
-  )
-
+test_that("calculate_plasma_partitions: logp method, ionized compound", {
   expect_equal(
-    as.double(result),
-    c(11324003.6323556, 16.9112310, 4.8520000),
+    calculate_plasma_partitions(
+      method = "logp",
+      lipophilicity = 2,
+      pka = c(3, 0),
+      ionization = c("acid", 0)
+    ),
+    list(
+      partition_albumin = 0.185104051916421,
+      partition_globulin = 0.349000112570181,
+      partition_membrane_lipids = 1.000183344634427
+    ),
     tolerance = 1e-6
   )
 })
 
-test_that("predict_plasma_affinities rejects an invalid QSAR", {
-  expect_error(
-    predict_plasma_affinities(QSAR = "bogus", logP = 2, pKa = c(3, 0), ionization = c("acid", 0))
+test_that("calculate_plasma_partitions: pplfer method", {
+  expect_equal(
+    calculate_plasma_partitions(
+      method = "pplfer",
+      lipophilicity = 2,
+      pka = c(3, 0),
+      ionization = c("acid", 0),
+      lfer_e = 1,
+      lfer_b = 0,
+      lfer_a = 1.5,
+      lfer_s = 0.8,
+      lfer_v = 2
+    ),
+    list(
+      partition_albumin = 16.9112310,
+      partition_globulin = 4.8520000,
+      partition_membrane_lipids = 11324003.6323556
+    ),
+    tolerance = 1e-6
+  )
+})
+
+test_that("calculate_plasma_partitions rejects invalid inputs", {
+  expect_snapshot(
+    error = TRUE,
+    calculate_plasma_partitions(
+      method = "bogus",
+      lipophilicity = 2,
+      pka = c(3, 0),
+      ionization = c("acid", 0)
+    )
+  )
+  expect_snapshot(
+    error = TRUE,
+    calculate_plasma_partitions(
+      method = "pplfer",
+      lipophilicity = 2,
+      pka = c(3, 0),
+      ionization = c("acid", 0),
+      lfer_e = 1
+    )
   )
 })

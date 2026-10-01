@@ -19,6 +19,7 @@ License: MIT + file LICENSE
 URL: https://github.com/esqLABS/esqIVIVE, https://esqlabs.github.io/esqIVIVE/
 BugReports: https://github.com/esqLABS/esqIVIVE/issues
 Imports:
+    cli,
     ggplot2,
     readxl,
     rlang,

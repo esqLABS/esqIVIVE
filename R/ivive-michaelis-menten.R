@@ -1,83 +1,89 @@
-#Code to derive convert Michaelis-Menten
-#' Title
-#' @name IVIVE_MM
-#' @description function that scales Vmax and correct km for fraction unbound
-#' 
-#' @param typeSystem if hepatocytes or microsomes
-#' @param fu_invitro value of fractionunbound in vitro, the default is 1
-#' @param vmax as umol/min/million hepatocytes or umol/min/mg microsomal protein
-#' @param km_micromolar Km of the enzyme reaction, in uM
-#' @param tissue liver, brain, lung, kidney, gonads and gut, default is liver
-#' @param species human, rat or dog, default human
-#' @param REF relative expression or activity factor, default is 1.
-#' To use this option the reference concentration of
-#'  of the enzyme of interest in pksim needs to be 1 uM
-#' @param verbose if TRUE, print the inputs and the resulting Vmax/Km
-#' @returns Vmax in umol/min/L and Km_unb in uM
+#' Scale Michaelis-Menten parameters to in vivo
+#'
+#' @description
+#' Scales an in vitro Vmax to the whole tissue with the physiological scaling
+#' factors of the species, and corrects Km for binding in the incubation.
+#'
+#' @param system Incubation system, `"microsomes"` or `"hepatocytes"`.
+#' @param vmax In vitro Vmax (umol/min/million cells for hepatocytes,
+#'   umol/min/mg protein for microsomes), for example from
+#'   [fit_michaelis_menten_curve()].
+#' @param km In vitro Km (uM).
+#' @param fu_in_vitro Fraction unbound in the incubation, for example from
+#'   [calculate_fu_in_vitro()]. Defaults to 1 (no binding).
+#' @param tissue Tissue whose scaling factors are used. Defaults to `"liver"`.
+#' @param species Species whose scaling factors are used: `"human"`, `"rat"`
+#'   or `"dog"`. Defaults to `"human"`.
+#' @param relative_expression_factor Relative expression or activity factor of
+#'   the enzyme in vivo compared with the incubation. Defaults to 1. To use it,
+#'   set the reference concentration of the enzyme in PK-Sim to 1 uM.
+#' @param verbose If `TRUE`, print the inputs and the result.
+#'
+#' @returns A named list:
+#'   * `vmax`: in vivo Vmax (umol/min/L of tissue);
+#'   * `km_unbound`: unbound Km (uM).
 #' @export
 #'
 #' @examples
-#' IVIVE_MM (typeSystem="hepatocytes",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
-#' IVIVE_MM (typeSystem="microsomes",fu_invitro=0.2,vmax=2,km_micromolar=1)
-
-IVIVE_MM <- function(
-  typeSystem,
-  fu_invitro=1,
+#' ivive_michaelis_menten(system = "hepatocytes", vmax = 2, km = 1)
+#'
+#' ivive_michaelis_menten(
+#'   system = "microsomes",
+#'   vmax = 2,
+#'   km = 1,
+#'   fu_in_vitro = 0.2
+#' )
+ivive_michaelis_menten <- function(
+  system,
   vmax,
-  km_micromolar,
-  tissue =  "liver",
+  km,
+  fu_in_vitro = 1,
+  tissue = "liver",
   species = "human",
-  REF = 1,
+  relative_expression_factor = 1,
   verbose = FALSE
 ) {
   # check if the arguments are valid
-  rlang::arg_match(typeSystem, c("hepatocytes", "microsomes"))
-
-  if (fu_invitro == 0) {
-    print("problem fu_invitro=0")
-  } else if (fu_invitro >1 ){
-    print("problem fu_invitro>1")
-  }
+  system <- rlang::arg_match(system, c("microsomes", "hepatocytes"))
+  .check_fu_in_vitro_value(fu_in_vitro)
 
   #Correct Km for fraction unbound
-  Km_unb_uM <- km_micromolar * fu_invitro
+  Km_unb_uM <- km * fu_in_vitro
 
   #Calculate in vivo Vmax--------------------------------------------------------
-  #Scaling factors
-  path <- system.file("extdata", "scaling_factors.csv", package = "ESQivive")
-  scaling_factors<-utils::read.csv(path)
+  scaling_factors <- .get_scaling_factors(species, tissue)
+  fintcell <- scaling_factors[["fcell"]]
 
-  # check if the arguments are valid
-  rlang::arg_match(species, unique(scaling_factors[,"species"]))
-  rlang::arg_match(tissue, unique(scaling_factors[,"organ"]))
-
-  #Get species scaling factor
-  species_row<-which(scaling_factors[,"species"]==species)
-  organ_row<-which(scaling_factors[,"organ"]==tissue)
-  overlap_row<-intersect(species_row,organ_row)
-  fintcell <- scaling_factors[overlap_row, "fcell"]
- 
   #chose the system specific scaling factors
-  if (typeSystem == "microsomes") {
-    scfactor <- scaling_factors[overlap_row, "MicProtGO"] # mg protein/g liver
- } else if (typeSystem == "hepatocytes") {
-   scfactor <- scaling_factors[overlap_row, "CellsGO"]
- } else {
-    warning("typeSystem not identified, only hepatocytes or microsomes allowed")
- }
-  dens<-1000 #g/L
-  vmax_umol_minL  <- vmax*scfactor*REF/fintcell*dens
+  if (system == "microsomes") {
+    scfactor <- scaling_factors[["MicProtGO"]] # mg protein/g liver
+  } else {
+    scfactor <- scaling_factors[["CellsGO"]]
+  }
+  dens <- 1000 #g/L
+  vmax_umol_minL <- vmax *
+    scfactor *
+    relative_expression_factor /
+    fintcell *
+    dens
 
-  result <- list("vmax_umol_minL"=vmax_umol_minL,"Km_unb_uM"=Km_unb_uM)
+  result <- list(vmax = vmax_umol_minL, km_unbound = Km_unb_uM)
 
   if (verbose) {
     .print_ivive_result(
-      "IVIVE_MM",
-      inputs = list(typeSystem = typeSystem, fu_invitro = fu_invitro, vmax = vmax, km_micromolar = km_micromolar, tissue = tissue, species = species, REF = REF),
+      "ivive_michaelis_menten",
+      inputs = list(
+        system = system,
+        vmax = vmax,
+        km = km,
+        fu_in_vitro = fu_in_vitro,
+        tissue = tissue,
+        species = species,
+        relative_expression_factor = relative_expression_factor
+      ),
       result = result
     )
   }
 
-  return(result)
+  result
 }
-

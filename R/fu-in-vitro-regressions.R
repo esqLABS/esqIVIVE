@@ -1,264 +1,112 @@
-#' @name calculate_fu_mic_turner 
-#' @title Turner algorithm for Fu calculation
-#' @description The Turner algorithm for calculating Fu in vitro
-#' 
-#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pKa vector of length of 2 with pKa of the compound
-#' @param log_lipophilicity LogP or LogMA of the compound
-#' @param conc_mic_mgml concentration of microsomes (in mg/mL)
-#' @param verbose if TRUE, print the inputs and the resulting fu_invitro
-#'
-#' @return fuInvitro
-#' @examples
-#' calculate_fu_mic_turner("acid",3,3,1)
-#'
-#' @export
+# Literature regressions for the fraction unbound in microsomal and hepatocyte
+# incubations. Internal: reached through calculate_fu_in_vitro(), which checks
+# the inputs. Concentrations are in mg protein/mL (microsomes) and million
+# cells/mL (hepatocytes).
 
-calculate_fu_mic_turner <- function(
-  ionization,
-  pKa,
-  log_lipophilicity,
-  conc_mic_mgml,
-  verbose = FALSE
-) {
-
-  if (ionization[1] == "base" & pKa[1] > 7) {
-    fu_invitro <- 1 /
-      (1 + conc_mic_mgml * 10^(0.58 * log_lipophilicity - 2.02))
-
-  } else if (ionization[1] == "acid" && pKa[1] < 7) {
-    fu_invitro <- 1 /
-      (1 + conc_mic_mgml * 10^(0.2 * log_lipophilicity - 1.54))
-
+# Lipophilicity used by the regressions: logD for strong bases, logP otherwise.
+.regression_lipophilicity <- function(ionization, pka, lipophilicity) {
+  if (.is_strong_base(ionization, pka)) {
+    ion_factor <- .calculate_ionization_factors(ionization, pka)[[
+      "ion_factor_plasma"
+    ]]
+    log10(1 / (1 + ion_factor) * 10^lipophilicity)
   } else {
-    fu_invitro <- 1 /
-      (1 + conc_mic_mgml * 10^(0.46 * log_lipophilicity - 1.51))
+    lipophilicity
   }
-
-  if (verbose) {
-    .print_ivive_result(
-      "calculate_fu_mic_turner",
-      inputs = list(ionization = ionization, pKa = pKa, log_lipophilicity = log_lipophilicity, conc_mic_mgml = conc_mic_mgml),
-      result = fu_invitro
-    )
-  }
-
-  return(fu_invitro)
 }
 
-#' @name calculate_fu_mic_halifax
-#' @title Halifax algorithm for Fu calculation
-#' @description The Halifax algorithm for calculating Fu in vitro
-#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pKa vector of length of 2 with pKa of the compound
-#' @param log_lipophilicity LogP or LogMA of the compound
-#' @param conc_mic_mgml concentration of microsomes mg/mL
-#' @param verbose if TRUE, print the inputs and the resulting fu_invitro
-#' @return fuInvitro
-#' @export
-#' @examples
-#' calculate_fu_mic_halifax(c("base",0),c(3,0),3,1)
-#'
-calculate_fu_mic_halifax <- function(
+.calculate_fu_mic_turner <- function(
   ionization,
-  pKa,
-  log_lipophilicity,
-  conc_mic_mgml,
-  verbose = FALSE
+  pka,
+  lipophilicity,
+  concentration_microsomes
 ) {
-  ion_factor <- ion_factors(ionization, pKa)["ion_factor_plasma"]
-
-  if (ionization[1] == "base" & pKa[1] > 7) {
-    log_partition <- log10(as.double(1 / (1 + ion_factor) * 10^log_lipophilicity))
+  if (.is_strong_base(ionization, pka)) {
+    1 / (1 + concentration_microsomes * 10^(0.58 * lipophilicity - 2.02))
+  } else if (ionization[1] == "acid" && pka[1] < 7) {
+    1 / (1 + concentration_microsomes * 10^(0.2 * lipophilicity - 1.54))
   } else {
-    log_partition <- log_lipophilicity
+    1 / (1 + concentration_microsomes * 10^(0.46 * lipophilicity - 1.51))
   }
-
-  fu_invitro <- 1 /
-      (1 + conc_mic_mgml *
-          10^(0.072 * log_partition^2 + 0.067 * log_partition - 1.126))
-
-  if (verbose) {
-    .print_ivive_result(
-      "calculate_fu_mic_halifax",
-      inputs = list(ionization = ionization, pKa = pKa, log_lipophilicity = log_lipophilicity, conc_mic_mgml = conc_mic_mgml),
-      result = fu_invitro
-    )
-  }
-
-  return(fu_invitro)
 }
 
-#' @name calculate_fu_mic_austin
-#' @title Austin algorithm for microsomes Fu calculation
-#' @description The Austin algorithm for calculating Fu in vitro for microsomes
-#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pKa vector of length of 2 with pKa of the compound
-#' @param log_lipophilicity LogP or LogMA of the compound
-#' @param conc_mic_mgml concentration of microsomes (in mg/mL)
-#' @param verbose if TRUE, print the inputs and the resulting fu_invitro
-#' @return fuInvitro
-#' @export
-#' @examples
-#' calculate_fu_mic_austin(c("base",0),c(8,0),3,1)
-#'
-calculate_fu_mic_austin<- function(
+# Hallifax and Houston 2006
+.calculate_fu_mic_hallifax <- function(
   ionization,
-  pKa,
-  log_lipophilicity,
-  conc_mic_mgml,
-  verbose = FALSE
+  pka,
+  lipophilicity,
+  concentration_microsomes
 ) {
-
-  ion_factor <- ion_factors(ionization, pKa)["ion_factor_plasma"]
-  if (ionization[1] == "base" & pKa[1] > 7) {
-    log_partition <- log10(as.double(1 / (1 + ion_factor ) * 10^log_lipophilicity))
-  } else {
-    log_partition <- log_lipophilicity
-  }
-
-  fu_invitro <- 1 /
-    (1 + conc_mic_mgml * 10^(0.56 *  log_partition- 1.41))
-
-  if (verbose) {
-    .print_ivive_result(
-      "calculate_fu_mic_austin",
-      inputs = list(ionization = ionization, pKa = pKa, log_lipophilicity = log_lipophilicity, conc_mic_mgml = conc_mic_mgml),
-      result = fu_invitro
-    )
-  }
-
-  return(fu_invitro)
+  log_partition <- .regression_lipophilicity(ionization, pka, lipophilicity)
+  1 /
+    (1 +
+      concentration_microsomes *
+        10^(0.072 * log_partition^2 + 0.067 * log_partition - 1.126))
 }
 
-#' @name calculate_fu_hep_austin 
-#' @title Austin algorithm for hepatocytes Fu calculation
-#' @description The Austin algorithm for calculating Fu in vitro for hepatocytes
-#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pKa vector of length of 2 with pKa of the compound
-#' @param log_lipophilicity LogP or LogMA of the compound
-#' @param conc_cell_millionml concentration of hepatocytes (in million cells/mL)
-#' @param verbose if TRUE, print the inputs and the resulting fu_invitro
-#' @return fuInvitro
-#' @export
-#' @examples
-#' calculate_fu_hep_austin(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,
-#'                         conc_cell_millionml=0.5)
-
-calculate_fu_hep_austin <- function(
+# Austin et al 2002
+.calculate_fu_mic_austin <- function(
   ionization,
-  pKa,
-  log_lipophilicity,
-  conc_cell_millionml,
-  verbose = FALSE
+  pka,
+  lipophilicity,
+  concentration_microsomes
 ) {
-  ion_factor <- ion_factors(ionization, pKa)["ion_factor_plasma"]
-  if (ionization[1] == "base" & pKa[1] > 7) {
-    log_partition <- log10(as.double(1 / (1 + ion_factor ) * 10^log_lipophilicity))
-  } else {
-    log_partition <- log_lipophilicity
-  }
-
-  fu_invitro <- 1 /
-    (1 + conc_cell_millionml * 10^(0.4 * log_partition- 1.38))
-
-  if (verbose) {
-    .print_ivive_result(
-      "calculate_fu_hep_austin",
-      inputs = list(ionization = ionization, pKa = pKa, log_lipophilicity = log_lipophilicity, conc_cell_millionml = conc_cell_millionml),
-      result = fu_invitro
-    )
-  }
-
-  return(fu_invitro)
+  log_partition <- .regression_lipophilicity(ionization, pka, lipophilicity)
+  1 / (1 + concentration_microsomes * 10^(0.56 * log_partition - 1.41))
 }
 
-#' @name calculate_fu_hep_kilford
-#' @title Kilford algorithm for Fu calculation
-#' @description The Kilford algorithm for calculating Fu in vitro
-#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pKa vector of length of 2 with pKa of the compound
-#' @param log_lipophilicity LogP or LogMA of the compound
-#' @param conc_cell_millionml concentration of hepatocytes (in million cells/mL)
-#' @param verbose if TRUE, print the inputs and the resulting fu_invitro
-#' @return fuInvitro
-#' @export
-#' @examples
-#' calculate_fu_hep_kilford(ionization=c("base",0),pKa=c(3,0),log_lipophilicity=3,
-#'                          conc_cell_millionml=0.5)
-
-calculate_fu_hep_kilford <- function(
+# Austin et al 2002, hepatocyte form
+.calculate_fu_hep_austin <- function(
   ionization,
-  pKa,
-  log_lipophilicity,
-  conc_cell_millionml,
-  verbose = FALSE
+  pka,
+  lipophilicity,
+  concentration_cells
 ) {
-  ion_factor <- ion_factors(ionization, pKa)["ion_factor_plasma"]
-  if (ionization[1] == "base" & pKa[1] > 7) {
-    log_partition <- log10(as.double(1 / (1 + ion_factor) * 10^log_lipophilicity))
-  } else {
-    log_partition <- log_lipophilicity
-  }
-  volume_ratio <- 0.005 * conc_cell_millionml
-  fu_invitro <- 1 /
+  log_partition <- .regression_lipophilicity(ionization, pka, lipophilicity)
+  1 / (1 + concentration_cells * 10^(0.4 * log_partition - 1.38))
+}
+
+# Kilford et al 2008
+.calculate_fu_hep_kilford <- function(
+  ionization,
+  pka,
+  lipophilicity,
+  concentration_cells
+) {
+  log_partition <- .regression_lipophilicity(ionization, pka, lipophilicity)
+  volume_ratio <- 0.005 * concentration_cells
+  1 /
     (1 +
       125 *
         volume_ratio *
         10^(0.072 * log_partition^2 + 0.067 * log_partition - 1.126))
-
-  if (verbose) {
-    .print_ivive_result(
-      "calculate_fu_hep_kilford",
-      inputs = list(ionization = ionization, pKa = pKa, log_lipophilicity = log_lipophilicity, conc_cell_millionml = conc_cell_millionml),
-      result = fu_invitro
-    )
-  }
-
-  return(fu_invitro)
 }
 
-#' @name calculate_fu_hep_poulin
-#' @title Poulin algorithm for Fu calculation
-#' @description The Poulin algorithm for calculating Fu in vitro
-#' @param ionization Vector of length 2 with ionization class, acid, neutral and base, if not input then it is c(0,0)
-#' @param pKa vector of length of 2 with pKa of the compound
-#' @param blood_plasma blood plasma ratio
-#' @param fraction_unbound fraction unbound in plasma
-#' @param concentration_cell_neutral_lipids neutral lipid concentration
-#' @param cCellAPL acidic phospholipid concentration in the in vitro system (as fraction of medium volume);
-#' only used for strong bases (base ionization class with a pKa above 7)
-#' @param log_lipophilicity LogP or LogMA of the compound
-#' @param verbose if TRUE, print the inputs and the resulting fu_invitro
-#' @return fuInvitro
-#' @export
-#' @examples
-#' calculate_fu_hep_poulin(ionization=c("base",0),pKa=c(8,0),blood_plasma=1,fraction_unbound=0.2,
-#'                         concentration_cell_neutral_lipids=0.03,cCellAPL=0.01,log_lipophilicity=3)
-#' calculate_fu_hep_poulin(ionization=c("neutral",0),pKa=c(0,0),
-#'                         concentration_cell_neutral_lipids=0.03,log_lipophilicity=3)
-calculate_fu_hep_poulin <- function(
+# Poulin: binding to the neutral lipids of the cells or microsomes, plus the
+# acidic phospholipids for strong bases. Used for both systems. Lipid
+# concentrations are fractions of the medium volume.
+.calculate_fu_hep_poulin <- function(
   ionization,
-  pKa,
-  blood_plasma=NULL,
-  fraction_unbound=NULL,
+  pka,
+  lipophilicity,
   concentration_cell_neutral_lipids,
-  cCellAPL,
-  log_lipophilicity,
-  verbose = FALSE
+  concentration_cell_acidic_phospholipids = NULL,
+  blood_plasma_ratio = NULL,
+  fu_plasma = NULL
 ) {
-  neutral_lipid_partition <- 10^log_lipophilicity
-  ion_factor_plasma <- ion_factors(ionization, pKa)["ion_factor_plasma"]
-  ion_factor_cells <- ion_factors(ionization, pKa)["ion_factor_cells"]
-  
-  if (ionization[1] == "base" & pKa[1] > 7) {
+  neutral_lipid_partition <- 10^lipophilicity
+  ionization_factors <- .calculate_ionization_factors(ionization, pka)
+  ion_factor_plasma <- ionization_factors[["ion_factor_plasma"]]
+  ion_factor_cells <- ionization_factors[["ion_factor_cells"]]
+
+  if (.is_strong_base(ionization, pka)) {
     fraction_neutral_lipids_erythrocytes <- 0.0024
     fraction_acidic_phospholipids_erythrocytes <- 0.00057
     fraction_water_erythrocytes <- 0.63
-    partition_erythrocytes_albumin <- (blood_plasma - (1 - 0.45)) /
+    partition_erythrocytes_albumin <- (blood_plasma_ratio - (1 - 0.45)) /
       0.45 /
-      fraction_unbound
-    
+      fu_plasma
+
     acidic_phospholipid_partition <- (partition_erythrocytes_albumin -
       ((1 + ion_factor_cells) *
         fraction_water_erythrocytes +
@@ -267,29 +115,18 @@ calculate_fu_hep_poulin <- function(
       ((1 + ion_factor_plasma) /
         (ion_factor_cells * fraction_acidic_phospholipids_erythrocytes))
 
-    fu_invitro <- as.double(
-      1 /(1 +
-          ((neutral_lipid_partition *
-            concentration_cell_neutral_lipids +
-            ion_factor_plasma * acidic_phospholipid_partition * cCellAPL) /
-            (1 + ion_factor_plasma)))
-    )
+    1 /
+      (1 +
+        ((neutral_lipid_partition *
+          concentration_cell_neutral_lipids +
+          ion_factor_plasma *
+            acidic_phospholipid_partition *
+            concentration_cell_acidic_phospholipids) /
+          (1 + ion_factor_plasma)))
   } else {
-    fu_invitro <- as.double(
-      1 /
-        (1 +
-          ((neutral_lipid_partition * concentration_cell_neutral_lipids) /
-            (1 + ion_factor_plasma)))
-    )
+    1 /
+      (1 +
+        ((neutral_lipid_partition * concentration_cell_neutral_lipids) /
+          (1 + ion_factor_plasma)))
   }
-
-  if (verbose) {
-    .print_ivive_result(
-      "calculate_fu_hep_poulin",
-      inputs = list(ionization = ionization, pKa = pKa, blood_plasma = blood_plasma, fraction_unbound = fraction_unbound, concentration_cell_neutral_lipids = concentration_cell_neutral_lipids, log_lipophilicity = log_lipophilicity),
-      result = fu_invitro
-    )
-  }
-
-  return(fu_invitro)
 }
