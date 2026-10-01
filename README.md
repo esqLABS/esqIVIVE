@@ -1,62 +1,69 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # esqIVIVE
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/esqLABS/esqIVIVE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml)
 <!-- badges: end -->
 
-The goal of esqIVIVE is to perform extrapolation of in vitro ADME parameters and derive ADME parameters to input for PBK models.
+The goal of esqIVIVE is to perform extrapolation of in vitro ADME
+parameters and derive ADME parameters to input for PBK models.
 
-The functions in this package have been developed focusing on the integration with OSP tools.
+The functions in this package have been developed focusing on the
+integration with OSP tools.
 
-Currently there are available codes to calculate: fraction unbound in microsomes :
+Currently there are available codes to calculate: fraction unbound in
+microsomes :
 
--   calculate_fu_mic_austin()
+- calculate_fu_mic_austin()
 
--   calculate_fu_mic_halifax()
+- calculate_fu_mic_halifax()
 
--   calculate_fu_mic_turner()
+- calculate_fu_mic_turner()
 
 fraction unbound in hepatocytes:
 
--   calculate_fu_hep_austin()
+- calculate_fu_hep_austin()
 
--   calculate_fu_hep_kilford()
+- calculate_fu_hep_kilford()
 
--   calculate_fu_hep_poulin()
+- calculate_fu_hep_poulin()
 
 derive metabolism parameters from experimental curves:
 
--   fit_clearance_from_curve()
+- fit_clearance_from_curve()
 
--   fit_mm_from_curve()
+- fit_mm_from_curve()
 
 perform scaling for clearance:
 
--   IVIVE_clearance()
+- IVIVE_clearance()
 
--   IVIVE_MM()
+- IVIVE_MM()
 
 calculate fu_plasma related parameters:
 
--   calculate_fu_pls_from_Ks()
+- calculate_fu_pls_from_Ks()
 
--   predict_plasma_affinities()
+- predict_plasma_affinities()
 
--   correct_fu_pls_pearce()
+- correct_fu_pls_pearce()
 
 perform IVIVE to derive Pint:
 
--   pint_caco2_empir()
+- pint_caco2_empir()
 
--   pint_peff_empir()
+- pint_peff_empir()
 
 Examples of how to use the functions are provided for each.
 
 ## Installation
 
-You can install the development version of esqIVIVE from [GitHub](https://github.com/) with:
+You can install the development version of esqIVIVE from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -65,13 +72,18 @@ devtools::install_github("esqLABS/esqIVIVE")
 
 ## Example: clearance IVIVE workflow for midazolam
 
-This example derives the PK-Sim specific clearance of midazolam from a human liver microsome (HLM) incubation in three steps:
+This example derives the PK-Sim specific clearance of midazolam from a
+human liver microsome (HLM) incubation in three steps:
 
-1.  Predict the fraction unbound in the microsomal incubation (fu_mic) and compare it with measured values.
-2.  Fit the depletion rate constant from the raw concentration-time data.
+1.  Predict the fraction unbound in the microsomal incubation (fu_mic)
+    and compare it with measured values.
+2.  Fit the depletion rate constant from the raw concentration-time
+    data.
 3.  Scale the in vitro rate constant to an in vivo specific clearance.
 
-The compound properties and the incubation conditions (1 mg/mL microsomal protein, in vitro half-life of 3.9 min) are from Obach (1999), Drug Metab Dispos 27(11):1350-1359.
+The compound properties and the incubation conditions (1 mg/mL
+microsomal protein, in vitro half-life of 3.9 min) are from Obach
+(1999), Drug Metab Dispos 27(11):1350-1359.
 
 ``` r
 library(esqIVIVE)
@@ -88,7 +100,9 @@ midazolam <- list(
 
 ### 1. Fraction unbound in the incubation
 
-`calculate_fu_in_vitro()` predicts fu_mic with different QSPRs. `"All_literature"` is the average of the Poulin, Austin, Halifax and Turner regressions.
+`calculate_fu_in_vitro()` predicts fu_mic with different QSPRs.
+`"All_literature"` is the average of the Poulin, Austin, Halifax and
+Turner regressions.
 
 ``` r
 fu_mic <- calculate_fu_in_vitro(
@@ -108,7 +122,9 @@ fu_mic
 #> [1] 0.3907191
 ```
 
-Measured values from the Krumpholz et al. database can be retrieved with `get_fu_krumpholz()`. The values are averaged per species and microsomal concentration, and `n` is the number of values averaged:
+Measured values from the Krumpholz et al. database can be retrieved with
+`get_fu_krumpholz()`. The values are averaged per species and microsomal
+concentration, and `n` is the number of values averaged:
 
 ``` r
 get_fu_krumpholz("Midazolam", system = "microsomes", species = "human")
@@ -127,9 +143,13 @@ get_fu_krumpholz("Midazolam", system = "microsomes", species = "human")
 
 ### 2. Depletion rate constant from raw data
 
-`fit_clearance_from_curve()` fits a mono-exponential decay to the substrate depletion curve (time in min, concentration in µM). It returns the rate constant (kcat, 1/min) with its 95% confidence interval and plots the fit.
+`fit_clearance_from_curve()` fits a mono-exponential decay to the
+substrate depletion curve (time in min, concentration in µM). It returns
+the rate constant (kcat, 1/min) with its 95% confidence interval and
+plots the fit.
 
-The data below are an illustrative depletion curve in triplicate, generated from the midazolam half-life of 3.9 min.
+The data below are an illustrative depletion curve in triplicate,
+generated from the midazolam half-life of 3.9 min.
 
 ``` r
 depletion <- data.frame(
@@ -143,11 +163,7 @@ depletion <- data.frame(
 kcat <- fit_clearance_from_curve(depletion)
 ```
 
-<img src="man/figures/README-example-fit-1.png" width="100%"/>
-
-```         
-#> Waiting for profiling to be done...
-```
+<img src="man/figures/README-example-fit-1.png" alt="Midazolam concentration decreases from about 1 to 0.1 micromolar over 12 minutes. Black points show triplicate depletion data, and the blue curve shows the fitted mono-exponential decay (R-squared = 0.995)." width="100%" />
 
 ``` r
 kcat
@@ -161,7 +177,10 @@ log(2) / kcat[["Mean_kcat_min-1"]]
 
 ### 3. IVIVE to the PK-Sim specific clearance
 
-`IVIVE_clearance()` scales the in vitro rate constant with the microsomal protein per gram liver and the intracellular fraction of the liver, and corrects it for fu_mic. The result is the specific clearance (1/min) to use in the PK-Sim “Liver Plasma Clearance” process.
+`IVIVE_clearance()` scales the in vitro rate constant with the
+microsomal protein per gram liver and the intracellular fraction of the
+liver, and corrects it for fu_mic. The result is the specific clearance
+(1/min) to use in the PK-Sim “Liver Plasma Clearance” process.
 
 ``` r
 IVIVE_clearance(
@@ -191,13 +210,17 @@ IVIVE_clearance(
 #>    24.43609
 ```
 
-The vignette `Clearance IVIVE check` applies this workflow to the 28 drugs of Obach (1999). It simulates their in vivo clearance with PK-Sim PBK models and compares the different IVIVE options.
+The vignette `Clearance IVIVE check` applies this workflow to the 28
+drugs of Obach (1999). It simulates their in vivo clearance with PK-Sim
+PBK models and compares the different IVIVE options.
 
 ## Contribute
 
 ### Coding Standards
 
-Contributors should comply with the [Open Systems Pharmacology Coding Standards for R](https://github.com/Open-Systems-Pharmacology/developer-docs/blob/main/ospsuite-r-specifics/CODING_STANDARDS_R.md)
+Contributors should comply with the [Open Systems Pharmacology Coding
+Standards for
+R](https://github.com/Open-Systems-Pharmacology/developer-docs/blob/main/ospsuite-r-specifics/CODING_STANDARDS_R.md)
 
 ### Development Environment
 
