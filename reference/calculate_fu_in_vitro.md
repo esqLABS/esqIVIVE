@@ -43,7 +43,7 @@ calculate_fu_in_vitro(
 
 - type_system:
 
-  microsomes or hepatocytes
+  "microsomes" or "cells"
 
 - FBS_fraction:
 
@@ -99,13 +99,13 @@ mayeb consider to have average data..
 ``` r
 calculate_fu_in_vitro(
  partition_qspr = "All PK-Sim Standard", log_lipophilicity = 3, ionization = c("acid", 0),
- type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+ type_system = "cells", FBS_fraction = 0, microplate_type = 96,
  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 #> [1] 0.5630088
 
 calculate_fu_in_vitro(
  partition_qspr = "Poulin and Theil + fu", log_lipophilicity = 3, ionization = c("acid", 0),
- type_system = "hepatocytes", FBS_fraction = 0, microplate_type = 96,
+ type_system = "cells", FBS_fraction = 0, microplate_type = 96,
  fraction_unbound=0.01,blood_plasma_ratio=2,
  volume_medium = 0.22, pka = c(6, 0), henry_law_constant = 1E-6, concentration_cells = 2)
 #> [1] 0.78331

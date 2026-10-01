@@ -80,7 +80,7 @@ then from literature, Poulin, Turner, Austin and Halifax. See thevignette for mo
 
 
 <dt id="arg-type-system">type_system<a class="anchor" aria-label="anchor" href="#arg-type-system"></a></dt>
-<dd><p>microsomes or hepatocytes</p></dd>
+<dd><p>"microsomes" or "cells"</p></dd>
 
 
 <dt id="arg-fbs-fraction">FBS_fraction<a class="anchor" aria-label="anchor" href="#arg-fbs-fraction"></a></dt>
@@ -136,13 +136,13 @@ then from literature, Poulin, Turner, Austin and Halifax. See thevignette for mo
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">calculate_fu_in_vitro</span><span class="op">(</span></span></span>
 <span class="r-in"><span> partition_qspr <span class="op">=</span> <span class="st">"All PK-Sim Standard"</span>, log_lipophilicity <span class="op">=</span> <span class="fl">3</span>, ionization <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"acid"</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> type_system <span class="op">=</span> <span class="st">"hepatocytes"</span>, FBS_fraction <span class="op">=</span> <span class="fl">0</span>, microplate_type <span class="op">=</span> <span class="fl">96</span>,</span></span>
+<span class="r-in"><span> type_system <span class="op">=</span> <span class="st">"cells"</span>, FBS_fraction <span class="op">=</span> <span class="fl">0</span>, microplate_type <span class="op">=</span> <span class="fl">96</span>,</span></span>
 <span class="r-in"><span> volume_medium <span class="op">=</span> <span class="fl">0.22</span>, pka <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0</span><span class="op">)</span>, henry_law_constant <span class="op">=</span> <span class="fl">1E-6</span>, concentration_cells <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5630088</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">calculate_fu_in_vitro</span><span class="op">(</span></span></span>
 <span class="r-in"><span> partition_qspr <span class="op">=</span> <span class="st">"Poulin and Theil + fu"</span>, log_lipophilicity <span class="op">=</span> <span class="fl">3</span>, ionization <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"acid"</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> type_system <span class="op">=</span> <span class="st">"hepatocytes"</span>, FBS_fraction <span class="op">=</span> <span class="fl">0</span>, microplate_type <span class="op">=</span> <span class="fl">96</span>,</span></span>
+<span class="r-in"><span> type_system <span class="op">=</span> <span class="st">"cells"</span>, FBS_fraction <span class="op">=</span> <span class="fl">0</span>, microplate_type <span class="op">=</span> <span class="fl">96</span>,</span></span>
 <span class="r-in"><span> fraction_unbound<span class="op">=</span><span class="fl">0.01</span>,blood_plasma_ratio<span class="op">=</span><span class="fl">2</span>,</span></span>
 <span class="r-in"><span> volume_medium <span class="op">=</span> <span class="fl">0.22</span>, pka <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0</span><span class="op">)</span>, henry_law_constant <span class="op">=</span> <span class="fl">1E-6</span>, concentration_cells <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.78331</span>

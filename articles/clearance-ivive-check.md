@@ -629,4 +629,4 @@ if (isTRUE(params$write_results)) {
 }
 ```
 
-    Results written to /home/runner/work/esqIVIVE/esqIVIVE/vignettes/articles/results/Clearance_IVIVE_results.xlsx 
+    Results written to /home/runner/work/ESQivive/ESQivive/vignettes/articles/results/Clearance_IVIVE_results.xlsx 

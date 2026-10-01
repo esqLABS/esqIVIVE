@@ -21,7 +21,7 @@ IVIVE_MM(
 
 - typeSystem:
 
-  if hepatocytes or microsomes
+  "cells" or "microsomes"
 
 - fu_invitro:
 
@@ -29,7 +29,7 @@ IVIVE_MM(
 
 - vmax:
 
-  as umol/min/million hepatocytes or umol/min/mg microsomal protein
+  as umol/min/million cells or umol/min/mg microsomal protein
 
 - km_micromolar:
 
@@ -60,7 +60,7 @@ Vmax in umol/min/L and Km_unb in uM
 ## Examples
 
 ``` r
-IVIVE_MM (typeSystem="hepatocytes",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
+IVIVE_MM (typeSystem="cells",vmax=2,km_micromolar=1,tissue="liver",species="human",REF=1)
 #> $vmax_umol_minL
 #> [1] 355223.9
 #> 

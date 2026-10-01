@@ -35,7 +35,7 @@ IVIVE_clearance(
 
   |                         |                       |               |
   |-------------------------|-----------------------|---------------|
-  | Hepatocytes             | Subcellular           | Generic       |
+  | Cells                   | Subcellular           | Generic       |
   | mL/minutes/millioncells | mL/minutes/mg protein | /minutes      |
   | uL/minutes/millioncells | uL/minutes/mg protein | /hours        |
   | L/minutes/millioncells  | L/minutes/mg protein  | /seconds      |
@@ -58,7 +58,10 @@ IVIVE_clearance(
 
 - typeSystem:
 
-  hepatocytes, microsomes
+  "cells", "microsomes" or "cytosolF" (cytosolic fraction). Cells are
+  scaled with the cells per gram organ (CellsGO), microsomes with the
+  microsomal protein per gram organ (MicProtGO) and the cytosolic
+  fraction with the cytosolic protein per gram organ (CytosProtGO)
 
 - fu_invitro:
 
@@ -89,11 +92,12 @@ IVIVE_clearance(
 
 - cProtein_mgml:
 
-  concentration of subcellular protein (in mg/mL)
+  concentration of subcellular (microsomal or cytosolic) protein (in
+  mg/mL)
 
 - cCells_Mml:
 
-  concentration of hepatocytes used (in million cells/mL)
+  concentration of cells used (in million cells/mL)
 
 - verbose:
 
@@ -106,29 +110,27 @@ Specific clearance parameter (/min) to plug in PK-Sim
 ## Examples
 
 ``` r
-# example hepatocytes
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",species="human",
+# example cells (e.g. hepatocytes)
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cells",species="human",
 units="mL/minutes/millioncells",expData=18.27,fu_invitro=0.5,cCells_Mml=0.5,empirical_scalar="No")
 #> ClspePermin 
 #>     6489.94 
 
 # if you dont specify some of the parameters they will be the default (example fu_in vitro=1)
-IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="hepatocytes",
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cells",
 units="mL/minutes/millioncells",expData=18.27,cCells_Mml=0.5,verbose=TRUE)
 #> --- IVIVE_clearance ---
 #> Inputs:
 #>   typeValue = invitro_clearance_parameter
 #>   units = mL/minutes/millioncells
 #>   expData = 18.27
-#>   typeSystem = hepatocytes
+#>   typeSystem = cells
 #>   fu_invitro = 1
 #>   empirical_scalar = No
 #>   tissue = liver
 #>   species = human
 #> Result:
-#>   3244.97014925372
-#> ClspePermin 
-#>     3244.97 
+#> Error in .print_ivive_result("IVIVE_clearance", inputs = list(typeValue = typeValue,     units = units, expData = expData, typeSystem = typeSystem,     fu_invitro = fu_invitro, empirical_scalar = empirical_scalar,     tissue = tissue, species = species)): argument "result" is missing, with no default
 
 
 # example microsomes
@@ -137,4 +139,10 @@ IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="microsomes",
                 volMedium_mL=0.5,empirical_scalar="No")
 #> ClspePermin 
 #>     1963343 
+
+# example cytosolic fraction
+IVIVE_clearance(typeValue="invitro_clearance_parameter",typeSystem="cytosolF",
+                units="mL/minutes/mg protein",expData=0.05,fu_invitro=0.8,cProtein_mgml=1)
+#> ClspePermin 
+#>    4.664179 
 ```

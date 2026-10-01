@@ -61,7 +61,7 @@
 
 
 <dl><dt id="arg-typesystem">typeSystem<a class="anchor" aria-label="anchor" href="#arg-typesystem"></a></dt>
-<dd><p>if hepatocytes or microsomes</p></dd>
+<dd><p>"cells" or "microsomes"</p></dd>
 
 
 <dt id="arg-fu-invitro">fu_invitro<a class="anchor" aria-label="anchor" href="#arg-fu-invitro"></a></dt>
@@ -69,7 +69,7 @@
 
 
 <dt id="arg-vmax">vmax<a class="anchor" aria-label="anchor" href="#arg-vmax"></a></dt>
-<dd><p>as umol/min/million hepatocytes or umol/min/mg microsomal protein</p></dd>
+<dd><p>as umol/min/million cells or umol/min/mg microsomal protein</p></dd>
 
 
 <dt id="arg-km-micromolar">km_micromolar<a class="anchor" aria-label="anchor" href="#arg-km-micromolar"></a></dt>
@@ -101,7 +101,7 @@ of the enzyme of interest in pksim needs to be 1 uM</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">IVIVE_MM</span> <span class="op">(</span>typeSystem<span class="op">=</span><span class="st">"hepatocytes"</span>,vmax<span class="op">=</span><span class="fl">2</span>,km_micromolar<span class="op">=</span><span class="fl">1</span>,tissue<span class="op">=</span><span class="st">"liver"</span>,species<span class="op">=</span><span class="st">"human"</span>,REF<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">IVIVE_MM</span> <span class="op">(</span>typeSystem<span class="op">=</span><span class="st">"cells"</span>,vmax<span class="op">=</span><span class="fl">2</span>,km_micromolar<span class="op">=</span><span class="fl">1</span>,tissue<span class="op">=</span><span class="st">"liver"</span>,species<span class="op">=</span><span class="st">"human"</span>,REF<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $vmax_umol_minL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 355223.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

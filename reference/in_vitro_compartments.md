@@ -1,9 +1,9 @@
 # in_vitro_compartments
 
 Generates a list of values describing a liver in vitro compartment based
-on hepatocytes or microsomes This function is used inside the Fraction
-unbound function but can also be used for general virtual hepatocyte
-systems
+on cells (e.g. hepatocytes) or microsomes This function is used inside
+the Fraction unbound function but can also be used for general virtual
+cell systems
 
 ## Usage
 
@@ -23,7 +23,7 @@ in_vitro_compartments(
 
 - typeSystem:
 
-  if system is hepatocytes or microsomes
+  "cells" or "microsomes"
 
 - FBS_fraction:
 
@@ -57,7 +57,7 @@ concentrations are given as fraction of volume
 ## Examples
 
 ``` r
-in_vitro_compartments("hepatocytes", FBS_fraction=0.05, microplateType = 96,
+in_vitro_compartments("cells", FBS_fraction=0.05, microplateType = 96,
                       volMedium_mL = 0.15, cCells_Mml = 0.1)
 #> $cCellNL_vvmedium
 #> [1] 1.1303e-05

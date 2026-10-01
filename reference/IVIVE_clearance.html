@@ -71,7 +71,7 @@
 
 <dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
 <dd><p>this are the units of the value.
-For kct</p><table class="table table"><tr><td>Hepatocytes</td><td>Subcellular</td><td>Generic</td></tr><tr><td>mL/minutes/millioncells</td><td>mL/minutes/mg protein</td><td>/minutes</td></tr><tr><td>uL/minutes/millioncells</td><td>uL/minutes/mg protein</td><td>/hours</td></tr><tr><td>L/minutes/millioncells</td><td>L/minutes/mg protein</td><td>/seconds</td></tr><tr><td>mL/hours/millioncells</td><td>mL/hours/mg protein</td><td>mL/minutes</td></tr><tr><td>uL/hours/millioncells</td><td>uL/hours/mg protein</td><td>uL/minutes</td></tr><tr><td>L/hours/millioncells</td><td>L/hours/mg protein</td><td>mL/seconds</td></tr><tr><td>mL/seconds/millioncells</td><td>mL/seconds/mg protein</td><td>uL/seconds</td></tr><tr><td>uL/seconds/millioncells</td><td>mL/seconds/mg protein</td><td>mL/hours</td></tr><tr><td>L/seconds/millioncells</td><td>uL/seconds/mg protein</td><td>uL/hours</td></tr><tr><td>mL/minutes/cell</td><td>L/seconds/mg protein</td><td>mL/minutes/kg</td></tr><tr><td>uL/minutes/cell</td><td></td><td>uL/minutes/kg</td></tr><tr><td>mL/hours/cell</td><td></td><td>mL/hours/kg</td></tr><tr><td>uL/hours/cell</td><td></td><td>uL/hours/kg</td></tr><tr><td>mL/seconds/cell</td><td></td><td></td></tr><tr><td>uL/seconds/cell</td><td></td><td></td></tr></table></dd>
+For kct</p><table class="table table"><tr><td>Cells</td><td>Subcellular</td><td>Generic</td></tr><tr><td>mL/minutes/millioncells</td><td>mL/minutes/mg protein</td><td>/minutes</td></tr><tr><td>uL/minutes/millioncells</td><td>uL/minutes/mg protein</td><td>/hours</td></tr><tr><td>L/minutes/millioncells</td><td>L/minutes/mg protein</td><td>/seconds</td></tr><tr><td>mL/hours/millioncells</td><td>mL/hours/mg protein</td><td>mL/minutes</td></tr><tr><td>uL/hours/millioncells</td><td>uL/hours/mg protein</td><td>uL/minutes</td></tr><tr><td>L/hours/millioncells</td><td>L/hours/mg protein</td><td>mL/seconds</td></tr><tr><td>mL/seconds/millioncells</td><td>mL/seconds/mg protein</td><td>uL/seconds</td></tr><tr><td>uL/seconds/millioncells</td><td>mL/seconds/mg protein</td><td>mL/hours</td></tr><tr><td>L/seconds/millioncells</td><td>uL/seconds/mg protein</td><td>uL/hours</td></tr><tr><td>mL/minutes/cell</td><td>L/seconds/mg protein</td><td>mL/minutes/kg</td></tr><tr><td>uL/minutes/cell</td><td></td><td>uL/minutes/kg</td></tr><tr><td>mL/hours/cell</td><td></td><td>mL/hours/kg</td></tr><tr><td>uL/hours/cell</td><td></td><td>uL/hours/kg</td></tr><tr><td>mL/seconds/cell</td><td></td><td></td></tr><tr><td>uL/seconds/cell</td><td></td><td></td></tr></table></dd>
 
 
 <dt id="arg-expdata">expData<a class="anchor" aria-label="anchor" href="#arg-expdata"></a></dt>
@@ -79,7 +79,9 @@ For kct</p><table class="table table"><tr><td>Hepatocytes</td><td>Subcellular</t
 
 
 <dt id="arg-typesystem">typeSystem<a class="anchor" aria-label="anchor" href="#arg-typesystem"></a></dt>
-<dd><p>hepatocytes, microsomes</p></dd>
+<dd><p>"cells", "microsomes" or "cytosolF" (cytosolic fraction). Cells are scaled with
+the cells per gram organ (CellsGO), microsomes with the microsomal protein per gram organ (MicProtGO)
+and the cytosolic fraction with the cytosolic protein per gram organ (CytosProtGO)</p></dd>
 
 
 <dt id="arg-fu-invitro">fu_invitro<a class="anchor" aria-label="anchor" href="#arg-fu-invitro"></a></dt>
@@ -107,11 +109,11 @@ For kct</p><table class="table table"><tr><td>Hepatocytes</td><td>Subcellular</t
 
 
 <dt id="arg-cprotein-mgml">cProtein_mgml<a class="anchor" aria-label="anchor" href="#arg-cprotein-mgml"></a></dt>
-<dd><p>concentration of subcellular protein (in mg/mL)</p></dd>
+<dd><p>concentration of subcellular (microsomal or cytosolic) protein (in mg/mL)</p></dd>
 
 
 <dt id="arg-ccells-mml">cCells_Mml<a class="anchor" aria-label="anchor" href="#arg-ccells-mml"></a></dt>
-<dd><p>concentration of hepatocytes used (in million cells/mL)</p></dd>
+<dd><p>concentration of cells used (in million cells/mL)</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -125,29 +127,27 @@ For kct</p><table class="table table"><tr><td>Hepatocytes</td><td>Subcellular</t
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># example hepatocytes</span></span></span>
-<span class="r-in"><span><span class="fu">IVIVE_clearance</span><span class="op">(</span>typeValue<span class="op">=</span><span class="st">"invitro_clearance_parameter"</span>,typeSystem<span class="op">=</span><span class="st">"hepatocytes"</span>,species<span class="op">=</span><span class="st">"human"</span>,</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># example cells (e.g. hepatocytes)</span></span></span>
+<span class="r-in"><span><span class="fu">IVIVE_clearance</span><span class="op">(</span>typeValue<span class="op">=</span><span class="st">"invitro_clearance_parameter"</span>,typeSystem<span class="op">=</span><span class="st">"cells"</span>,species<span class="op">=</span><span class="st">"human"</span>,</span></span>
 <span class="r-in"><span>units<span class="op">=</span><span class="st">"mL/minutes/millioncells"</span>,expData<span class="op">=</span><span class="fl">18.27</span>,fu_invitro<span class="op">=</span><span class="fl">0.5</span>,cCells_Mml<span class="op">=</span><span class="fl">0.5</span>,empirical_scalar<span class="op">=</span><span class="st">"No"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ClspePermin </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     6489.94 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># if you dont specify some of the parameters they will be the default (example fu_in vitro=1)</span></span></span>
-<span class="r-in"><span><span class="fu">IVIVE_clearance</span><span class="op">(</span>typeValue<span class="op">=</span><span class="st">"invitro_clearance_parameter"</span>,typeSystem<span class="op">=</span><span class="st">"hepatocytes"</span>,</span></span>
+<span class="r-in"><span><span class="fu">IVIVE_clearance</span><span class="op">(</span>typeValue<span class="op">=</span><span class="st">"invitro_clearance_parameter"</span>,typeSystem<span class="op">=</span><span class="st">"cells"</span>,</span></span>
 <span class="r-in"><span>units<span class="op">=</span><span class="st">"mL/minutes/millioncells"</span>,expData<span class="op">=</span><span class="fl">18.27</span>,cCells_Mml<span class="op">=</span><span class="fl">0.5</span>,verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- IVIVE_clearance ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Inputs:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   typeValue = invitro_clearance_parameter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   units = mL/minutes/millioncells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   expData = 18.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   typeSystem = hepatocytes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   typeSystem = cells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   fu_invitro = 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   empirical_scalar = No</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   tissue = liver</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   species = human</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Result:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3244.97014925372</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ClspePermin </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     3244.97 </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .print_ivive_result("IVIVE_clearance", inputs = list(typeValue = typeValue,     units = units, expData = expData, typeSystem = typeSystem,     fu_invitro = fu_invitro, empirical_scalar = empirical_scalar,     tissue = tissue, species = species)):</span> argument "result" is missing, with no default</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># example microsomes</span></span></span>
@@ -156,6 +156,12 @@ For kct</p><table class="table table"><tr><td>Hepatocytes</td><td>Subcellular</t
 <span class="r-in"><span>                volMedium_mL<span class="op">=</span><span class="fl">0.5</span>,empirical_scalar<span class="op">=</span><span class="st">"No"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ClspePermin </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1963343 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># example cytosolic fraction</span></span></span>
+<span class="r-in"><span><span class="fu">IVIVE_clearance</span><span class="op">(</span>typeValue<span class="op">=</span><span class="st">"invitro_clearance_parameter"</span>,typeSystem<span class="op">=</span><span class="st">"cytosolF"</span>,</span></span>
+<span class="r-in"><span>                units<span class="op">=</span><span class="st">"mL/minutes/mg protein"</span>,expData<span class="op">=</span><span class="fl">0.05</span>,fu_invitro<span class="op">=</span><span class="fl">0.8</span>,cProtein_mgml<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ClspePermin </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4.664179 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
