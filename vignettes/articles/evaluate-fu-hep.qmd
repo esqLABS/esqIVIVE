@@ -31,7 +31,7 @@ Same equation as for microsomes, but the neutral lipid and (for strong bases) ac
 
 Same restriction as for Fu_mic: only implemented for strong bases (ionization class "base" with pKa \> 7), since it is calibrated from the compound's blood-cell partitioning (fraction unbound in plasma and blood:plasma ratio).
 
-#### All_literature
+#### all_literature
 
 Average of this package's own Austin, Kilford and Poulin predictions.
 
@@ -61,18 +61,18 @@ We used the Obs_Fuhep from this dataset to evaluate the predictions. Unlike the 
 ```{r}
 #| echo: false
 
-QSARs <- c(
-  "Austin",
-  "Kilford",
-  "Poulin",
-  "All Poulin and Theil",
-  "All Berezhkovskiy",
-  "All PK-Sim Standard",
-  "Rodgers & Rowland + fu",
-  "All Schmitt",
-  "All_literature"
+methods <- c(
+  "austin",
+  "kilford",
+  "poulin",
+  "poulin_theil",
+  "berezhkovskiy",
+  "pksim_standard",
+  "rodgers_rowland_fu",
+  "schmitt",
+  "all_literature"
 )
-QSAR_colnames <- c(
+method_colnames <- c(
   "ESQivive_Austin",
   "ESQivive_Kilford",
   "ESQivive_Poulin",
@@ -81,32 +81,32 @@ QSAR_colnames <- c(
   "All_PK_Sim_Standard",
   "Rodgers_Rowland_fu",
   "All_Schmitt",
-  "All_literature"
+  "all_literature"
 )
 
 # Rodgers & Rowland only supports strong bases (see Theory above) and, along
-# with Poulin's strong-base branch and All_literature, needs fraction unbound
+# with Poulin's strong-base branch and all_literature, needs fraction unbound
 # in plasma / blood:plasma ratio - taken from this dataset's fuP/RBP columns
 # where available (NA otherwise, which safe_fu() turns into a clean NA result
 # rather than an error).
 safe_fu <- function(...) tryCatch(calculate_fu_in_vitro(...), error = function(e) NA_real_)
 
-for (j in seq_along(QSARs)) {
-  testFuHepData[[QSAR_colnames[j]]] <- sapply(seq_len(nrow(testFuHepData)), function(i) {
+for (j in seq_along(methods)) {
+  testFuHepData[[method_colnames[j]]] <- sapply(seq_len(nrow(testFuHepData)), function(i) {
     # pKa is not numeric for neutral compounds (no ionizable group); this is
-    # fine since none of the QSARs above use pka when the compound is neutral.
+    # fine since none of the methods above use pka when the compound is neutral.
     suppressWarnings(safe_fu(
-      partition_qspr = QSARs[j],
-      log_lipophilicity = as.double(testFuHepData[i, "LogP37C"]),
+      method = methods[j],
+      lipophilicity = as.double(testFuHepData[i, "LogP37C"]),
       ionization = c(testFuHepData[i, "Class"], 0),
-      type_system = "hepatocytes",
-      FBS_fraction = 0,
+      system = "hepatocytes",
+      fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
       pka = c(as.double(testFuHepData[i, "pKa"]), 0),
       concentration_cells = as.double(testFuHepData[i, "Cell_concentration.10_6cells.mL."]),
       blood_plasma_ratio = as.double(testFuHepData[i, "RBP"]),
-      fraction_unbound = as.double(testFuHepData[i, "fuP"])
+      fu_plasma = as.double(testFuHepData[i, "fuP"])
     ))
   })
 }
@@ -135,14 +135,14 @@ plot(testFuHepData$Fu_Austin, testFuHepData$ESQivive_Austin,
 abline(0, 1, col = "red")
 ```
 
-Poulin agrees closely with the paper's own values (points fall near the identity line). Austin does not - this package's `calculate_fu_hep_austin()` systematically predicts lower Fu than the paper's `Fu_Austin` column, which is worth investigating further (e.g. whether the coefficients or cell-concentration assumptions used here match the original hepatocyte-specific regression) before relying on it.
+Poulin agrees closely with the paper's own values (points fall near the identity line). Austin does not - the `"austin"` method of `calculate_fu_in_vitro()` systematically predicts lower Fu than the paper's `Fu_Austin` column, which is worth investigating further (e.g. whether the coefficients or cell-concentration assumptions used here match the original hepatocyte-specific regression) before relying on it.
 
 Verapamil appears twice in this dataset (rat and human), giving a small comparison between the spread across our prediction methods and the spread between the two species' observed values.
 
 ```{r}
 verapamil_rows <- testFuHepData[testFuHepData$Compound == "Verapamil", ]
 human_row <- verapamil_rows[verapamil_rows$Species == "Human", ]
-predicted_cols <- c("Fuhep_Poulin", "Fu_Austin", QSAR_colnames)
+predicted_cols <- c("Fuhep_Poulin", "Fu_Austin", method_colnames)
 
 verapamil_df <- data.frame(
   fu = c(as.double(human_row[1, predicted_cols]), verapamil_rows$Obs_Fuhep),
@@ -167,7 +167,7 @@ ggplot(verapamil_df, aes(x = type, y = fu, color = type)) +
 
 # First 2 columns are the original papers' own reported predictions (from the
 # dataset itself); the rest are computed by this package above.
-plot_cols <- c("Fuhep_Poulin", "Fu_Austin", QSAR_colnames)
+plot_cols <- c("Fuhep_Poulin", "Fu_Austin", method_colnames)
 
 make_fu_plot <- function(data, ycol) {
   ggplot(data, aes(x = Obs_Fuhep, y = .data[[ycol]], col = Class)) +
@@ -279,5 +279,5 @@ for (predi in plot_cols) {
     )
 }
 
-# error_table[["All_literature"]]
+# error_table[["all_literature"]]
 ```
