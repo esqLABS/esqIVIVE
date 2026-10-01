@@ -134,7 +134,7 @@ get_fu_krumpholz("Midazolam", system = "microsomes", species = "human")
 
 The data below are an illustrative depletion curve in triplicate, generated from the midazolam half-life of 3.9 min.
 
-```{r example-fit, results = "hide", message = FALSE}
+```{r example-fit, results = "hide", message = FALSE, fig.alt = "Midazolam concentration decreases from about 1 to 0.1 micromolar over 12 minutes. Black points show triplicate depletion data, and the blue curve shows the fitted mono-exponential decay (R-squared = 0.995)."}
 depletion <- data.frame(
   Time_min = c(0, 0, 0, 2, 2, 2, 4, 4, 4, 8, 8, 8, 12, 12, 12),
   Concentration_uM = c(

@@ -163,7 +163,7 @@ depletion <- data.frame(
 kcat <- fit_clearance_from_curve(depletion)
 ```
 
-<img src="man/figures/README-example-fit-1.png" alt="" width="100%" />
+<img src="man/figures/README-example-fit-1.png" alt="Midazolam concentration decreases from about 1 to 0.1 micromolar over 12 minutes. Black points show triplicate depletion data, and the blue curve shows the fitted mono-exponential decay (R-squared = 0.995)." width="100%" />
 
 ``` r
 kcat
