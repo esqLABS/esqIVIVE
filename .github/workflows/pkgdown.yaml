@@ -37,6 +37,12 @@ jobs:
           extra-packages: any::pkgdown, any::quarto, local::.
           needs: website
 
+      # The clearance article needs ospsuite and PK-Sim models, which are not
+      # available on the runner. Leave it out of the site until #7 decides
+      # how it is published.
+      - name: Leave out articles that need PK-Sim
+        run: rm "vignettes/Clearance IVIVE check.qmd"
+
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
