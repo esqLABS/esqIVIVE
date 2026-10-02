@@ -70,6 +70,8 @@ data_path<-system.file("extdata","test_fu_microsomes.csv",package="ESQivive")
 testFuData<-read.csv(data_path)
 ```
 
+The dataset (`inst/extdata/test_fu_microsomes.csv`) comes from Poulin and Haddad (2011), "Microsome Composition-Based Model as a Mechanistic Tool to Predict Nonspecific Binding of Drugs in Liver Microsomes", *Journal of Pharmaceutical Sciences* 100(10):4501-4517, <https://doi.org/10.1002/jps.22619>. It has the observed Fu_mic (`Obs_Fumic`) and the predictions of the Poulin, Hallifax and Houston, Turner and Austin methods (`Fu_Poulin`, `Fu_HalifaxHouston`, `Fu_Turner`, `Fu_Austin`).
+
 We used the Fu_mic from this dataset to evaluate the predictions
 
 #### alculate Fu_mic for all
@@ -292,5 +294,5 @@ for (predi in plot_cols) {
 # error_table[["all_literature"]]
 ```
 
-```{}
+```         
 ```

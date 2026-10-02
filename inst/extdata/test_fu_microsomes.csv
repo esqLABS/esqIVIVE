@@ -1,4 +1,4 @@
-﻿Compound,LogP25C,LogP37C,LogD37C,pKa,Class,Pea,Cp(mg/mL),Obs_Fumic,Fu_Poulin,Fu_HalifaxHouston,Fu_Austin,Fu_Turner
+﻿Compound,LogP25C,LogP37C,LogD37C,pKa,Class,Pea,Cp(mg/mL),Obs_Fumic,Fu_Poulin,Fu_HalifaxHouston,Fu_Turner,Fu_Austin
 Bumetanide,3.21,3.32,0.42,4.5,acid,–,1,0.92,1,0.92,0.88,0.94
 Bumetanide,3.21,3.32,0.42,4.5,acid,–,0.25,0.95,1,0.98,0.97,0.98
 Bumetanide,3.21,3.32,0.42,4.5,acid,–,4,0.83,1,0.75,0.65,0.79
