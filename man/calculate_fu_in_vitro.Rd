@@ -108,6 +108,11 @@ a pKa above 7.
 
 \code{"berezhkovskiy"} and \code{"berezhkovskiy_fu"} currently give the same results
 as \code{"poulin_theil"} and \code{"poulin_theil_fu"}.
+
+The partition models also take binding to the plastic of the well into
+account. The plastic-water partition coefficient is the average of the
+polystyrene regressions on lipophilicity of Fischer et al. (2018) and Kramer
+(2010), divided by \code{1 + ion_factor}, so only the neutral species binds.
 }
 \examples{
 calculate_fu_in_vitro(
@@ -181,6 +186,8 @@ partition coefficient of drugs in in vitro metabolic studies. \emph{Journal of
 Pharmaceutical Sciences} 102(8):2806-2818.
 \url{https://doi.org/10.1002/jps.23602}
 
+New in vitro partition algorithms were created by adapting the tissue-water partitioning algorithsm implemented in PK-Sim:
+
 Poulin P, Theil FP (2000). A priori prediction of tissue:plasma partition
 coefficients of drugs to facilitate the use of physiologically-based
 pharmacokinetic models in drug discovery. \emph{Journal of Pharmaceutical
@@ -210,6 +217,16 @@ zwitterions. \emph{Journal of Pharmaceutical Sciences} 95(6):1238-1257.
 Schmitt W (2008). General approach for the calculation of tissue to plasma
 partition coefficients. \emph{Toxicology in Vitro} 22(2):457-467.
 \url{https://doi.org/10.1016/j.tiv.2007.09.010}
+
+Fischer FC, Cirpka OA, Goss K-U, Henneberger L, Escher BI (2018).
+Application of experimental polystyrene partition constants and diffusion
+coefficients to predict the sorption of neutral organic chemicals to
+multiwell plates in in vivo and in vitro bioassays. \emph{Environmental Science &
+Technology} 52(22):13511-13522. \url{https://doi.org/10.1021/acs.est.8b04246}
+
+Kramer NI (2010). Measuring, modeling, and increasing the free concentration
+of test chemicals in cell assays. PhD thesis, Utrecht University.
+\url{https://research-portal.uu.nl/en/publications/measuring-modeling-and-increasing-the-free-concentration-of-test-/}
 }
 \concept{austin}
 \concept{berezhkovskiy}

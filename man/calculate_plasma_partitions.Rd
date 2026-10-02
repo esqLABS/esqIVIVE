@@ -54,18 +54,34 @@ plasma.
 \details{
 For neutral compounds with logP above 4, use \code{method = "logp"}. For acidic
 phenols, carboxylic acids, pyridines and amines you can use
-\code{method = "pplfer"}. Descriptors can be obtained, for example, from the fup
-calculator (\url{https://drumap.nibiohn.go.jp/fup/}).
+\code{method = "pplfer"}. Descriptors can be obtained, for example, from the
+UFZ-LSER database (\url{https://web.app.ufz.de/compbc/lserd/public/start/}) or
+from the fup calculator (\url{https://drumap.nibiohn.go.jp/fup/}).
 
 The PP-LFER method uses the polyparameter LFERs at 37 C for membrane
 lipid-water (Endo et al. 2011), bovine serum albumin-water (Endo and Goss
 2011) and muscle protein-water (Endo et al. 2012) partitioning, for the
-membrane lipids, albumin and globulins respectively. Each system has two
-published equations (one using L, one using E); both are calculated and the
-resulting K values are averaged (arithmetic mean in linear space). The
-protein equations give K per volume of protein (L/L), which is converted to
-L/kg using a protein density of 1.35 g/mL. The equations are for the
-neutral species, ionization is not taken into account.
+membrane lipids, albumin and globulins respectively. The system parameters
+and the algorithms (two equations per system, one using L and one using E)
+are those of the UFZ-LSER database, which compiles the published equations;
+the equations that use L are also given in the supporting information of
+Endo et al. (2013). Both equations are calculated and the resulting K
+values are averaged (arithmetic mean in linear space). The equations are for
+the neutral species, ionization is not taken into account.
+
+The protein partition coefficients are published per kg of protein (L/kg).
+The UFZ-LSER database gives them per volume of protein (L/L), which adds
+log10(1.35) to the intercept: the intercepts of the muscle protein and
+albumin equations differ by 0.13 from the papers. The result is converted
+back to L/kg with a protein density of 1.35 g/mL.
+
+The muscle protein equation is the one fitted to chicken muscle protein
+(Endo et al. 2012), which is similar to the one for fish muscle protein. The
+albumin equations were determined for bovine serum albumin (heat shock
+fraction, fatty acid free) and fit worse than the others (SD of 0.41 log
+units, against 0.22 to 0.28 for the muscle protein and membrane lipid
+equations), because binding to albumin is partly specific. Binding to the
+globulins is assumed to be that of muscle protein.
 }
 \examples{
 calculate_plasma_partitions(
@@ -85,4 +101,27 @@ calculate_plasma_partitions(
   lfer_v = 3.7208,
   lfer_l = 19.71
 )
+}
+\references{
+UFZ-LSER database v 4.1.2. Helmholtz Centre for Environmental
+Research-UFZ, Leipzig, Germany. \url{https://www.ufz.de/lserd}. Web
+application: \url{https://web.app.ufz.de/compbc/lserd/public/start/}
+
+Endo S, Escher BI, Goss K-U (2011). Capacities of membrane lipids to
+accumulate neutral organic chemicals. \emph{Environmental Science & Technology}
+45(14):5912-5921. \url{https://doi.org/10.1021/es200855w}
+
+Endo S, Goss K-U (2011). Serum albumin binding of structurally diverse
+neutral organic compounds: data and models. \emph{Chemical Research in
+Toxicology} 24(12):2293-2301. \url{https://doi.org/10.1021/tx200431b}
+
+Endo S, Bauerfeind J, Goss K-U (2012). Partitioning of neutral organic
+compounds to structural proteins. \emph{Environmental Science & Technology}
+46(22):12697-12703. \url{https://doi.org/10.1021/es303379y}
+
+Endo S, Brown TN, Goss K-U (2013). General model for estimating partition
+coefficients to organisms and their tissues using the biological
+compositions and polyparameter linear free energy relationships.
+\emph{Environmental Science & Technology} 47(12):6630-6639.
+\url{https://doi.org/10.1021/es401772m}
 }

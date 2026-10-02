@@ -72,6 +72,11 @@
 #' `"berezhkovskiy"` and `"berezhkovskiy_fu"` currently give the same results
 #' as `"poulin_theil"` and `"poulin_theil_fu"`.
 #'
+#' The partition models also take binding to the plastic of the well into
+#' account. The plastic-water partition coefficient is the average of the
+#' polystyrene regressions on lipophilicity of Fischer et al. (2018) and Kramer
+#' (2010), divided by `1 + ion_factor`, so only the neutral species binds.
+#'
 #' @references
 #' Austin RP, Barton P, Cockroft SL, Wenlock MC, Riley RJ (2002). The influence
 #' of nonspecific microsomal binding on apparent intrinsic clearance, and its
@@ -109,6 +114,8 @@
 #' Pharmaceutical Sciences* 102(8):2806-2818.
 #' <https://doi.org/10.1002/jps.23602>
 #'
+#' New in vitro partition algorithms were created by adapting the tissue-water partitioning algorithsm implemented in PK-Sim:
+#' 
 #' Poulin P, Theil FP (2000). A priori prediction of tissue:plasma partition
 #' coefficients of drugs to facilitate the use of physiologically-based
 #' pharmacokinetic models in drug discovery. *Journal of Pharmaceutical
@@ -138,6 +145,16 @@
 #' Schmitt W (2008). General approach for the calculation of tissue to plasma
 #' partition coefficients. *Toxicology in Vitro* 22(2):457-467.
 #' <https://doi.org/10.1016/j.tiv.2007.09.010>
+#'
+#' Fischer FC, Cirpka OA, Goss K-U, Henneberger L, Escher BI (2018).
+#' Application of experimental polystyrene partition constants and diffusion
+#' coefficients to predict the sorption of neutral organic chemicals to
+#' multiwell plates in in vivo and in vitro bioassays. *Environmental Science &
+#' Technology* 52(22):13511-13522. <https://doi.org/10.1021/acs.est.8b04246>
+#'
+#' Kramer NI (2010). Measuring, modeling, and increasing the free concentration
+#' of test chemicals in cell assays. PhD thesis, Utrecht University.
+#' <https://research-portal.uu.nl/en/publications/measuring-modeling-and-increasing-the-free-concentration-of-test-/>
 #'
 #' @concept austin
 #' @concept hallifax
@@ -244,7 +261,9 @@ calculate_fu_in_vitro <- function(
     (0.08206 * 310) *
     101325
 
-  # Calculate plastic partitioning
+  # Calculate plastic partitioning: polystyrene-water regressions of
+  # Fischer et al 2018, doi:10.1021/acs.est.8b04246, and Kramer 2010 (PhD
+  # thesis, Utrecht University)
   plastic_partition_fischer <- 10**(lipophilicity * 0.47 - 4.64)
   plastic_partition_kramer <- 10**(lipophilicity * 0.97 - 6.94)
   kPlastic <- mean(
