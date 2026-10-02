@@ -1,4 +1,8 @@
 test_that("calculate_plasma_partitions: logp method, ionized compound", {
+  # Tests the logP-based method for an ionized compound. A strong acid
+  # (pKa 3) is almost fully ionized at plasma pH 7.4, so its lipophilicity is
+  # first corrected to logD and the partition coefficients come out very low.
+  # The expected values follow from the equations in the method:
   # kmemlip = 10^logD = 10^2 / (1 + 10^(7.4 - 3)); kalb = 0.163 + 0.0221 * kmemlip;
   # kglob = mean(kalb, 10^(0.37 * logD - 0.29))
   expect_equal(
@@ -18,8 +22,13 @@ test_that("calculate_plasma_partitions: logp method, ionized compound", {
 })
 
 test_that("calculate_plasma_partitions: pplfer method matches the LSER Calculation workbook", {
-  # Descriptors and the logK from equation 1 (L-based) and equation 3 (E-based)
-  # are taken from the "LSER Calculation" workbook, which reports logK rounded
+  # Tests the PP-LFER method against reference values from the "LSER
+  # Calculation" workbook, for four chemicals (ketoconazole, diclofenac,
+  # naproxen and diphenhydramine). The workbook is independent of the
+  # coefficients in the code, so it checks the equations were entered correctly.
+  #
+  # For each chemical the workbook gives the Abraham descriptors and the logK
+  # of each system from equation 1 (L-based) and equation 3 (E-based), rounded
   # to 2 decimals. Expected K = mean of the two K values (linear space); the
   # protein systems are converted from L/L to L/kg with a protein density of
   # 1.35 g/mL.
@@ -89,6 +98,9 @@ test_that("calculate_plasma_partitions: pplfer method matches the LSER Calculati
 })
 
 test_that("calculate_plasma_partitions: pplfer method ignores ionization inputs", {
+  # Tests that the PP-LFER equations, which are for the neutral species, give
+  # the same result whether or not lipophilicity, ionization and pKa are
+  # supplied, and that the method can be called without them at all.
   descriptors <- list(
     lfer_e = 0.610,
     lfer_s = 0.52,
@@ -116,6 +128,9 @@ test_that("calculate_plasma_partitions: pplfer method ignores ionization inputs"
 })
 
 test_that("calculate_plasma_partitions rejects invalid inputs", {
+  # Tests the error messages, stored as snapshots, for an unknown method and
+  # for the PP-LFER method called with missing descriptors (the message must
+  # list every missing descriptor, including lfer_l).
   expect_snapshot(
     error = TRUE,
     calculate_plasma_partitions(
@@ -138,6 +153,9 @@ test_that("calculate_plasma_partitions rejects invalid inputs", {
 })
 
 test_that("calculate_plasma_partitions: the ionizable group can be in either position", {
+  # Tests that a single ionizable group gives the same result in the second
+  # slot (c("neutral", "acid"), pKa c(0, 3)) as in the first (c("acid",
+  # "neutral"), pKa c(3, 0)), which is the case in the test above.
   expect_equal(
     calculate_plasma_partitions(
       method = "logp",
