@@ -11,15 +11,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/esqLABS/esqIVIVE/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/esqLABS/ESQivive/blob/main/DESCRIPTION)
 
-Proença S (2026). *esqIVIVE: IVIVE of ADME Parameters for PBK Models*. R
-package version 0.0.0.9000, <https://github.com/esqLABS/esqIVIVE>.
+Proença S (2026). *ESQivive: IVIVE of ADME Parameters for PBK Models*. R
+package version 0.0.0.9000, <https://github.com/esqLABS/ESQivive>.
 
     @Manual{,
-      title = {esqIVIVE: IVIVE of ADME Parameters for PBK Models},
+      title = {ESQivive: IVIVE of ADME Parameters for PBK Models},
       author = {Susana Proença},
       year = {2026},
       note = {R package version 0.0.0.9000},
-      url = {https://github.com/esqLABS/esqIVIVE},
+      url = {https://github.com/esqLABS/ESQivive},
     }

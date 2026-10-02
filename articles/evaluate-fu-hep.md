@@ -40,7 +40,7 @@ Same restriction as for Fu_mic: only implemented for strong bases
 compound’s blood-cell partitioning (fraction unbound in plasma and
 blood:plasma ratio).
 
-#### All_literature
+#### all_literature
 
 Average of this package’s own Austin, Kilford and Poulin predictions.
 
@@ -69,7 +69,7 @@ generic literature default.
     4                                1    0.8525         0.97      0.83
     5                              0.5    0.9400         1.00      0.96
     6                              0.5    0.2200         0.38      0.61
-      esqIVIVE_Austin esqIVIVE_Kilford esqIVIVE_Poulin All_Poulin_and_Theil
+      ESQivive_Austin ESQivive_Kilford ESQivive_Poulin All_Poulin_and_Theil
     1       0.5298979        0.6733039       0.9994825           0.77584983
     2       0.2487592        0.2245463       0.9877335           0.13936190
     3       0.2942186        0.3045536       0.9624477           0.22357288
@@ -83,7 +83,7 @@ generic literature default.
     4        0.08000397          0.03004464                 NA  0.02844196
     5        0.99740217          0.99286291                 NA  0.99175497
     6        0.74239262          0.50680789                 NA  0.35592270
-      All_literature
+      all_literature
     1      0.7342281
     2      0.4870130
     3      0.5204066
@@ -93,13 +93,13 @@ generic literature default.
 
 This dataset also gives two literature-reported prediction columns
 (`Fuhep_Poulin`, `Fu_Austin`), letting us sanity-check this package’s
-own `esqIVIVE_Poulin`/`esqIVIVE_Austin` against the originally reported
+own `ESQivive_Poulin`/`ESQivive_Austin` against the originally reported
 values.
 
 ``` r
 
-plot(testFuHepData$Fuhep_Poulin, testFuHepData$esqIVIVE_Poulin,
-  xlab = "Fuhep_Poulin (paper)", ylab = "esqIVIVE_Poulin (this package)"
+plot(testFuHepData$Fuhep_Poulin, testFuHepData$ESQivive_Poulin,
+  xlab = "Fuhep_Poulin (paper)", ylab = "ESQivive_Poulin (this package)"
 )
 abline(0, 1, col = "red")
 ```
@@ -108,8 +108,8 @@ abline(0, 1, col = "red")
 
 ``` r
 
-plot(testFuHepData$Fu_Austin, testFuHepData$esqIVIVE_Austin,
-  xlab = "Fu_Austin (paper)", ylab = "esqIVIVE_Austin (this package)"
+plot(testFuHepData$Fu_Austin, testFuHepData$ESQivive_Austin,
+  xlab = "Fu_Austin (paper)", ylab = "ESQivive_Austin (this package)"
 )
 abline(0, 1, col = "red")
 ```
@@ -117,8 +117,8 @@ abline(0, 1, col = "red")
 ![](evaluate-fu-hep_files/figure-html/unnamed-chunk-3-1.png)
 
 Poulin agrees closely with the paper’s own values (points fall near the
-identity line). Austin does not - this package’s
-[`calculate_fu_hep_austin()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_hep_austin.md)
+identity line). Austin does not - the `"austin"` method of
+[`calculate_fu_in_vitro()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_in_vitro.md)
 systematically predicts lower Fu than the paper’s `Fu_Austin` column,
 which is worth investigating further (e.g. whether the coefficients or
 cell-concentration assumptions used here match the original
@@ -132,7 +132,7 @@ spread between the two species’ observed values.
 
 verapamil_rows <- testFuHepData[testFuHepData$Compound == "Verapamil", ]
 human_row <- verapamil_rows[verapamil_rows$Species == "Human", ]
-predicted_cols <- c("Fuhep_Poulin", "Fu_Austin", QSAR_colnames)
+predicted_cols <- c("Fuhep_Poulin", "Fu_Austin", method_colnames)
 
 verapamil_df <- data.frame(
   fu = c(as.double(human_row[1, predicted_cols]), verapamil_rows$Obs_Fuhep),
@@ -157,7 +157,7 @@ ggplot(verapamil_df, aes(x = type, y = fu, color = type)) +
 
 # First 2 columns are the original papers' own reported predictions (from the
 # dataset itself); the rest are computed by this package above.
-plot_cols <- c("Fuhep_Poulin", "Fu_Austin", QSAR_colnames)
+plot_cols <- c("Fuhep_Poulin", "Fu_Austin", method_colnames)
 
 make_fu_plot <- function(data, ycol) {
   ggplot(data, aes(x = Obs_Fuhep, y = .data[[ycol]], col = Class)) +
@@ -386,5 +386,5 @@ for (predi in plot_cols) {
     )
 }
 
-# error_table[["All_literature"]]
+# error_table[["all_literature"]]
 ```

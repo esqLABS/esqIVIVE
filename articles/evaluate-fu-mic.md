@@ -13,7 +13,7 @@ Some algorithms are purely empirical regressions
 fu_{inc} = 1 \cdot C \cdot 10^{0.56 \log \left( \frac{P}{D} \right) - 1.41} + 1
 ```
 
-#### Halifax and Houston 2006
+#### Hallifax and Houston 2006
 
 ``` math
 fu_{inc} = \frac{1}{1+ C \cdot 10^{0.072\cdot \log \left( \frac{P}{D} \right)^2 +0.067\cdot\log \left( \frac{P}{D} \right)-1.126}}
@@ -68,10 +68,10 @@ bases (ionization class “base” with pKa \> 7) - for every other class
 PK-Sim itself switches to a different, protein-binding-based term that
 this package does not implement yet.
 
-**All_literature**
+**all_literature**
 
 A simple average of the four empirical/literature regressions above
-(Poulin, Halifax and Houston, Austin, Turner), computed with this
+(Poulin, Hallifax and Houston, Austin, Turner), computed with this
 package’s own implementation of each rather than the papers’ originally
 reported values.
 
@@ -102,7 +102,7 @@ We used the Fu_mic from this dataset to evaluate the predictions
     4        0.04465329         0.017378575                 NA 0.015423378
     5        0.15751277         0.066069707                 NA 0.058965184
     6        0.01155014         0.004402019                 NA 0.003900969
-      All_literature
+      all_literature
     1      0.6762981
     2      0.8479296
     3      0.4918986
@@ -152,7 +152,7 @@ ggplot(verapamil_df, aes(x = type, y = fu, color = type)) +
 # dataset itself); the rest are computed by this package above.
 plot_cols <- c(
   "Fu_Poulin", "Fu_HalifaxHouston", "Fu_Turner", "Fu_Austin",
-  QSAR_colnames
+  method_colnames
 )
 
 make_fu_plot <- function(data, ycol) {
@@ -325,7 +325,7 @@ for (predi in plot_cols) {
     )
 }
 
-# error_table[["All_literature"]]
+# error_table[["all_literature"]]
 ```
 
 Calculate liver partitioning for all is it more proportional to any

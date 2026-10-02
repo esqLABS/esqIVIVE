@@ -5,7 +5,7 @@
 This vignette showcases and compares different IVIVE frameworks for
 clearance, and evaluates how the clearance predicted with the standard
 PK-Sim PBK model compares with observed plasma clearances. In vitro
-metabolism data are converted with `esqIVIVE` into a PK-Sim specific
+metabolism data are converted with `ESQivive` into a PK-Sim specific
 clearance, which is then simulated in batch mode with the `ospsuite` R
 package using the PBK models in `inst/extdata/pkml4htpbk`.
 
@@ -40,7 +40,7 @@ Code
 
 ``` r
 
-input_file <- system.file("extdata", "Obach1999_IVIVE_input.xlsx", package = "esqIVIVE")
+input_file <- system.file("extdata", "Obach1999_IVIVE_input.xlsx", package = "ESQivive")
 compounds <- as.data.frame(read_excel(input_file, sheet = "Compounds"))
 scenarios <- as.data.frame(read_excel(input_file, sheet = "Scenarios"))
 
@@ -52,27 +52,27 @@ if (!identical(params$scenarios, "all")) {
 knitr::kable(scenarios)
 ```
 
-| scenario | description | fu_mic_method | fu_mic_fallback | permeability | permeability_high_cmmin | empirical_scalar | blood_plasma_ratio | pkml |
+| scenario | description | fu_mic_method | fu_mic_fallback | permeability | permeability_high_cmmin | empirical_correction | blood_plasma_ratio | pkml |
 |:---|:---|:---|:---|:---|---:|:---|:---|:---|
-| S1 | Standard IVIVE (fu_mic = 1), PK-Sim partitioning, QSAR permeability | none | NA | QSAR | NA | No | observed | single-iv-pksim.pkml |
-| S2 | fu_mic All_literature, PK-Sim partitioning, QSAR permeability | All_literature | NA | QSAR | NA | No | observed | single-iv-pksim.pkml |
-| S3 | fu_mic All_literature, high cell permeability, PK-Sim partitioning | All_literature | NA | high | 1000 | No | observed | single-iv-pksim.pkml |
-| S4 | fu_mic All_literature, high cell permeability, Wood 2017 scaling factors, PK-Sim partitioning | All_literature | NA | high | 1000 | Yes | observed | single-iv-pksim.pkml |
-| S5 | fu_mic Rodgers & Rowland, high cell permeability, Rodgers & Rowland partitioning | Rodgers & Rowland + fu | All_literature | high | 1000 | No | observed | single-iv-rodgers-rowland.pkml |
-| S6 | Reference: measured fu_mic (Obach 1999), high cell permeability, PK-Sim partitioning | measured | NA | high | 1000 | No | observed | single-iv-pksim.pkml |
+| S1 | Standard IVIVE (fu_mic = 1), PK-Sim partitioning, QSAR permeability | none | NA | QSAR | NA | FALSE | observed | single-iv-pksim.pkml |
+| S2 | fu_mic all_literature, PK-Sim partitioning, QSAR permeability | all_literature | NA | QSAR | NA | FALSE | observed | single-iv-pksim.pkml |
+| S3 | fu_mic all_literature, high cell permeability, PK-Sim partitioning | all_literature | NA | high | 1000 | FALSE | observed | single-iv-pksim.pkml |
+| S4 | fu_mic all_literature, high cell permeability, Wood 2017 scaling factors, PK-Sim partitioning | all_literature | NA | high | 1000 | TRUE | observed | single-iv-pksim.pkml |
+| S5 | fu_mic Rodgers & Rowland, high cell permeability, Rodgers & Rowland partitioning | rodgers_rowland_fu | all_literature | high | 1000 | FALSE | observed | single-iv-rodgers-rowland.pkml |
+| S6 | Reference: measured fu_mic (Obach 1999), high cell permeability, PK-Sim partitioning | measured | NA | high | 1000 | FALSE | observed | single-iv-pksim.pkml |
 
 ### Make batch htpbk simulations with IV simulations using different options
 
 1-Using standard IVIVE (fu_mic = 1) and tissue partitioning default
 PK-Sim
 
-2-Correcting for fu-All_literature and tissue partitioning default
+2-Correcting for fu-all_literature and tissue partitioning default
 PK-Sim
 
-3-Correcting for fu-All_literature and a default high cell permeability
+3-Correcting for fu-all_literature and a default high cell permeability
 and tissue partitioning default PK-Sim
 
-4-Correcting for fu-All_literature and a default high cell permeability
+4-Correcting for fu-all_literature and a default high cell permeability
 and Wood scaling factors and tissue partitioning default PK-Sim
 
 5-Correcting for fu-R&R and a default high cell permeability and tissue
@@ -90,7 +90,7 @@ cm/min, which makes the liver perfusion-limited.
 
 The in vitro half-life is scaled to a PK-Sim specific clearance (1/min,
 per volume of liver intracellular space) with
-[`IVIVE_clearance()`](https://esqlabs.github.io/esqIVIVE/reference/IVIVE_clearance.md):
+[`ivive_clearance()`](https://esqlabs.github.io/ESQivive/reference/ivive_clearance.md):
 
 ``` math
 CL_{spec} = \frac{0.693}{t_{1/2}} \cdot \frac{1}{C_{mic}} \cdot \frac{MPPGL}{f_{cell} \cdot fu_{mic}}
@@ -100,7 +100,7 @@ Where $`C_{mic}`$ is the microsomal protein concentration in the
 incubation (mg/mL), $`MPPGL`$ the microsomal protein per gram of liver
 and $`f_{cell}`$ the intracellular fraction of the liver. $`fu_{mic}`$
 is either set to 1, taken from the measured values, or predicted with
-[`calculate_fu_in_vitro()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_in_vitro.md).
+[`calculate_fu_in_vitro()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_in_vitro.md).
 Rodgers & Rowland is only implemented for strong bases, so for other
 compounds the method in `fu_mic_fallback` is used. The column
 `fu_mic_method_used` records which method was used for each compound.
@@ -127,15 +127,15 @@ predict_fu_mic <- function(method, cmp) {
   }
   tryCatch(
     suppressWarnings(calculate_fu_in_vitro(
-      partition_qspr = method,
-      log_lipophilicity = cmp$LogP,
+      method = method,
+      lipophilicity = cmp$LogP,
       ionization = c(cmp$Ionization, 0),
-      type_system = "microsomes",
-      FBS_fraction = 0,
+      system = "microsomes",
+      fbs_fraction = 0,
       microplate_type = microplate_type,
       volume_medium = incubation_volume_mL,
       pka = c(cmp$pKa, 0),
-      fraction_unbound = cmp$fu_plasma,
+      fu_plasma = cmp$fu_plasma,
       blood_plasma_ratio = cmp$BP,
       concentration_microsomes = cmp$Cmic_mgml
     )),
@@ -158,15 +158,15 @@ ivive_one <- function(scn, cmp) {
   }
 
   #perfrom IVIVE with calculated fu
-  cl_spec <- IVIVE_clearance(
-    typeValue = "halfLife",
-    units = "minutes",
-    expData = cmp$halflife_min,
-    typeSystem = "microsomes",
-    fu_invitro = fu_mic,
-    empirical_scalar = scn$empirical_scalar,
+  cl_spec <- ivive_clearance(
+    value_type = "half_life",
+    value = cmp$halflife_min,
+    unit = "minutes",
+    system = "microsomes",
+    fu_in_vitro = fu_mic,
+    empirical_correction = scn$empirical_correction,
     species = "human",
-    cProtein_mgml = cmp$Cmic_mgml
+    concentration_microsomes = cmp$Cmic_mgml
   )
 
   data.frame(
@@ -195,15 +195,15 @@ ivive %>%
   knitr::kable()
 ```
 
-| scenario | fu_mic_method_used     |   n |
-|:---------|:-----------------------|----:|
-| S1       | none                   |  28 |
-| S2       | All_literature         |  28 |
-| S3       | All_literature         |  28 |
-| S4       | All_literature         |  28 |
-| S5       | All_literature         |  16 |
-| S5       | Rodgers & Rowland + fu |  12 |
-| S6       | measured               |  28 |
+| scenario | fu_mic_method_used |   n |
+|:---------|:-------------------|----:|
+| S1       | none               |  28 |
+| S2       | all_literature     |  28 |
+| S3       | all_literature     |  28 |
+| S4       | all_literature     |  28 |
+| S5       | all_literature     |  16 |
+| S5       | rodgers_rowland_fu |  12 |
+| S6       | measured           |  28 |
 
 #### Run the PBK batch simulations
 
@@ -241,7 +241,7 @@ Code
 molecule <- "test_chemical"
 clearance_process <- "test_chemical-Total Hepatic Clearance-different sources"
 plasma_output <- "Organism|PeripheralVenousBlood|test_chemical|Plasma (Peripheral Venous Blood)"
-pkml_dir <- system.file("extdata", "pkml4htpbk", package = "esqIVIVE")
+pkml_dir <- system.file("extdata", "pkml4htpbk", package = "ESQivive")
 
 # All values in the pkml base units
 batch_parameters <- c(
@@ -443,9 +443,9 @@ knitr::kable(gof_table, digits = 2)
 | scenario | description | n | r2_log | ccc_log | spearman_rho | rmse_log | afe | aafe | percent_within_2fold | percent_within_3fold |
 |:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | S1 | Standard IVIVE (fu_mic = 1), PK-Sim partitioning, QSAR permeability | 28 | 0.81 | 0.89 | 0.90 | 0.37 | 0.73 | 1.97 | 50.00 | 75.00 |
-| S2 | fu_mic All_literature, PK-Sim partitioning, QSAR permeability | 28 | 0.81 | 0.90 | 0.84 | 0.34 | 1.11 | 1.86 | 60.71 | 85.71 |
-| S3 | fu_mic All_literature, high cell permeability, PK-Sim partitioning | 28 | 0.80 | 0.89 | 0.83 | 0.34 | 1.13 | 1.89 | 57.14 | 82.14 |
-| S4 | fu_mic All_literature, high cell permeability, Wood 2017 scaling factors, PK-Sim partitioning | 28 | 0.84 | 0.90 | 0.85 | 0.34 | 1.45 | 1.97 | 53.57 | 78.57 |
+| S2 | fu_mic all_literature, PK-Sim partitioning, QSAR permeability | 28 | 0.81 | 0.90 | 0.84 | 0.34 | 1.11 | 1.86 | 60.71 | 85.71 |
+| S3 | fu_mic all_literature, high cell permeability, PK-Sim partitioning | 28 | 0.80 | 0.89 | 0.83 | 0.34 | 1.13 | 1.89 | 57.14 | 82.14 |
+| S4 | fu_mic all_literature, high cell permeability, Wood 2017 scaling factors, PK-Sim partitioning | 28 | 0.84 | 0.90 | 0.85 | 0.34 | 1.45 | 1.97 | 53.57 | 78.57 |
 | S5 | fu_mic Rodgers & Rowland, high cell permeability, Rodgers & Rowland partitioning | 28 | 0.76 | 0.87 | 0.77 | 0.37 | 0.92 | 2.00 | 53.57 | 82.14 |
 | S6 | Reference: measured fu_mic (Obach 1999), high cell permeability, PK-Sim partitioning | 28 | 0.85 | 0.92 | 0.89 | 0.30 | 1.14 | 1.76 | 67.86 | 85.71 |
 

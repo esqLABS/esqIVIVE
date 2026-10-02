@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Compare algorithms to predict Fu_hep • esqIVIVE</title>
+<title>Compare algorithms to predict Fu_hep • ESQivive</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">esqIVIVE</a>
+    <a class="navbar-brand me-2" href="../index.html">ESQivive</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
 
@@ -45,7 +45,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/esqLABS/esqIVIVE/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/esqLABS/ESQivive/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,7 +60,7 @@
       <p class="author">Susana Proenca</p>
 
 
-      <small class="dont-index">Source: <a href="https://github.com/esqLABS/esqIVIVE/blob/main/vignettes/articles/evaluate-fu-hep.qmd" class="external-link"><code>vignettes/articles/evaluate-fu-hep.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/esqLABS/ESQivive/blob/main/vignettes/articles/evaluate-fu-hep.qmd" class="external-link"><code>vignettes/articles/evaluate-fu-hep.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -88,7 +88,7 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 </section><section class="level4"><h4 id="rodgers-rowland">Rodgers &amp; Rowland<a class="anchor" aria-label="anchor" href="#rodgers-rowland"></a>
 </h4>
 <p>Same restriction as for Fu_mic: only implemented for strong bases (ionization class “base” with pKa &gt; 7), since it is calibrated from the compound’s blood-cell partitioning (fraction unbound in plasma and blood:plasma ratio).</p>
-</section><section class="level4"><h4 id="all_literature">All_literature<a class="anchor" aria-label="anchor" href="#all_literature"></a>
+</section><section class="level4"><h4 id="all_literature">all_literature<a class="anchor" aria-label="anchor" href="#all_literature"></a>
 </h4>
 <p>Average of this package’s own Austin, Kilford and Poulin predictions.</p>
 <p>We used the Obs_Fuhep from this dataset to evaluate the predictions. Unlike the microsomal dataset, this one includes compound-specific fraction unbound in plasma (<code>fuP</code>) and blood:plasma ratio (<code>RBP</code>) for a subset of the base compounds - these are used for Poulin’s strong-base branch and for Rodgers &amp; Rowland wherever available, instead of a generic literature default.</p>
@@ -113,7 +113,7 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 4                                1    0.8525         0.97      0.83
 5                              0.5    0.9400         1.00      0.96
 6                              0.5    0.2200         0.38      0.61
-  esqIVIVE_Austin esqIVIVE_Kilford esqIVIVE_Poulin All_Poulin_and_Theil
+  ESQivive_Austin ESQivive_Kilford ESQivive_Poulin All_Poulin_and_Theil
 1       0.5298979        0.6733039       0.9994825           0.77584983
 2       0.2487592        0.2245463       0.9877335           0.13936190
 3       0.2942186        0.3045536       0.9624477           0.22357288
@@ -127,7 +127,7 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 4        0.08000397          0.03004464                 NA  0.02844196
 5        0.99740217          0.99286291                 NA  0.99175497
 6        0.74239262          0.50680789                 NA  0.35592270
-  All_literature
+  all_literature
 1      0.7342281
 2      0.4870130
 3      0.5204066
@@ -136,11 +136,11 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 6      0.6657582</code></pre>
 </div>
 </div>
-<p>This dataset also gives two literature-reported prediction columns (<code>Fuhep_Poulin</code>, <code>Fu_Austin</code>), letting us sanity-check this package’s own <code>esqIVIVE_Poulin</code>/<code>esqIVIVE_Austin</code> against the originally reported values.</p>
+<p>This dataset also gives two literature-reported prediction columns (<code>Fuhep_Poulin</code>, <code>Fu_Austin</code>), letting us sanity-check this package’s own <code>ESQivive_Poulin</code>/<code>ESQivive_Austin</code> against the originally reported values.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">testFuHepData</span><span class="op">$</span><span class="va">Fuhep_Poulin</span>, <span class="va">testFuHepData</span><span class="op">$</span><span class="va">esqIVIVE_Poulin</span>,</span>
-<span>  xlab <span class="op">=</span> <span class="st">"Fuhep_Poulin (paper)"</span>, ylab <span class="op">=</span> <span class="st">"esqIVIVE_Poulin (this package)"</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">testFuHepData</span><span class="op">$</span><span class="va">Fuhep_Poulin</span>, <span class="va">testFuHepData</span><span class="op">$</span><span class="va">ESQivive_Poulin</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Fuhep_Poulin (paper)"</span>, ylab <span class="op">=</span> <span class="st">"ESQivive_Poulin (this package)"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -152,8 +152,8 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">testFuHepData</span><span class="op">$</span><span class="va">Fu_Austin</span>, <span class="va">testFuHepData</span><span class="op">$</span><span class="va">esqIVIVE_Austin</span>,</span>
-<span>  xlab <span class="op">=</span> <span class="st">"Fu_Austin (paper)"</span>, ylab <span class="op">=</span> <span class="st">"esqIVIVE_Austin (this package)"</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">testFuHepData</span><span class="op">$</span><span class="va">Fu_Austin</span>, <span class="va">testFuHepData</span><span class="op">$</span><span class="va">ESQivive_Austin</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Fu_Austin (paper)"</span>, ylab <span class="op">=</span> <span class="st">"ESQivive_Austin (this package)"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -163,13 +163,13 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 </div>
 </div>
 </div>
-<p>Poulin agrees closely with the paper’s own values (points fall near the identity line). Austin does not - this package’s <code><a href="../reference/calculate_fu_hep_austin.html">calculate_fu_hep_austin()</a></code> systematically predicts lower Fu than the paper’s <code>Fu_Austin</code> column, which is worth investigating further (e.g. whether the coefficients or cell-concentration assumptions used here match the original hepatocyte-specific regression) before relying on it.</p>
+<p>Poulin agrees closely with the paper’s own values (points fall near the identity line). Austin does not - the <code>"austin"</code> method of <code><a href="../reference/calculate_fu_in_vitro.html">calculate_fu_in_vitro()</a></code> systematically predicts lower Fu than the paper’s <code>Fu_Austin</code> column, which is worth investigating further (e.g. whether the coefficients or cell-concentration assumptions used here match the original hepatocyte-specific regression) before relying on it.</p>
 <p>Verapamil appears twice in this dataset (rat and human), giving a small comparison between the spread across our prediction methods and the spread between the two species’ observed values.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">verapamil_rows</span> <span class="op">&lt;-</span> <span class="va">testFuHepData</span><span class="op">[</span><span class="va">testFuHepData</span><span class="op">$</span><span class="va">Compound</span> <span class="op">==</span> <span class="st">"Verapamil"</span>, <span class="op">]</span></span>
 <span><span class="va">human_row</span> <span class="op">&lt;-</span> <span class="va">verapamil_rows</span><span class="op">[</span><span class="va">verapamil_rows</span><span class="op">$</span><span class="va">Species</span> <span class="op">==</span> <span class="st">"Human"</span>, <span class="op">]</span></span>
-<span><span class="va">predicted_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fuhep_Poulin"</span>, <span class="st">"Fu_Austin"</span>, <span class="va">QSAR_colnames</span><span class="op">)</span></span>
+<span><span class="va">predicted_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fuhep_Poulin"</span>, <span class="st">"Fu_Austin"</span>, <span class="va">method_colnames</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">verapamil_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  fu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">human_row</span><span class="op">[</span><span class="fl">1</span>, <span class="va">predicted_cols</span><span class="op">]</span><span class="op">)</span>, <span class="va">verapamil_rows</span><span class="op">$</span><span class="va">Obs_Fuhep</span><span class="op">)</span>,</span>
@@ -197,7 +197,7 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 <div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># First 2 columns are the original papers' own reported predictions (from the</span></span>
 <span><span class="co"># dataset itself); the rest are computed by this package above.</span></span>
-<span><span class="va">plot_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fuhep_Poulin"</span>, <span class="st">"Fu_Austin"</span>, <span class="va">QSAR_colnames</span><span class="op">)</span></span>
+<span><span class="va">plot_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fuhep_Poulin"</span>, <span class="st">"Fu_Austin"</span>, <span class="va">method_colnames</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">make_fu_plot</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">ycol</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">ggplot</span><span class="op">(</span><span class="va">data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Obs_Fuhep</span>, y <span class="op">=</span> <span class="va">.data</span><span class="op">[[</span><span class="va">ycol</span><span class="op">]</span><span class="op">]</span>, col <span class="op">=</span> <span class="va">Class</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -459,7 +459,7 @@ fu_{inc} = \frac{1}{1+ 125 \cdot VR \cdot 10^{0.072\cdot \log \left( \frac{P}{D}
 <span>    <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># error_table[["All_literature"]]</span></span></code></pre></div>
+<span><span class="co"># error_table[["all_literature"]]</span></span></code></pre></div>
 </div>
 </section></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

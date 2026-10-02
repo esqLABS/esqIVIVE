@@ -1,65 +1,52 @@
-# esqIVIVE
+# ESQivive
 
-The goal of esqIVIVE is to perform extrapolation of in vitro ADME
+The goal of ESQivive is to perform extrapolation of in vitro ADME
 parameters and derive ADME parameters to input for PBK models.
 
 The functions in this package have been developed focusing on the
 integration with OSP tools.
 
-Currently there are available codes to calculate: fraction unbound in
-microsomes :
+The package provides functions to:
 
-- calculate_fu_mic_austin()
-
-- calculate_fu_mic_halifax()
-
-- calculate_fu_mic_turner()
-
-fraction unbound in hepatocytes:
-
-- calculate_fu_hep_austin()
-
-- calculate_fu_hep_kilford()
-
-- calculate_fu_hep_poulin()
-
-derive metabolism parameters from experimental curves:
-
-- fit_clearance_from_curve()
-
-- fit_mm_from_curve()
-
-perform scaling for clearance:
-
-- IVIVE_clearance()
-
-- IVIVE_MM()
-
-calculate fu_plasma related parameters:
-
-- calculate_fu_pls_from_Ks()
-
-- predict_plasma_affinities()
-
-- correct_fu_pls_pearce()
-
-perform IVIVE to derive Pint:
-
-- pint_caco2_empir()
-
-- pint_peff_empir()
+- predict the fraction unbound in microsomal and hepatocyte incubations
+  with literature regressions or partition models:
+  [`calculate_fu_in_vitro()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_in_vitro.md);
+- describe the lipid, protein, plastic and air compartments of an
+  incubation:
+  [`calculate_in_vitro_compartments()`](https://esqlabs.github.io/ESQivive/reference/calculate_in_vitro_compartments.md);
+- look up measured fraction unbound values in the Krumpholz et
+  al. database:
+  [`get_fu_krumpholz()`](https://esqlabs.github.io/ESQivive/reference/get_fu_krumpholz.md)
+  and
+  [`list_krumpholz_compounds()`](https://esqlabs.github.io/ESQivive/reference/list_krumpholz_compounds.md);
+- fit substrate depletion and Michaelis-Menten curves:
+  [`fit_depletion_curve()`](https://esqlabs.github.io/ESQivive/reference/fit_depletion_curve.md)
+  and
+  [`fit_michaelis_menten_curve()`](https://esqlabs.github.io/ESQivive/reference/fit_michaelis_menten_curve.md);
+- scale in vitro clearance and Michaelis-Menten parameters to in vivo:
+  [`ivive_clearance()`](https://esqlabs.github.io/ESQivive/reference/ivive_clearance.md)
+  and
+  [`ivive_michaelis_menten()`](https://esqlabs.github.io/ESQivive/reference/ivive_michaelis_menten.md);
+- predict the fraction unbound in plasma:
+  [`calculate_plasma_partitions()`](https://esqlabs.github.io/ESQivive/reference/calculate_plasma_partitions.md),
+  [`calculate_fu_plasma()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_plasma.md)
+  and
+  [`correct_fu_plasma_pearce()`](https://esqlabs.github.io/ESQivive/reference/correct_fu_plasma_pearce.md);
+- derive the intestinal permeability from Caco-2 or effective
+  permeability values:
+  [`calculate_pint()`](https://esqlabs.github.io/ESQivive/reference/calculate_pint.md).
 
 Examples of how to use the functions are provided for each.
 
 ## Installation
 
-You can install the development version of esqIVIVE from
+You can install the development version of ESQivive from
 [GitHub](https://github.com/) with:
 
 ``` r
 
 # install.packages("devtools")
-devtools::install_github("esqLABS/esqIVIVE")
+devtools::install_github("esqLABS/ESQivive")
 ```
 
 ## Example: clearance IVIVE workflow for midazolam
@@ -79,45 +66,42 @@ microsomal protein, in vitro half-life of 3.9 min) are from Obach
 
 ``` r
 
-library(esqIVIVE)
+library(ESQivive)
 
 midazolam <- list(
-  log_lipophilicity = 3.38, # logP at 37 C
+  lipophilicity = 3.38, # logP at 37 C
   ionization = c("neutral", 0),
   pka = c(0, 0),
   fu_plasma = 0.05,
   blood_plasma_ratio = 0.53,
-  cMicro_mgml = 1 # microsomal protein concentration in the incubation
+  concentration_microsomes = 1 # microsomal protein in the incubation, mg/mL
 )
 ```
 
 ### 1. Fraction unbound in the incubation
 
-[`calculate_fu_in_vitro()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_in_vitro.md)
-predicts fu_mic with different QSPRs. `"All_literature"` is the average
-of the Poulin, Austin, Halifax and Turner regressions.
+[`calculate_fu_in_vitro()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_in_vitro.md)
+predicts fu_mic with different methods. `"all_literature"` is the
+average of the Poulin, Austin, Hallifax and Turner regressions.
 
 ``` r
 
 fu_mic <- calculate_fu_in_vitro(
-  partition_qspr = "All_literature",
-  log_lipophilicity = midazolam$log_lipophilicity,
+  method = "all_literature",
+  system = "microsomes",
+  lipophilicity = midazolam$lipophilicity,
   ionization = midazolam$ionization,
   pka = midazolam$pka,
-  type_system = "microsomes",
-  FBS_fraction = 0,
-  microplate_type = 96,
-  volume_medium = 0.5,
-  fraction_unbound = midazolam$fu_plasma,
-  blood_plasma_ratio = midazolam$blood_plasma_ratio,
-  concentration_microsomes = midazolam$cMicro_mgml
+  concentration_microsomes = midazolam$concentration_microsomes,
+  fu_plasma = midazolam$fu_plasma,
+  blood_plasma_ratio = midazolam$blood_plasma_ratio
 )
 fu_mic
 #> [1] 0.3907191
 ```
 
 Measured values from the Krumpholz et al. database can be retrieved with
-[`get_fu_krumpholz()`](https://esqlabs.github.io/esqIVIVE/reference/get_fu_krumpholz.md).
+[`get_fu_krumpholz()`](https://esqlabs.github.io/ESQivive/reference/get_fu_krumpholz.md).
 The values are averaged per species and microsomal concentration, and
 `n` is the number of values averaged:
 
@@ -139,10 +123,10 @@ get_fu_krumpholz("Midazolam", system = "microsomes", species = "human")
 
 ### 2. Depletion rate constant from raw data
 
-[`fit_clearance_from_curve()`](https://esqlabs.github.io/esqIVIVE/reference/fit_clearance_from_curve.md)
+[`fit_depletion_curve()`](https://esqlabs.github.io/ESQivive/reference/fit_depletion_curve.md)
 fits a mono-exponential decay to the substrate depletion curve (time in
-min, concentration in µM). It returns the rate constant (kcat, 1/min)
-with its 95% confidence interval and plots the fit.
+min, concentration in µM). It returns the rate constant (1/min) with its
+95% confidence interval and plots the fit.
 
 The data below are an illustrative depletion curve in triplicate,
 generated from the midazolam half-life of 3.9 min.
@@ -157,7 +141,7 @@ depletion <- data.frame(
   )
 )
 
-kcat <- fit_clearance_from_curve(depletion)
+fit <- fit_depletion_curve(depletion)
 ```
 
 ![Midazolam concentration decreases from about 1 to 0.1 micromolar over
@@ -167,18 +151,20 @@ curve shows the fitted mono-exponential decay (R-squared =
 
 ``` r
 
-kcat
-#> Mean_kcat_min-1    2.5%_CI_kcat     95%_CI_kcat 
-#>       0.1683673       0.1607129       0.1764242
+fit
+#>       parameter  estimate     lower     upper
+#> 1 rate_constant 0.1683673 0.1607129 0.1764242
+
+rate_constant <- fit$estimate[fit$parameter == "rate_constant"]
 
 # in vitro half-life (min)
-log(2) / kcat[["Mean_kcat_min-1"]]
+log(2) / rate_constant
 #> [1] 4.116874
 ```
 
 ### 3. IVIVE to the PK-Sim specific clearance
 
-[`IVIVE_clearance()`](https://esqlabs.github.io/esqIVIVE/reference/IVIVE_clearance.md)
+[`ivive_clearance()`](https://esqlabs.github.io/ESQivive/reference/ivive_clearance.md)
 scales the in vitro rate constant with the microsomal protein per gram
 liver and the intracellular fraction of the liver, and corrects it for
 fu_mic. The result is the specific clearance (1/min) to use in the
@@ -186,32 +172,30 @@ PK-Sim “Liver Plasma Clearance” process.
 
 ``` r
 
-IVIVE_clearance(
-  typeValue = "kcat",
-  units = "/minutes",
-  expData = kcat[["Mean_kcat_min-1"]],
-  typeSystem = "microsomes",
-  fu_invitro = fu_mic,
-  cProtein_mgml = midazolam$cMicro_mgml
+ivive_clearance(
+  value_type = "rate_constant",
+  value = rate_constant,
+  unit = "/minutes",
+  system = "microsomes",
+  fu_in_vitro = fu_mic,
+  concentration_microsomes = midazolam$concentration_microsomes
 )
-#> ClspePermin 
-#>    23.15373
+#> [1] 23.15373
 ```
 
 If only the in vitro half-life is reported, it can be used directly:
 
 ``` r
 
-IVIVE_clearance(
-  typeValue = "halfLife",
-  units = "minutes",
-  expData = 3.9,
-  typeSystem = "microsomes",
-  fu_invitro = fu_mic,
-  cProtein_mgml = midazolam$cMicro_mgml
+ivive_clearance(
+  value_type = "half_life",
+  value = 3.9,
+  unit = "minutes",
+  system = "microsomes",
+  fu_in_vitro = fu_mic,
+  concentration_microsomes = midazolam$concentration_microsomes
 )
-#> ClspePermin 
-#>    24.43609
+#> [1] 24.43609
 ```
 
 The vignette `Clearance IVIVE check` applies this workflow to the 28
@@ -224,7 +208,9 @@ PBK models and compares the different IVIVE options.
 
 Contributors should comply with the [Open Systems Pharmacology Coding
 Standards for
-R](https://github.com/Open-Systems-Pharmacology/developer-docs/blob/main/ospsuite-r-specifics/CODING_STANDARDS_R.md)
+R](https://github.com/Open-Systems-Pharmacology/developer-docs/blob/main/ospsuite-r-specifics/CODING_STANDARDS_R.md),
+with one exception: functions, arguments and returned names use
+snake_case instead of camelCase.
 
 ### Development Environment
 
@@ -266,56 +252,38 @@ files, and results are ignored.
 
 ## All functions
 
-- [`IVIVE_MM()`](https://esqlabs.github.io/esqIVIVE/reference/IVIVE_MM.md)
-  : Title
-- [`IVIVE_clearance()`](https://esqlabs.github.io/esqIVIVE/reference/IVIVE_clearance.md)
-  : IVIVE for clearance
-- [`calculate_fu_hep_austin()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_hep_austin.md)
-  : Austin algorithm for hepatocytes Fu calculation
-- [`calculate_fu_hep_kilford()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_hep_kilford.md)
-  : Kilford algorithm for Fu calculation
-- [`calculate_fu_hep_poulin()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_hep_poulin.md)
-  : Poulin algorithm for Fu calculation
-- [`calculate_fu_in_vitro()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_in_vitro.md)
-  : Calculate fraction unbound in the in vitro (hepatic) system
-- [`calculate_fu_mic_austin()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_mic_austin.md)
-  : Austin algorithm for microsomes Fu calculation
-- [`calculate_fu_mic_halifax()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_mic_halifax.md)
-  : Halifax algorithm for Fu calculation
-- [`calculate_fu_mic_turner()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_mic_turner.md)
-  : Turner algorithm for Fu calculation
-- [`calculate_fu_pls_from_Ks()`](https://esqlabs.github.io/esqIVIVE/reference/calculate_fu_pls_from_Ks.md)
-  : Calculate Fu in plasma based on affinity to different components
-- [`correct_fu_pls_pearce()`](https://esqlabs.github.io/esqIVIVE/reference/correct_fu_pls_pearce.md)
-  : Correct Fu based on Pearce correction factor
-- [`fit_clearance_from_curve()`](https://esqlabs.github.io/esqIVIVE/reference/fit_clearance_from_curve.md)
-  : function to determine clearance from experimental curve
-- [`fit_mm_from_curve()`](https://esqlabs.github.io/esqIVIVE/reference/fit_mm_from_curve.md)
-  : Get michaelis-menten parameters form experimental curves
-- [`get_fu_krumpholz()`](https://esqlabs.github.io/esqIVIVE/reference/get_fu_krumpholz.md)
+- [`calculate_fu_in_vitro()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_in_vitro.md)
+  : Calculate the fraction unbound in an in vitro incubation
+- [`calculate_fu_plasma()`](https://esqlabs.github.io/ESQivive/reference/calculate_fu_plasma.md)
+  : Calculate the fraction unbound in plasma from partition coefficients
+- [`calculate_in_vitro_compartments()`](https://esqlabs.github.io/ESQivive/reference/calculate_in_vitro_compartments.md)
+  : Calculate the compartments of an in vitro incubation
+- [`calculate_pint()`](https://esqlabs.github.io/ESQivive/reference/calculate_pint.md)
+  : Calculate the intestinal transcellular permeability
+- [`calculate_plasma_partitions()`](https://esqlabs.github.io/ESQivive/reference/calculate_plasma_partitions.md)
+  : Calculate the partition coefficients to plasma components
+- [`correct_fu_plasma_pearce()`](https://esqlabs.github.io/ESQivive/reference/correct_fu_plasma_pearce.md)
+  : Correct the fraction unbound in plasma for binding to neutral lipids
+- [`fit_depletion_curve()`](https://esqlabs.github.io/ESQivive/reference/fit_depletion_curve.md)
+  : Fit a substrate depletion curve
+- [`fit_michaelis_menten_curve()`](https://esqlabs.github.io/ESQivive/reference/fit_michaelis_menten_curve.md)
+  : Fit a Michaelis-Menten curve
+- [`get_fu_krumpholz()`](https://esqlabs.github.io/ESQivive/reference/get_fu_krumpholz.md)
   : Get measured fraction unbound from the Krumpholz et al. database
-- [`in_vitro_compartments()`](https://esqlabs.github.io/esqIVIVE/reference/in_vitro_compartments.md)
-  : in_vitro_compartments
-- [`ion_factors()`](https://esqlabs.github.io/esqIVIVE/reference/ion_factors.md)
-  : ion_factors
-- [`list_krumpholz_compounds()`](https://esqlabs.github.io/esqIVIVE/reference/list_krumpholz_compounds.md)
+- [`ivive_clearance()`](https://esqlabs.github.io/ESQivive/reference/ivive_clearance.md)
+  : Scale an in vitro clearance to in vivo
+- [`ivive_michaelis_menten()`](https://esqlabs.github.io/ESQivive/reference/ivive_michaelis_menten.md)
+  : Scale Michaelis-Menten parameters to in vivo
+- [`list_krumpholz_compounds()`](https://esqlabs.github.io/ESQivive/reference/list_krumpholz_compounds.md)
   : List compounds in the Krumpholz et al. database
-- [`pint_caco2_empir()`](https://esqlabs.github.io/esqIVIVE/reference/pint_caco2_empir.md)
-  : Function to convert from Papp to Pint transcellular permeability
-  from a empirical regression
-- [`pint_peff_empir()`](https://esqlabs.github.io/esqIVIVE/reference/pint_peff_empir.md)
-  : Function to convert from Papp to Pint transcellular permeability
-  from a empirical regression
-- [`predict_plasma_affinities()`](https://esqlabs.github.io/esqIVIVE/reference/predict_plasma_affinities.md)
-  : Predict affinity constant to plasma components based on QSARs
 
 # Articles
 
 ### All vignettes
 
 - [Test for clearance
-  IVIVE](https://esqlabs.github.io/esqIVIVE/articles/clearance-ivive-check.md):
+  IVIVE](https://esqlabs.github.io/ESQivive/articles/clearance-ivive-check.md):
 - [Compare algorithms to predict
-  Fu_hep](https://esqlabs.github.io/esqIVIVE/articles/evaluate-fu-hep.md):
+  Fu_hep](https://esqlabs.github.io/ESQivive/articles/evaluate-fu-hep.md):
 - [Compare algorithms to predict
-  Fu](https://esqlabs.github.io/esqIVIVE/articles/evaluate-fu-mic.md):
+  Fu](https://esqlabs.github.io/ESQivive/articles/evaluate-fu-mic.md):
