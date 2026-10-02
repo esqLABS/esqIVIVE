@@ -156,7 +156,13 @@ ivive_clearance(
 
 The vignette `Clearance IVIVE check` applies this workflow to the 28 drugs of Obach (1999). It simulates their in vivo clearance with PK-Sim PBK models and compares the different IVIVE options.
 
+## Data and licences
 
+The package is released under the MIT licence. The fraction unbound database used by `get_fu_krumpholz()` and `list_krumpholz_compounds()` is third-party data with its own licence, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). If you use it, please cite:
+
+Krumpholz L, Klimczyk A, Bieniek W, Polak S, Wiśniowska B (2024). Data set of fraction unbound values in the in vitro incubations for metabolic studies for better prediction of human clearance. *Database* 2024:baae063. <https://doi.org/10.1093/database/baae063>
+
+The data are also available from Mendeley Data: <https://doi.org/10.17632/3bs5526htd.1>. See `inst/COPYRIGHTS` for details.
 
 ## Contribute
 

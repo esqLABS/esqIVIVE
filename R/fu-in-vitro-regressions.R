@@ -15,6 +15,8 @@
   }
 }
 
+# Turner et al 2006 (Turner-Simcyp model), Drug Metab Rev 38(S1):162, a
+# conference abstract without a DOI. See the references in calculate_fu_in_vitro().
 .calculate_fu_mic_turner <- function(
   ionization,
   pka,
@@ -30,7 +32,7 @@
   }
 }
 
-# Hallifax and Houston 2006
+# Hallifax and Houston 2006, doi:10.1124/dmd.105.007658
 .calculate_fu_mic_hallifax <- function(
   ionization,
   pka,
@@ -44,7 +46,7 @@
         10^(0.072 * log_partition^2 + 0.067 * log_partition - 1.126))
 }
 
-# Austin et al 2002
+# Austin et al 2002, doi:10.1124/dmd.30.12.1497
 .calculate_fu_mic_austin <- function(
   ionization,
   pka,
@@ -55,7 +57,8 @@
   1 / (1 + concentration_microsomes * 10^(0.56 * log_partition - 1.41))
 }
 
-# Austin et al 2002, hepatocyte form
+# Austin et al 2005, doi:10.1124/dmd.104.002436: the hepatocyte regression
+# log((1 - fu)/fu) = 0.4 log(P or D) - 1.38 per million cells/mL
 .calculate_fu_hep_austin <- function(
   ionization,
   pka,
@@ -66,7 +69,7 @@
   1 / (1 + concentration_cells * 10^(0.4 * log_partition - 1.38))
 }
 
-# Kilford et al 2008
+# Kilford et al 2008, doi:10.1124/dmd.108.020834
 .calculate_fu_hep_kilford <- function(
   ionization,
   pka,
@@ -85,6 +88,9 @@
 # Poulin: binding to the neutral lipids of the cells or microsomes, plus the
 # acidic phospholipids for strong bases. Used for both systems. Lipid
 # concentrations are fractions of the medium volume.
+# Poulin and Haddad 2011 (microsomes), doi:10.1002/jps.22619, and 2013 (cells),
+# doi:10.1002/jps.23602. The acidic phospholipid partition is calibrated on
+# blood cells, following Rodgers et al 2005, doi:10.1002/jps.20322.
 .calculate_fu_hep_poulin <- function(
   ionization,
   pka,

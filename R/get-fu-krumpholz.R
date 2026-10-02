@@ -34,6 +34,27 @@
 #'  compound_concentration_uM are added.
 #'
 #'  Compounds that are not found return no rows.
+#'
+#' @details
+#' The database is described in Krumpholz et al. (2024) and its data are
+#' available from Mendeley Data. The data are licensed under the Creative
+#' Commons Attribution 4.0 International licence
+#' ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)): they may be
+#' used, shared and adapted, including commercially, as long as the authors
+#' are credited, a link to the licence is given and any changes are indicated.
+#' This licence applies to the data file only; it is separate from the MIT
+#' licence of this package. Please cite the paper below when you use these
+#' values. Each record also names the original study it comes from
+#' (`reference` and `doi`).
+#'
+#' @references
+#' Krumpholz L, Klimczyk A, Bieniek W, Polak S, Wiśniowska B (2024). Data set
+#' of fraction unbound values in the in vitro incubations for metabolic studies
+#' for better prediction of human clearance. *Database* 2024:baae063.
+#' <https://doi.org/10.1093/database/baae063>
+#'
+#' Krumpholz L (2024). Dataset of fraction unbound values in the in vitro
+#' incubations. Mendeley Data, V1. <https://doi.org/10.17632/3bs5526htd.1>
 #' @export
 #'
 #' @examples
@@ -137,6 +158,16 @@ get_fu_krumpholz <- function(
 #' @param system in vitro system: "microsomes", "hepatocytes", "plasma" or "recombinant CYPs"
 #'
 #' @return sorted character vector with the compound names available for that system
+#'
+#' @details
+#' The data are licensed under CC BY 4.0, see [get_fu_krumpholz()] for the
+#' conditions of use.
+#'
+#' @references
+#' Krumpholz L, Klimczyk A, Bieniek W, Polak S, Wiśniowska B (2024). Data set
+#' of fraction unbound values in the in vitro incubations for metabolic studies
+#' for better prediction of human clearance. *Database* 2024:baae063.
+#' <https://doi.org/10.1093/database/baae063>
 #' @export
 #'
 #' @examples

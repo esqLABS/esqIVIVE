@@ -15,6 +15,16 @@ sorted character vector with the compound names available for that system
 \description{
 List compounds in the Krumpholz et al. database
 }
+\details{
+The data are licensed under CC BY 4.0, see \code{\link[=get_fu_krumpholz]{get_fu_krumpholz()}} for the
+conditions of use.
+}
 \examples{
 head(list_krumpholz_compounds("hepatocytes"))
+}
+\references{
+Krumpholz L, Klimczyk A, Bieniek W, Polak S, Wiśniowska B (2024). Data set
+of fraction unbound values in the in vitro incubations for metabolic studies
+for better prediction of human clearance. \emph{Database} 2024:baae063.
+\url{https://doi.org/10.1093/database/baae063}
 }

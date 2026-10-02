@@ -17,17 +17,17 @@
 #'
 #'   | `method` | System | Description |
 #'   |---|---|---|
-#'   | `"austin"` | both | Austin et al. (2002) regression |
+#'   | `"austin"` | both | Austin et al. regression (2002 for microsomes, 2005 for cells) |
 #'   | `"hallifax"` | microsomes | Hallifax and Houston (2006) regression |
-#'   | `"turner"` | microsomes | Turner regression, with separate equations for acids, bases and neutral compounds |
+#'   | `"turner"` | microsomes | Turner et al. (2006) regression, with separate equations for acids, bases and neutral compounds |
 #'   | `"kilford"` | cells | Kilford et al. (2008) regression |
-#'   | `"poulin"` | both | Poulin regression on the neutral lipid content, with acidic phospholipid binding for strong bases |
+#'   | `"poulin"` | both | Poulin and Haddad regression (2011 for microsomes, 2013 for cells) on the neutral lipid content, with acidic phospholipid binding for strong bases |
 #'   | `"all_literature"` | both | Average of the regressions available for the system |
-#'   | `"poulin_theil"`, `"poulin_theil_fu"` | both | Poulin and Theil partition model |
-#'   | `"berezhkovskiy"`, `"berezhkovskiy_fu"` | both | Berezhkovskiy partition model |
-#'   | `"pksim_standard"`, `"pksim_standard_fu"` | both | PK-Sim Standard partition model |
-#'   | `"rodgers_rowland_fu"` | both | Rodgers and Rowland partition model, strong bases only |
-#'   | `"schmitt"`, `"schmitt_fu"` | both | Schmitt partition model |
+#'   | `"poulin_theil"`, `"poulin_theil_fu"` | both | Poulin and Theil (2000) partition model |
+#'   | `"berezhkovskiy"`, `"berezhkovskiy_fu"` | both | Berezhkovskiy (2004) partition model |
+#'   | `"pksim_standard"`, `"pksim_standard_fu"` | both | PK-Sim Standard partition model (Willmann et al. 2005) |
+#'   | `"rodgers_rowland_fu"` | both | Rodgers and Rowland (2005, 2006) partition model, strong bases only |
+#'   | `"schmitt"`, `"schmitt_fu"` | both | Schmitt (2008) partition model |
 #'
 #'   The partition models without the `_fu` suffix predict binding to serum in
 #'   the medium from the serum lipid and protein content. The `_fu` versions
@@ -71,6 +71,73 @@
 #'
 #' `"berezhkovskiy"` and `"berezhkovskiy_fu"` currently give the same results
 #' as `"poulin_theil"` and `"poulin_theil_fu"`.
+#'
+#' @references
+#' Austin RP, Barton P, Cockroft SL, Wenlock MC, Riley RJ (2002). The influence
+#' of nonspecific microsomal binding on apparent intrinsic clearance, and its
+#' prediction from physicochemical properties. *Drug Metabolism and Disposition*
+#' 30(12):1497-1503. <https://doi.org/10.1124/dmd.30.12.1497>
+#'
+#' Austin RP, Barton P, Mohmed S, Riley RJ (2005). The binding of drugs to
+#' hepatocytes and its relationship to physicochemical properties. *Drug
+#' Metabolism and Disposition* 33(3):419-425.
+#' <https://doi.org/10.1124/dmd.104.002436>
+#'
+#' Hallifax D, Houston JB (2006). Binding of drugs to hepatic microsomes:
+#' comment and assessment of current prediction methodology with recommendation
+#' for improvement. *Drug Metabolism and Disposition* 34(4):724-726.
+#' <https://doi.org/10.1124/dmd.105.007658>
+#'
+#' Turner DB, Rostami-Hodjegan A, Tucker GT, Rowland-Yeo K (2006). Prediction of
+#' non-specific hepatic microsomal binding from readily available
+#' physicochemical properties (the Turner-Simcyp model). *Drug Metabolism
+#' Reviews* 38(S1):162. Conference abstract.
+#'
+#' Kilford PJ, Gertz M, Houston JB, Galetin A (2008). Hepatocellular binding of
+#' drugs: correction for unbound fraction in hepatocyte incubations using
+#' microsomal binding or drug lipophilicity data. *Drug Metabolism and
+#' Disposition* 36(7):1194-1197. <https://doi.org/10.1124/dmd.108.020834>
+#'
+#' Poulin P, Haddad S (2011). Microsome composition-based model as a
+#' mechanistic tool to predict nonspecific binding of drugs in liver
+#' microsomes. *Journal of Pharmaceutical Sciences* 100(10):4501-4517.
+#' <https://doi.org/10.1002/jps.22619>
+#'
+#' Poulin P, Haddad S (2013). Hepatocyte composition-based model as a
+#' mechanistic tool for predicting the cell suspension: aqueous phase
+#' partition coefficient of drugs in in vitro metabolic studies. *Journal of
+#' Pharmaceutical Sciences* 102(8):2806-2818.
+#' <https://doi.org/10.1002/jps.23602>
+#'
+#' Poulin P, Theil FP (2000). A priori prediction of tissue:plasma partition
+#' coefficients of drugs to facilitate the use of physiologically-based
+#' pharmacokinetic models in drug discovery. *Journal of Pharmaceutical
+#' Sciences* 89(1):16-35. DOI
+#' `10.1002/(SICI)1520-6017(200001)89:1<16::AID-JPS3>3.0.CO;2-E`
+#'
+#' Berezhkovskiy LM (2004). Volume of distribution at steady state for a linear
+#' pharmacokinetic system with peripheral elimination. *Journal of
+#' Pharmaceutical Sciences* 93(6):1628-1640.
+#' <https://doi.org/10.1002/jps.20073>
+#'
+#' Willmann S, Lippert J, Schmitt W (2005). From physicochemistry to absorption
+#' and distribution: predictive mechanistic modelling and computational tools.
+#' *Expert Opinion on Drug Metabolism & Toxicology* 1(1):159-168.
+#' <https://doi.org/10.1517/17425255.1.1.159>
+#'
+#' Rodgers T, Leahy D, Rowland M (2005). Physiologically based pharmacokinetic
+#' modeling 1: predicting the tissue distribution of moderate-to-strong bases.
+#' *Journal of Pharmaceutical Sciences* 94(6):1259-1276.
+#' <https://doi.org/10.1002/jps.20322>
+#'
+#' Rodgers T, Rowland M (2006). Physiologically based pharmacokinetic modelling
+#' 2: predicting the tissue distribution of acids, very weak bases, neutrals and
+#' zwitterions. *Journal of Pharmaceutical Sciences* 95(6):1238-1257.
+#' <https://doi.org/10.1002/jps.20502>
+#'
+#' Schmitt W (2008). General approach for the calculation of tissue to plasma
+#' partition coefficients. *Toxicology in Vitro* 22(2):457-467.
+#' <https://doi.org/10.1016/j.tiv.2007.09.010>
 #'
 #' @concept austin
 #' @concept hallifax

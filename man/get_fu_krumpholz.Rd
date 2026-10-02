@@ -53,6 +53,18 @@ Matching of compound names ignores case and leading/trailing spaces. If a
 compound is not in the database a message is given, with similar compound
 names when there are any.
 }
+\details{
+The database is described in Krumpholz et al. (2024) and its data are
+available from Mendeley Data. The data are licensed under the Creative
+Commons Attribution 4.0 International licence
+(\href{https://creativecommons.org/licenses/by/4.0/}{CC BY 4.0}): they may be
+used, shared and adapted, including commercially, as long as the authors
+are credited, a link to the licence is given and any changes are indicated.
+This licence applies to the data file only; it is separate from the MIT
+licence of this package. Please cite the paper below when you use these
+values. Each record also names the original study it comes from
+(\code{reference} and \code{doi}).
+}
 \examples{
 # all verapamil fu_mic in human, averaged per microsomal concentration
 get_fu_krumpholz("Verapamil", system = "microsomes", species = "human")
@@ -64,4 +76,13 @@ get_fu_krumpholz("Verapamil", system = "microsomes", species = "human", average 
 
 # check if a compound is in the database
 nrow(get_fu_krumpholz("Verapamil", system = "plasma")) > 0
+}
+\references{
+Krumpholz L, Klimczyk A, Bieniek W, Polak S, Wiśniowska B (2024). Data set
+of fraction unbound values in the in vitro incubations for metabolic studies
+for better prediction of human clearance. \emph{Database} 2024:baae063.
+\url{https://doi.org/10.1093/database/baae063}
+
+Krumpholz L (2024). Dataset of fraction unbound values in the in vitro
+incubations. Mendeley Data, V1. \url{https://doi.org/10.17632/3bs5526htd.1}
 }

@@ -1,0 +1,25 @@
+ESQivive is licensed under the MIT licence (see LICENSE). The following
+third-party material shipped with the package is NOT covered by that licence
+and keeps its own terms.
+
+Fraction unbound database
+-------------------------
+File:      inst/extdata/Krumpholz_et_al_fu_dataset.xlsx
+Used by:   get_fu_krumpholz() and list_krumpholz_compounds()
+Authors:   Laura Krumpholz, Aleksandra Klimczyk, Wiktoria Bieniek,
+           Sebastian Polak, Barbara Wisniowska
+Paper:     Krumpholz L, Klimczyk A, Bieniek W, Polak S, Wisniowska B (2024).
+           Data set of fraction unbound values in the in vitro incubations for
+           metabolic studies for better prediction of human clearance.
+           Database 2024:baae063. https://doi.org/10.1093/database/baae063
+Data:      Krumpholz L (2024). Dataset of fraction unbound values in the in
+           vitro incubations. Mendeley Data, V1.
+           https://doi.org/10.17632/3bs5526htd.1
+Licence:   Creative Commons Attribution 4.0 International (CC BY 4.0)
+           https://creativecommons.org/licenses/by/4.0/
+
+Under CC BY 4.0 the data may be used, shared and adapted, including for
+commercial purposes, provided that the authors are credited, a link to the
+licence is given and any changes are indicated. Each record of the database
+also names the original study it was taken from; cite those studies as well
+when you rely on individual values.
