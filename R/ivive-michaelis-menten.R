@@ -13,8 +13,8 @@
 #' @param fu_in_vitro Fraction unbound in the incubation, for example from
 #'   [calculate_fu_in_vitro()]. Defaults to 1 (no binding).
 #' @param tissue Tissue whose scaling factors are used. Defaults to `"liver"`.
-#' @param species Species whose scaling factors are used: `"human"`, `"rat"`
-#'   or `"dog"`. Defaults to `"human"`.
+#' @param species Species whose scaling factors are used: `"human"`, `"rat"`,
+#'   `"dog"` or `"beagle"`. Defaults to `"human"`.
 #' @param relative_expression_factor Relative expression or activity factor of
 #'   the enzyme in vivo compared with the incubation. Defaults to 1. To use it,
 #'   set the reference concentration of the enzyme in PK-Sim to 1 uM.
@@ -23,10 +23,21 @@
 #' @returns A named list:
 #'   * `vmax`: in vivo Vmax (umol/min/L of tissue);
 #'   * `km_unbound`: unbound Km (uM).
+#'
+#'   `vmax` is `NA`, with a warning, if the scaling factor of the system is not
+#'   available for the species and tissue.
+#'
+#' @details
+#' The scaling factors are in `inst/extdata/scaling_factors.csv`. The liver has
+#' its own scaling factors. For the other tissues, the scaling factors per gram
+#' tissue (microsomal protein and cells) are the average of the kidney and gut
+#' scaling factors, if they are available. Combinations of species, tissue and
+#' system that have no value (`NA`) in the table are not supported: a warning
+#' is given and `vmax` is `NA`.
 #' @export
 #'
 #' @examples
-#' ivive_michaelis_menten(system = "cells", vmax = 2, km = 1)
+#' ivive_michaelis_menten(system = "cells", vmax = 2, km = 1, species = "rat")
 #'
 #' ivive_michaelis_menten(
 #'   system = "microsomes",
@@ -58,9 +69,17 @@ ivive_michaelis_menten <- function(
   #chose the system specific scaling factors
   if (system == "microsomes") {
     scfactor <- scaling_factors[["MicProtGO"]] # mg protein/g liver
+    scaling_column <- "MicProtGO"
   } else {
     scfactor <- scaling_factors[["CellsGO"]]
+    scaling_column <- "CellsGO"
   }
+  .warn_unsupported_scaling_factors(
+    scaling_factors,
+    c("fcell", scaling_column),
+    species,
+    tissue
+  )
   dens <- 1000 #g/L
   vmax_umol_minL <- vmax *
     scfactor *

@@ -292,18 +292,5 @@ for (predi in plot_cols) {
 # error_table[["all_literature"]]
 ```
 
-Calculate liver partitioning for all is it more proportional to any specific ..
-
-steps
-
-#import from diana htpbk
-
-#make table to save values row chemicals and col the different partitions
-
-#add parameeters, logP and pKa class as input parameters as loop and get Kliver/water for different partitions coefficents
-
-#Compare the proportion of Fu to Kp ..
-
-```{r}
-
+```{}
 ```

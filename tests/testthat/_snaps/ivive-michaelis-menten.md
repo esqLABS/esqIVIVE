@@ -1,10 +1,19 @@
+# ivive_michaelis_menten: a tissue without a scaling factor gives NA vmax and a warning
+
+    Code
+      mm <- ivive_michaelis_menten(system = "cells", vmax = 2, km = 1, tissue = "brain")
+    Condition
+      Warning in `ivive_michaelis_menten()`:
+      The scaling factor CellsGO (the cells per gram tissue) is not supported for species "human" and tissue "brain": it is `NA` in the scaling factor table.
+      i The result is `NA`.
+
 # ivive_michaelis_menten rejects invalid inputs
 
     Code
       ivive_michaelis_menten(system = "cells", vmax = 2, km = 1, species = "bogus")
     Condition
       Error in `ivive_michaelis_menten()`:
-      ! `species` must be one of "human", "rat", or "dog", not "bogus".
+      ! `species` must be one of "human", "rat", "dog", or "beagle", not "bogus".
 
 ---
 

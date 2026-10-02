@@ -43,23 +43,34 @@
 #'   to overpredict slow and underpredict fast clearances. Available for human
 #'   and rat, with microsomes or cells.
 #' @param tissue Tissue whose scaling factors are used. Defaults to `"liver"`.
-#' @param species Species whose scaling factors are used: `"human"`, `"rat"`
-#'   or `"dog"`. Defaults to `"human"`.
+#' @param species Species whose scaling factors are used: `"human"`, `"rat"`,
+#'   `"dog"` or `"beagle"`. Defaults to `"human"`.
 #' @param relative_expression_factor Relative expression or activity factor of
 #'   the enzyme in vivo compared with the incubation. Defaults to 1.
 #' @param verbose If `TRUE`, print the inputs.
 #'
-#' @return The specific clearance (1/min), a single number.
+#' @return The specific clearance (1/min), a single number. It is `NA`, with a
+#'   warning, if the scaling factor of the system is not available for the
+#'   species and tissue.
+#'
+#' @details
+#' The scaling factors are in `inst/extdata/scaling_factors.csv`. The liver has
+#' its own scaling factors. For the other tissues, the scaling factors per gram
+#' tissue (microsomal protein, cytosolic protein and cells) are the average of
+#' the kidney and gut scaling factors, if they are available. Combinations of
+#' species, tissue and system that have no value (`NA`) in the table are not
+#' supported: a warning is given and the result is `NA`.
 #' @export
 #' @examples
-#' # cells, for example hepatocytes
+#' # cells, for example rat hepatocytes
 #' ivive_clearance(
 #'   value_type = "intrinsic_clearance",
 #'   value = 18.27,
 #'   unit = "mL/minutes/millioncells",
 #'   system = "cells",
 #'   fu_in_vitro = 0.5,
-#'   concentration_cells = 0.5
+#'   concentration_cells = 0.5,
+#'   species = "rat"
 #' )
 #'
 #' # microsomes, from the in vitro half-life
@@ -139,8 +150,26 @@ ivive_clearance <- function(
     )
   }
 
+  .warn_unsupported_scaling_factors(
+    scaling_factors,
+    c(
+      "fcell",
+      if (unit %in% names(.clearance_per_kg) || empirical_correction) {
+        "weightorgankgBW"
+      },
+      switch(
+        system,
+        microsomes = "MicProtGO",
+        cytosol = "CytosProtGO",
+        cells = "CellsGO"
+      )
+    ),
+    species,
+    tissue
+  )
+
   #combination scale factors
-  SF <- nLiver / fintcell * relative_expression_factor / fu_in_vitro
+  SF <-nLiver / fintcell * relative_expression_factor / fu_in_vitro
   SF2 <- 1 / fintcell * relative_expression_factor / fu_in_vitro
 
   #Derive the in vitro clearance value---------------------
@@ -289,6 +318,10 @@ ivive_clearance <- function(
 
   # conditional to pick the right wood scalar
   scaled <- ClspePermin * organkgBW
+  if (is.na(scaled)) {
+    # a scaling factor is not supported, the warning is given by the caller
+    return(NA_real_)
+  }
   band <- if (scaled < 10) {
     "<10"
   } else if (scaled < 100) {

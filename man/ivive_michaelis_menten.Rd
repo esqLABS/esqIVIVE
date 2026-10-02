@@ -30,8 +30,8 @@ umol/min/mg protein for microsomes), for example from
 
 \item{tissue}{Tissue whose scaling factors are used. Defaults to \code{"liver"}.}
 
-\item{species}{Species whose scaling factors are used: \code{"human"}, \code{"rat"}
-or \code{"dog"}. Defaults to \code{"human"}.}
+\item{species}{Species whose scaling factors are used: \code{"human"}, \code{"rat"},
+\code{"dog"} or \code{"beagle"}. Defaults to \code{"human"}.}
 
 \item{relative_expression_factor}{Relative expression or activity factor of
 the enzyme in vivo compared with the incubation. Defaults to 1. To use it,
@@ -45,13 +45,24 @@ A named list:
 \item \code{vmax}: in vivo Vmax (umol/min/L of tissue);
 \item \code{km_unbound}: unbound Km (uM).
 }
+
+\code{vmax} is \code{NA}, with a warning, if the scaling factor of the system is not
+available for the species and tissue.
 }
 \description{
 Scales an in vitro Vmax to the whole tissue with the physiological scaling
 factors of the species, and corrects Km for binding in the incubation.
 }
+\details{
+The scaling factors are in \code{inst/extdata/scaling_factors.csv}. The liver has
+its own scaling factors. For the other tissues, the scaling factors per gram
+tissue (microsomal protein and cells) are the average of the kidney and gut
+scaling factors, if they are available. Combinations of species, tissue and
+system that have no value (\code{NA}) in the table are not supported: a warning
+is given and \code{vmax} is \code{NA}.
+}
 \examples{
-ivive_michaelis_menten(system = "cells", vmax = 2, km = 1)
+ivive_michaelis_menten(system = "cells", vmax = 2, km = 1, species = "rat")
 
 ivive_michaelis_menten(
   system = "microsomes",

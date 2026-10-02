@@ -1,3 +1,13 @@
+# ivive_clearance: a tissue without a scaling factor gives NA and a warning
+
+    Code
+      cl <- ivive_clearance(value_type = "intrinsic_clearance", system = "cells",
+        unit = "mL/minutes/millioncells", value = 18.27, tissue = "brain")
+    Condition
+      Warning in `ivive_clearance()`:
+      The scaling factor CellsGO (the cells per gram tissue) is not supported for species "human" and tissue "brain": it is `NA` in the scaling factor table.
+      i The result is `NA`.
+
 # ivive_clearance rejects a unit that does not fit the value type
 
     Code
@@ -70,7 +80,7 @@
         concentration_microsomes = 0.5, species = "bogus")
     Condition
       Error in `ivive_clearance()`:
-      ! `species` must be one of "human", "rat", or "dog", not "bogus".
+      ! `species` must be one of "human", "rat", "dog", or "beagle", not "bogus".
 
 ---
 
@@ -112,7 +122,7 @@
 
     Code
       cl <- ivive_clearance(value_type = "intrinsic_clearance", value = 18.27, unit = "mL/minutes/millioncells",
-        system = "cells", concentration_cells = 0.5, verbose = TRUE)
+        system = "cells", concentration_cells = 0.5, species = "rat", verbose = TRUE)
     Output
       --- ivive_clearance ---
       Inputs:
@@ -123,5 +133,5 @@
         fu_in_vitro = 1
         empirical_correction = FALSE
         tissue = liver
-        species = human
+        species = rat
 

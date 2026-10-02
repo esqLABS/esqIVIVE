@@ -74,8 +74,8 @@ and rat, with microsomes or cells.}
 
 \item{tissue}{Tissue whose scaling factors are used. Defaults to \code{"liver"}.}
 
-\item{species}{Species whose scaling factors are used: \code{"human"}, \code{"rat"}
-or \code{"dog"}. Defaults to \code{"human"}.}
+\item{species}{Species whose scaling factors are used: \code{"human"}, \code{"rat"},
+\code{"dog"} or \code{"beagle"}. Defaults to \code{"human"}.}
 
 \item{relative_expression_factor}{Relative expression or activity factor of
 the enzyme in vivo compared with the incubation. Defaults to 1.}
@@ -83,7 +83,9 @@ the enzyme in vivo compared with the incubation. Defaults to 1.}
 \item{verbose}{If \code{TRUE}, print the inputs.}
 }
 \value{
-The specific clearance (1/min), a single number.
+The specific clearance (1/min), a single number. It is \code{NA}, with a
+warning, if the scaling factor of the system is not available for the
+species and tissue.
 }
 \description{
 Converts an in vitro half-life, depletion rate constant or intrinsic
@@ -91,15 +93,24 @@ clearance into the specific clearance (1/min) that PK-Sim expects. The
 value is corrected for binding in the incubation and scaled to the whole
 tissue with the physiological scaling factors of the species.
 }
+\details{
+The scaling factors are in \code{inst/extdata/scaling_factors.csv}. The liver has
+its own scaling factors. For the other tissues, the scaling factors per gram
+tissue (microsomal protein, cytosolic protein and cells) are the average of
+the kidney and gut scaling factors, if they are available. Combinations of
+species, tissue and system that have no value (\code{NA}) in the table are not
+supported: a warning is given and the result is \code{NA}.
+}
 \examples{
-# cells, for example hepatocytes
+# cells, for example rat hepatocytes
 ivive_clearance(
   value_type = "intrinsic_clearance",
   value = 18.27,
   unit = "mL/minutes/millioncells",
   system = "cells",
   fu_in_vitro = 0.5,
-  concentration_cells = 0.5
+  concentration_cells = 0.5,
+  species = "rat"
 )
 
 # microsomes, from the in vitro half-life
