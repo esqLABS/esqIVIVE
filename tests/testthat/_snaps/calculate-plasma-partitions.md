@@ -14,5 +14,5 @@
       ionization = c("acid", 0), lfer_e = 1)
     Condition
       Error in `calculate_plasma_partitions()`:
-      ! "pplfer" needs `lfer_b`, `lfer_a`, `lfer_s`, and `lfer_v`.
+      ! "pplfer" needs `lfer_b`, `lfer_a`, `lfer_s`, `lfer_v`, and `lfer_l`.
 

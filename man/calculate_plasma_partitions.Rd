@@ -14,6 +14,7 @@ calculate_plasma_partitions(
   lfer_a = NULL,
   lfer_s = NULL,
   lfer_v = NULL,
+  lfer_l = NULL,
   verbose = FALSE
 )
 }
@@ -21,16 +22,21 @@ calculate_plasma_partitions(
 \item{method}{Prediction method: \code{"logp"} (regressions on lipophilicity)
 or \code{"pplfer"} (poly-parameter linear free energy relationships).}
 
-\item{lipophilicity}{Lipophilicity of the compound as logP (log units).}
+\item{lipophilicity}{Lipophilicity of the compound as logP (log units).
+Only used when \code{method = "logp"}.}
 
 \item{ionization}{Ionization class of up to two ionizable groups, as a
 vector of length 2 with \code{"acid"}, \code{"base"} or \code{"neutral"}, for example
-\code{c("acid", "neutral")}.}
+\code{c("acid", "neutral")}. Only used when \code{method = "logp"}.}
 
-\item{pka}{pKa values of the two ionizable groups, a vector of length 2.}
+\item{pka}{pKa values of the two ionizable groups, a vector of length 2.
+Only used when \code{method = "logp"}.}
 
-\item{lfer_e, lfer_b, lfer_a, lfer_s, lfer_v}{Abraham solute descriptors E, B,
-A, S and V (the McGowan volume). Needed when \code{method = "pplfer"}.}
+\item{lfer_e, lfer_b, lfer_a, lfer_s, lfer_v, lfer_l}{Abraham solute descriptors
+E (excess molar refraction), B (hydrogen-bond basicity), A
+(hydrogen-bond acidity), S (dipolarity/polarizability), V (McGowan
+volume) and L (log of the gas-hexadecane partition coefficient at 25 C).
+Needed when \code{method = "pplfer"}.}
 
 \item{verbose}{If \code{TRUE}, print the inputs and the result.}
 }
@@ -51,8 +57,15 @@ phenols, carboxylic acids, pyridines and amines you can use
 \code{method = "pplfer"}. Descriptors can be obtained, for example, from the fup
 calculator (\url{https://drumap.nibiohn.go.jp/fup/}).
 
-How ionization is taken into account by the PP-LFER method is still under
-review.
+The PP-LFER method uses the polyparameter LFERs at 37 C for membrane
+lipid-water (Endo et al. 2011), bovine serum albumin-water (Endo and Goss
+2011) and muscle protein-water (Endo et al. 2012) partitioning, for the
+membrane lipids, albumin and globulins respectively. Each system has two
+published equations (one using L, one using E); both are calculated and the
+resulting K values are averaged (arithmetic mean in linear space). The
+protein equations give K per volume of protein (L/L), which is converted to
+L/kg using a protein density of 1.35 g/mL. The equations are for the
+neutral species, ionization is not taken into account.
 }
 \examples{
 calculate_plasma_partitions(
@@ -62,15 +75,14 @@ calculate_plasma_partitions(
   pka = c(3, 0)
 )
 
+# Abraham descriptors of ketoconazole
 calculate_plasma_partitions(
   method = "pplfer",
-  lipophilicity = 2,
-  ionization = c("acid", "neutral"),
-  pka = c(3, 0),
-  lfer_e = 1,
-  lfer_b = 0,
-  lfer_a = 1.5,
-  lfer_s = 0.8,
-  lfer_v = 2
+  lfer_e = 3.14,
+  lfer_s = 3.68,
+  lfer_a = 0,
+  lfer_b = 2.6,
+  lfer_v = 3.7208,
+  lfer_l = 19.71
 )
 }
