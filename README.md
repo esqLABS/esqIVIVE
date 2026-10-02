@@ -165,7 +165,7 @@ ivive_clearance(
   fu_in_vitro = fu_mic,
   concentration_microsomes = midazolam$concentration_microsomes
 )
-#> [1] 23.15373
+#> [1] 20.58109
 ```
 
 If only the in vitro half-life is reported, it can be used directly:
@@ -179,7 +179,7 @@ ivive_clearance(
   fu_in_vitro = fu_mic,
   concentration_microsomes = midazolam$concentration_microsomes
 )
-#> [1] 24.43609
+#> [1] 21.72097
 ```
 
 The vignette `Clearance IVIVE check` applies this workflow to the 28
