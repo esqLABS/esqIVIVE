@@ -15,7 +15,7 @@ params:
 
 ## Introduction
 
-This vignette showcases and compares different IVIVE frameworks for clearance, and evaluates how the clearance predicted with the standard PK-Sim PBK model compares with observed plasma clearances. In vitro metabolism data are converted with `esqIVIVE` into a PK-Sim specific clearance, which is then simulated in batch mode with the `ospsuite` R package using the PBK models in `inst/extdata/pkml4htpbk`.
+This vignette showcases and compares different IVIVE frameworks for clearance, and evaluates how the clearance predicted with the standard PK-Sim PBK model compares with observed plasma clearances. In vitro metabolism data are converted with `ESQivive` into a PK-Sim specific clearance, which is then simulated in batch mode with the `ospsuite` R package using the PBK models in `inst/extdata/pkml4htpbk`.
 
 The scenarios to run and the simulation time can be set in the YAML header (`params`) or from the command line at the package root, e.g. `quarto render "vignettes/articles/clearance-ivive-check.qmd" -P scenarios:S1,S3,S5`.
 
@@ -32,7 +32,7 @@ library(readxl)
 library(openxlsx)
 library(ospsuite)
 
-library(esqIVIVE)
+library(ESQivive)
 ```
 
 #### Import data
@@ -48,7 +48,7 @@ The data are stored in the import sheet `inst/extdata/Obach1999_IVIVE_input.xlsx
 ```{r}
 #| label: import
 
-input_file <- system.file("extdata", "Obach1999_IVIVE_input.xlsx", package = "esqIVIVE")
+input_file <- system.file("extdata", "Obach1999_IVIVE_input.xlsx", package = "ESQivive")
 compounds <- as.data.frame(read_excel(input_file, sheet = "Compounds"))
 scenarios <- as.data.frame(read_excel(input_file, sheet = "Scenarios"))
 
@@ -64,11 +64,11 @@ knitr::kable(scenarios)
 
 1-Using standard IVIVE (fu_mic = 1) and tissue partitioning default PK-Sim
 
-2-Correcting for fu-All_literature and tissue partitioning default PK-Sim
+2-Correcting for fu-all_literature and tissue partitioning default PK-Sim
 
-3-Correcting for fu-All_literature and a default high cell permeability and tissue partitioning default PK-Sim
+3-Correcting for fu-all_literature and a default high cell permeability and tissue partitioning default PK-Sim
 
-4-Correcting for fu-All_literature and a default high cell permeability and Wood scaling factors and tissue partitioning default PK-Sim
+4-Correcting for fu-all_literature and a default high cell permeability and Wood scaling factors and tissue partitioning default PK-Sim
 
 5-Correcting for fu-R&R and a default high cell permeability and tissue partitioning default R&R
 
@@ -78,7 +78,7 @@ Scenarios 1 and 2 use the cell permeability calculated by the PK-Sim QSAR, while
 
 #### IVIVE of the in vitro half-life
 
-The in vitro half-life is scaled to a PK-Sim specific clearance (1/min, per volume of liver intracellular space) with `IVIVE_clearance()`:
+The in vitro half-life is scaled to a PK-Sim specific clearance (1/min, per volume of liver intracellular space) with `ivive_clearance()`:
 
 $$
 CL_{spec} = \frac{0.693}{t_{1/2}} \cdot \frac{1}{C_{mic}} \cdot \frac{MPPGL}{f_{cell} \cdot fu_{mic}}
@@ -105,15 +105,15 @@ predict_fu_mic <- function(method, cmp) {
   }
   tryCatch(
     suppressWarnings(calculate_fu_in_vitro(
-      partition_qspr = method,
-      log_lipophilicity = cmp$LogP,
+      method = method,
+      lipophilicity = cmp$LogP,
       ionization = c(cmp$Ionization, 0),
-      type_system = "microsomes",
-      FBS_fraction = 0,
+      system = "microsomes",
+      fbs_fraction = 0,
       microplate_type = microplate_type,
       volume_medium = incubation_volume_mL,
       pka = c(cmp$pKa, 0),
-      fraction_unbound = cmp$fu_plasma,
+      fu_plasma = cmp$fu_plasma,
       blood_plasma_ratio = cmp$BP,
       concentration_microsomes = cmp$Cmic_mgml
     )),
@@ -136,15 +136,15 @@ ivive_one <- function(scn, cmp) {
   }
 
   #perfrom IVIVE with calculated fu
-  cl_spec <- IVIVE_clearance(
-    typeValue = "halfLife",
-    units = "minutes",
-    expData = cmp$halflife_min,
-    typeSystem = "microsomes",
-    fu_invitro = fu_mic,
-    empirical_scalar = scn$empirical_scalar,
+  cl_spec <- ivive_clearance(
+    value_type = "half_life",
+    value = cmp$halflife_min,
+    unit = "minutes",
+    system = "microsomes",
+    fu_in_vitro = fu_mic,
+    empirical_correction = scn$empirical_correction,
     species = "human",
-    cProtein_mgml = cmp$Cmic_mgml
+    concentration_microsomes = cmp$Cmic_mgml
   )
 
   data.frame(
@@ -187,7 +187,7 @@ The clearance is taken from the PK analysis (dose/AUC~inf~). For compounds with 
 molecule <- "test_chemical"
 clearance_process <- "test_chemical-Total Hepatic Clearance-different sources"
 plasma_output <- "Organism|PeripheralVenousBlood|test_chemical|Plasma (Peripheral Venous Blood)"
-pkml_dir <- system.file("extdata", "pkml4htpbk", package = "esqIVIVE")
+pkml_dir <- system.file("extdata", "pkml4htpbk", package = "ESQivive")
 
 # All values in the pkml base units
 batch_parameters <- c(

@@ -1,4 +1,4 @@
-Package: esqIVIVE
+Package: ESQivive
 Title: IVIVE of ADME Parameters for PBK Models
 Version: 0.0.0.9000
 Authors@R: c(
@@ -16,9 +16,10 @@ Description: In vitro to in vivo extrapolation (IVIVE) of absorption,
     values. The functions are developed for use with the Open Systems
     Pharmacology Suite ('PK-Sim' and 'MoBi').
 License: MIT + file LICENSE
-URL: https://github.com/esqLABS/esqIVIVE, https://esqlabs.github.io/esqIVIVE/
-BugReports: https://github.com/esqLABS/esqIVIVE/issues
+URL: https://github.com/esqLABS/ESQivive, https://esqlabs.github.io/ESQivive/
+BugReports: https://github.com/esqLABS/ESQivive/issues
 Imports:
+    cli,
     ggplot2,
     readxl,
     rlang,

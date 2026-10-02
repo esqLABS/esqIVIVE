@@ -52,20 +52,20 @@ scenarios <- data.frame(
   scenario = paste0("S", 1:6),
   description = c(
     "Standard IVIVE (fu_mic = 1), PK-Sim partitioning, QSAR permeability",
-    "fu_mic All_literature, PK-Sim partitioning, QSAR permeability",
-    "fu_mic All_literature, high cell permeability, PK-Sim partitioning",
-    "fu_mic All_literature, high cell permeability, Wood 2017 scaling factors, PK-Sim partitioning",
+    "fu_mic all_literature, PK-Sim partitioning, QSAR permeability",
+    "fu_mic all_literature, high cell permeability, PK-Sim partitioning",
+    "fu_mic all_literature, high cell permeability, Wood 2017 scaling factors, PK-Sim partitioning",
     "fu_mic Rodgers & Rowland, high cell permeability, Rodgers & Rowland partitioning",
     "Reference: measured fu_mic (Obach 1999), high cell permeability, PK-Sim partitioning"
   ),
   fu_mic_method = c(
-    "none", "All_literature", "All_literature", "All_literature",
-    "Rodgers & Rowland + fu", "measured"
+    "none", "all_literature", "all_literature", "all_literature",
+    "rodgers_rowland_fu", "measured"
   ),
-  fu_mic_fallback = c(NA, NA, NA, NA, "All_literature", NA),
+  fu_mic_fallback = c(NA, NA, NA, NA, "all_literature", NA),
   permeability = c("QSAR", "QSAR", "high", "high", "high", "high"),
   permeability_high_cmmin = c(NA, NA, 1000, 1000, 1000, 1000),
-  empirical_scalar = c("No", "No", "No", "Yes", "No", "No"),
+  empirical_correction = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
   blood_plasma_ratio = "observed",
   pkml = c(
     rep("single-iv-pksim.pkml", 4),
@@ -79,7 +79,7 @@ columns <- data.frame(
   column = c(names(compounds), names(scenarios)),
   description = c(
     "Drug name",
-    "Ionization class used by esqIVIVE (acid, base, neutral)",
+    "Ionization class used by ESQivive (acid, base, neutral)",
     "Most relevant pKa (0 for neutrals)",
     "Molecular weight",
     "Number of chlorine atoms (PK-Sim effective MW)",
@@ -101,11 +101,11 @@ columns <- data.frame(
     "Original references for the in vivo clearance (as cited by Obach 1999)",
     "Scenario identifier",
     "Scenario description",
-    "fu_mic used in IVIVE: none (=1), measured, or any calculate_fu_in_vitro() partition_qspr",
+    "fu_mic used in IVIVE: none (=1), measured, or any calculate_fu_in_vitro() method",
     "Method used when fu_mic_method fails for a compound (e.g. R&R for non strong bases)",
     "Cell permeability: QSAR (PK-Sim formula from MW_eff and LogP) or high",
     "Cell permeability value used when permeability = high",
-    "Apply Wood 2017 empirical scaling factors in IVIVE_clearance() (Yes / No)",
+    "Apply Wood 2017 empirical scaling factors in ivive_clearance() (TRUE / FALSE)",
     "Blood/plasma ratio: observed (set blood cell partitioning from BP) or model (PK-Sim formula from LogP)",
     "pkml file in inst/extdata/pkml4htpbk (defines the partition coefficient method)"
   ),

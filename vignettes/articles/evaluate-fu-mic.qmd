@@ -17,7 +17,7 @@ $$
 fu_{inc} = 1 \cdot C \cdot 10^{0.56 \log \left( \frac{P}{D} \right) - 1.41} + 1 
 $$
 
-#### Halifax and Houston 2006
+#### Hallifax and Houston 2006
 
 $$ 
 fu_{inc} = \frac{1}{1+ C \cdot 10^{0.072\cdot \log \left( \frac{P}{D} \right)^2 +0.067\cdot\log \left( \frac{P}{D} \right)-1.126}}
@@ -49,9 +49,9 @@ $$ Pnla is parameterized with logPow at 37 C. Since logKow values are often for 
 
 Adapts the same mechanistic (neutral lipid / neutral and acidic phospholipid) partitioning approach Rodgers & Rowland use for whole-organ tissue partitioning to the in vitro incubation compartments instead. The acidic-phospholipid affinity constant is calibrated from the compound's blood-cell partitioning (fraction unbound in plasma and blood:plasma ratio), so it is currently only implemented for strong bases (ionization class "base" with pKa \> 7) - for every other class PK-Sim itself switches to a different, protein-binding-based term that this package does not implement yet.
 
-**All_literature**
+**all_literature**
 
-A simple average of the four empirical/literature regressions above (Poulin, Halifax and Houston, Austin, Turner), computed with this package's own implementation of each rather than the papers' originally reported values.
+A simple average of the four empirical/literature regressions above (Poulin, Hallifax and Houston, Austin, Turner), computed with this package's own implementation of each rather than the papers' originally reported values.
 
 ```{r}
 #| label: load functions and data
@@ -63,10 +63,10 @@ library(dplyr)
 library(ggpubr)
 library(ggplot2)
 
-library(esqIVIVE)
+library(ESQivive)
 
 
-data_path<-system.file("extdata","test_fu_microsomes.csv",package="esqIVIVE")
+data_path<-system.file("extdata","test_fu_microsomes.csv",package="ESQivive")
 testFuData<-read.csv(data_path)
 ```
 
@@ -77,21 +77,21 @@ We used the Fu_mic from this dataset to evaluate the predictions
 ```{r}
 #| echo: false
 
-QSARs <- c(
-  "All Poulin and Theil",
-  "All Berezhkovskiy",
-  "All PK-Sim Standard",
-  "Rodgers & Rowland + fu",
-  "All Schmitt",
-  "All_literature"
+methods <- c(
+  "poulin_theil",
+  "berezhkovskiy",
+  "pksim_standard",
+  "rodgers_rowland_fu",
+  "schmitt",
+  "all_literature"
 )
-QSAR_colnames <- c(
+method_colnames <- c(
   "All_Poulin_and_Theil",
   "All_Berezhkovskiy",
   "All_PK_Sim_Standard",
   "Rodgers_Rowland_fu",
   "All_Schmitt",
-  "All_literature"
+  "all_literature"
 )
 
 # Rodgers & Rowland only supports strong bases (ionization == "base" and
@@ -99,27 +99,27 @@ QSAR_colnames <- c(
 # itself switches to a different, protein-binding-based pathway for those
 # that we don't implement. We also don't have per-compound fraction unbound
 # in plasma / blood:plasma ratio for this microsomal dataset, so a generic
-# literature default (fraction_unbound = 0.2, blood_plasma_ratio = 1) is used
-# where Rodgers & Rowland and All_literature (which uses Poulin internally)
+# literature default (fu_plasma = 0.2, blood_plasma_ratio = 1) is used
+# where Rodgers & Rowland and all_literature (which uses Poulin internally)
 # need it - a real limitation, not a substitute for compound-specific values.
 safe_fu <- function(...) tryCatch(calculate_fu_in_vitro(...), error = function(e) NA_real_)
 
-for (j in seq_along(QSARs)) {
-  testFuData[[QSAR_colnames[j]]] <- sapply(seq_len(nrow(testFuData)), function(i) {
+for (j in seq_along(methods)) {
+  testFuData[[method_colnames[j]]] <- sapply(seq_len(nrow(testFuData)), function(i) {
     # pKa is not numeric for neutral compounds (no ionizable group); this is
-    # fine since none of the QSARs above use pka when the compound is neutral.
+    # fine since none of the methods above use pka when the compound is neutral.
     suppressWarnings(safe_fu(
-      partition_qspr = QSARs[j],
-      log_lipophilicity = as.double(testFuData[i, "LogP37C"]),
+      method = methods[j],
+      lipophilicity = as.double(testFuData[i, "LogP37C"]),
       ionization = c(testFuData[i, "Class"], 0),
-      type_system = "microsomes",
-      FBS_fraction = 0,
+      system = "microsomes",
+      fbs_fraction = 0,
       microplate_type = 96,
       volume_medium = 0.22,
       pka = c(as.double(testFuData[i, "pKa"]), 0),
       concentration_microsomes = as.double(testFuData[i, "Cp.mg.mL."]),
       blood_plasma_ratio = 1,
-      fraction_unbound = 0.2
+      fu_plasma = 0.2
     ))
   })
 }
@@ -167,7 +167,7 @@ ggplot(verapamil_df, aes(x = type, y = fu, color = type)) +
 # dataset itself); the rest are computed by this package above.
 plot_cols <- c(
   "Fu_Poulin", "Fu_HalifaxHouston", "Fu_Turner", "Fu_Austin",
-  QSAR_colnames
+  method_colnames
 )
 
 make_fu_plot <- function(data, ycol) {
@@ -289,7 +289,7 @@ for (predi in plot_cols) {
     )
 }
 
-# error_table[["All_literature"]]
+# error_table[["all_literature"]]
 ```
 
 Calculate liver partitioning for all is it more proportional to any specific ..

@@ -7,8 +7,8 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(esqIVIVE)
+library(ESQivive)
 
-test_check("esqIVIVE")
+test_check("ESQivive")
 
 #test different examples to see if they do not crash

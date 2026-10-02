@@ -1,73 +1,49 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# esqIVIVE
+# ESQivive
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/esqLABS/esqIVIVE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/esqLABS/esqIVIVE/actions/workflows/pkgdown.yaml)
+[![R-CMD-check](https://github.com/esqLABS/ESQivive/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/esqLABS/ESQivive/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/esqLABS/ESQivive/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/esqLABS/ESQivive/actions/workflows/pkgdown.yaml)
 <!-- badges: end -->
 
-The goal of esqIVIVE is to perform extrapolation of in vitro ADME
+The goal of ESQivive is to perform extrapolation of in vitro ADME
 parameters and derive ADME parameters to input for PBK models.
 
 The functions in this package have been developed focusing on the
 integration with OSP tools.
 
-Currently there are available codes to calculate: fraction unbound in
-microsomes :
+The package provides functions to:
 
-- calculate_fu_mic_austin()
-
-- calculate_fu_mic_halifax()
-
-- calculate_fu_mic_turner()
-
-fraction unbound in hepatocytes:
-
-- calculate_fu_hep_austin()
-
-- calculate_fu_hep_kilford()
-
-- calculate_fu_hep_poulin()
-
-derive metabolism parameters from experimental curves:
-
-- fit_clearance_from_curve()
-
-- fit_mm_from_curve()
-
-perform scaling for clearance:
-
-- IVIVE_clearance()
-
-- IVIVE_MM()
-
-calculate fu_plasma related parameters:
-
-- calculate_fu_pls_from_Ks()
-
-- predict_plasma_affinities()
-
-- correct_fu_pls_pearce()
-
-perform IVIVE to derive Pint:
-
-- pint_caco2_empir()
-
-- pint_peff_empir()
+- predict the fraction unbound in microsomal and hepatocyte incubations
+  with literature regressions or partition models:
+  `calculate_fu_in_vitro()`;
+- describe the lipid, protein, plastic and air compartments of an
+  incubation: `calculate_in_vitro_compartments()`;
+- look up measured fraction unbound values in the Krumpholz et
+  al. database: `get_fu_krumpholz()` and `list_krumpholz_compounds()`;
+- fit substrate depletion and Michaelis-Menten curves:
+  `fit_depletion_curve()` and `fit_michaelis_menten_curve()`;
+- scale in vitro clearance and Michaelis-Menten parameters to in vivo:
+  `ivive_clearance()` and `ivive_michaelis_menten()`;
+- predict the fraction unbound in plasma:
+  `calculate_plasma_partitions()`, `calculate_fu_plasma()` and
+  `correct_fu_plasma_pearce()`;
+- derive the intestinal permeability from Caco-2 or effective
+  permeability values: `calculate_pint()`.
 
 Examples of how to use the functions are provided for each.
 
 ## Installation
 
-You can install the development version of esqIVIVE from
+You can install the development version of ESQivive from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("esqLABS/esqIVIVE")
+devtools::install_github("esqLABS/ESQivive")
 ```
 
 ## Example: clearance IVIVE workflow for midazolam
@@ -86,37 +62,34 @@ microsomal protein, in vitro half-life of 3.9 min) are from Obach
 (1999), Drug Metab Dispos 27(11):1350-1359.
 
 ``` r
-library(esqIVIVE)
+library(ESQivive)
 
 midazolam <- list(
-  log_lipophilicity = 3.38, # logP at 37 C
+  lipophilicity = 3.38, # logP at 37 C
   ionization = c("neutral", 0),
   pka = c(0, 0),
   fu_plasma = 0.05,
   blood_plasma_ratio = 0.53,
-  cMicro_mgml = 1 # microsomal protein concentration in the incubation
+  concentration_microsomes = 1 # microsomal protein in the incubation, mg/mL
 )
 ```
 
 ### 1. Fraction unbound in the incubation
 
-`calculate_fu_in_vitro()` predicts fu_mic with different QSPRs.
-`"All_literature"` is the average of the Poulin, Austin, Halifax and
+`calculate_fu_in_vitro()` predicts fu_mic with different methods.
+`"all_literature"` is the average of the Poulin, Austin, Hallifax and
 Turner regressions.
 
 ``` r
 fu_mic <- calculate_fu_in_vitro(
-  partition_qspr = "All_literature",
-  log_lipophilicity = midazolam$log_lipophilicity,
+  method = "all_literature",
+  system = "microsomes",
+  lipophilicity = midazolam$lipophilicity,
   ionization = midazolam$ionization,
   pka = midazolam$pka,
-  type_system = "microsomes",
-  FBS_fraction = 0,
-  microplate_type = 96,
-  volume_medium = 0.5,
-  fraction_unbound = midazolam$fu_plasma,
-  blood_plasma_ratio = midazolam$blood_plasma_ratio,
-  concentration_microsomes = midazolam$cMicro_mgml
+  concentration_microsomes = midazolam$concentration_microsomes,
+  fu_plasma = midazolam$fu_plasma,
+  blood_plasma_ratio = midazolam$blood_plasma_ratio
 )
 fu_mic
 #> [1] 0.3907191
@@ -143,10 +116,9 @@ get_fu_krumpholz("Midazolam", system = "microsomes", species = "human")
 
 ### 2. Depletion rate constant from raw data
 
-`fit_clearance_from_curve()` fits a mono-exponential decay to the
-substrate depletion curve (time in min, concentration in µM). It returns
-the rate constant (kcat, 1/min) with its 95% confidence interval and
-plots the fit.
+`fit_depletion_curve()` fits a mono-exponential decay to the substrate
+depletion curve (time in min, concentration in µM). It returns the rate
+constant (1/min) with its 95% confidence interval and plots the fit.
 
 The data below are an illustrative depletion curve in triplicate,
 generated from the midazolam half-life of 3.9 min.
@@ -160,54 +132,54 @@ depletion <- data.frame(
   )
 )
 
-kcat <- fit_clearance_from_curve(depletion)
+fit <- fit_depletion_curve(depletion)
 ```
 
 <img src="man/figures/README-example-fit-1.png" alt="Midazolam concentration decreases from about 1 to 0.1 micromolar over 12 minutes. Black points show triplicate depletion data, and the blue curve shows the fitted mono-exponential decay (R-squared = 0.995)." width="100%" />
 
 ``` r
-kcat
-#> Mean_kcat_min-1    2.5%_CI_kcat     95%_CI_kcat 
-#>       0.1683673       0.1607129       0.1764242
+fit
+#>       parameter  estimate     lower     upper
+#> 1 rate_constant 0.1683673 0.1607129 0.1764242
+
+rate_constant <- fit$estimate[fit$parameter == "rate_constant"]
 
 # in vitro half-life (min)
-log(2) / kcat[["Mean_kcat_min-1"]]
+log(2) / rate_constant
 #> [1] 4.116874
 ```
 
 ### 3. IVIVE to the PK-Sim specific clearance
 
-`IVIVE_clearance()` scales the in vitro rate constant with the
+`ivive_clearance()` scales the in vitro rate constant with the
 microsomal protein per gram liver and the intracellular fraction of the
 liver, and corrects it for fu_mic. The result is the specific clearance
 (1/min) to use in the PK-Sim “Liver Plasma Clearance” process.
 
 ``` r
-IVIVE_clearance(
-  typeValue = "kcat",
-  units = "/minutes",
-  expData = kcat[["Mean_kcat_min-1"]],
-  typeSystem = "microsomes",
-  fu_invitro = fu_mic,
-  cProtein_mgml = midazolam$cMicro_mgml
+ivive_clearance(
+  value_type = "rate_constant",
+  value = rate_constant,
+  unit = "/minutes",
+  system = "microsomes",
+  fu_in_vitro = fu_mic,
+  concentration_microsomes = midazolam$concentration_microsomes
 )
-#> ClspePermin 
-#>    23.15373
+#> [1] 23.15373
 ```
 
 If only the in vitro half-life is reported, it can be used directly:
 
 ``` r
-IVIVE_clearance(
-  typeValue = "halfLife",
-  units = "minutes",
-  expData = 3.9,
-  typeSystem = "microsomes",
-  fu_invitro = fu_mic,
-  cProtein_mgml = midazolam$cMicro_mgml
+ivive_clearance(
+  value_type = "half_life",
+  value = 3.9,
+  unit = "minutes",
+  system = "microsomes",
+  fu_in_vitro = fu_mic,
+  concentration_microsomes = midazolam$concentration_microsomes
 )
-#> ClspePermin 
-#>    24.43609
+#> [1] 24.43609
 ```
 
 The vignette `Clearance IVIVE check` applies this workflow to the 28
@@ -220,7 +192,9 @@ PBK models and compares the different IVIVE options.
 
 Contributors should comply with the [Open Systems Pharmacology Coding
 Standards for
-R](https://github.com/Open-Systems-Pharmacology/developer-docs/blob/main/ospsuite-r-specifics/CODING_STANDARDS_R.md)
+R](https://github.com/Open-Systems-Pharmacology/developer-docs/blob/main/ospsuite-r-specifics/CODING_STANDARDS_R.md),
+with one exception: functions, arguments and returned names use
+snake_case instead of camelCase.
 
 ### Development Environment
 
@@ -240,16 +214,18 @@ devtools::test()
 
 ### Website
 
-With Quarto and the `ospsuite`/PK-Sim system prerequisites installed, run from
-the package root:
+With Quarto and the `ospsuite`/PK-Sim system prerequisites installed,
+run from the package root:
 
-```sh
+``` sh
 Rscript dev/build-website.R
 ```
 
-The script installs pkgdown, the package, and its dependencies, including
-`DESCRIPTION`'s `Config/Needs/website`, before building the website.
+The script installs pkgdown, the package, and its dependencies,
+including `DESCRIPTION`’s `Config/Needs/website`, before building the
+website.
 
-The Quarto documents in `vignettes/articles/` are pkgdown articles, excluded
-from the R package build. Rendering the clearance article additionally requires
-`ospsuite` and PK-Sim. Generated HTML, supporting files, and results are ignored.
+The Quarto documents in `vignettes/articles/` are pkgdown articles,
+excluded from the R package build. Rendering the clearance article
+additionally requires `ospsuite` and PK-Sim. Generated HTML, supporting
+files, and results are ignored.
