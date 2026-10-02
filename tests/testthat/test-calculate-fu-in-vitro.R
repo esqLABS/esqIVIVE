@@ -12,7 +12,7 @@ test_that("calculate_fu_in_vitro: pksim_standard", {
       henry_law_constant = 1E-6,
       concentration_cells = 2
     ),
-    0.563008780871692,
+    0.563006547940565,
     tolerance = 1e-6
   )
 })
@@ -32,7 +32,7 @@ test_that("calculate_fu_in_vitro: pksim_standard_fu", {
       henry_law_constant = 1E-6,
       concentration_cells = 2
     ),
-    0.506029024084582,
+    0.506027220252861,
     tolerance = 1e-6
   )
 })
@@ -53,7 +53,7 @@ test_that("calculate_fu_in_vitro: poulin_theil_fu", {
       henry_law_constant = 1E-6,
       concentration_cells = 2
     ),
-    0.783309951145294,
+    0.783305628878156,
     tolerance = 1e-6
   )
 })
@@ -317,7 +317,7 @@ test_that("calculate_fu_in_vitro: rodgers_rowland_fu, strong bases only", {
       blood_plasma_ratio = 1,
       concentration_cells = 2
     ),
-    0.94721416433249,
+    0.947223702721102,
     tolerance = 1e-6
   )
 
@@ -422,7 +422,7 @@ test_that("calculate_fu_in_vitro: berezhkovskiy_fu currently gives the poulin_th
       henry_law_constant = 1E-6,
       concentration_cells = 2
     ),
-    0.783309951145294,
+    0.783305628878156,
     tolerance = 1e-6
   )
 })

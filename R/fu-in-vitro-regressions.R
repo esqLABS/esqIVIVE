@@ -97,7 +97,8 @@
   neutral_lipid_partition <- 10^lipophilicity
   ionization_factors <- .calculate_ionization_factors(ionization, pka)
   ion_factor_plasma <- ionization_factors[["ion_factor_plasma"]]
-  ion_factor_cells <- ionization_factors[["ion_factor_cells"]]
+  # the acidic phospholipid partition is calibrated on blood cells (Rodgers and Rowland)
+  ion_factor_blood_cells <- ionization_factors[["ion_factor_blood_cells"]]
 
   if (.is_strong_base(ionization, pka)) {
     fraction_neutral_lipids_erythrocytes <- 0.0024
@@ -108,12 +109,12 @@
       fu_plasma
 
     acidic_phospholipid_partition <- (partition_erythrocytes_albumin -
-      ((1 + ion_factor_cells) *
+      ((1 + ion_factor_blood_cells) *
         fraction_water_erythrocytes +
         neutral_lipid_partition * fraction_neutral_lipids_erythrocytes) /
         (1 + ion_factor_plasma)) *
       ((1 + ion_factor_plasma) /
-        (ion_factor_cells * fraction_acidic_phospholipids_erythrocytes))
+        (ion_factor_blood_cells * fraction_acidic_phospholipids_erythrocytes))
 
     1 /
       (1 +

@@ -160,6 +160,7 @@ calculate_fu_in_vitro <- function(
   ionization_factors <- .calculate_ionization_factors(ionization, pka)
   ion_factor_plasma <- ionization_factors[["ion_factor_plasma"]] # Interstitial tissue
   ion_factor_cells <- ionization_factors[["ion_factor_cells"]] # intracellular
+  ion_factor_blood_cells <- ionization_factors[["ion_factor_blood_cells"]] # blood cells (Rodgers and Rowland)
 
   protein_partition_1 <- 0.73 * 10^lipophilicity - 0.39 # from Endo 2012,dx.doi.org/10.1021/es303379y partition to chicken muscle, R2=0.86
   protein_partition_2 <- 0.163 + 0.0221 * 10^lipophilicity #from Schmitt 2008, doi:10.1016/j.tiv.2007.09.010
@@ -270,11 +271,11 @@ calculate_fu_in_vitro <- function(
       KAPL_1 <- max(
         0,
         kpuBC -
-          (1 + ion_factor_cells) / (1 + ion_factor_plasma) * fiwBC -
+          (1 + ion_factor_blood_cells) / (1 + ion_factor_plasma) * fiwBC -
           (kNL * fnlBC + (0.3 * kNL + 0.7 / (1 + ion_factor_plasma)) * fnpBC)
       )
 
-      kAPL <- KAPL_1 * (1 + ion_factor_plasma) / APbc / ion_factor_cells
+      kAPL <- KAPL_1 * (1 + ion_factor_plasma) / APbc / ion_factor_blood_cells
 
       1 /
         (1 +

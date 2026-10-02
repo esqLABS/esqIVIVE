@@ -1,4 +1,5 @@
-# Ionization factors in plasma (pH 7.4) and in cells (pH 7.22), used to
+# Ionization factors in plasma (pH 7.4), in cells (pH 7.0) and in blood cells
+# (pH 7.22, used for the Rodgers and Rowland blood cell calibration), used to
 # calculate the fraction neutral or ionized. Supports a monoprotic acid, a
 # monoprotic base and a zwitterion (one acidic and one basic group); any other
 # combination is treated as neutral.
@@ -10,7 +11,8 @@
   pka <- groups$pka
   # confirm##################
   pH <- 7.4
-  pH_cell <- 7.22
+  pH_cell <- 7.0 # intracellular, average from literature
+  pH_blood_cell <- 7.22 # blood cells
 
   # convert type ionization in 1, 0 and -1
   ionParam <- c(0, 0)
@@ -24,30 +26,27 @@
     }
   }
 
-  if (identical(ionParam, c(-1, 0))) {
-    # Monoprotic base
-
-    X <- 10^(pka[1] - pH)
-    Y <- 10^(pka[1] - pH_cell)
-  } else if (identical(ionParam, c(-1, 1)) | identical(ionParam, c(1, -1))) {
-    # monoproticBaseMonoproticAcid
-
-    X <- 10^(pka[which(ionParam %in% -1)] - pH) +
-      10^(pH - pka[which(ionParam %in% 1)])
-
-    Y <- 10^(pka[which(ionParam %in% -1)] - pH_cell) +
-      10^(pH_cell - pka[which(ionParam %in% 1)])
-  } else if (identical(ionParam, c(1, 0))) {
-    # monoprotic acid
-
-    X <- 10^(pH - pka[1])
-    Y <- 10^(pH_cell - pka[1])
-  } else {
-    X <- 0
-    Y <- 0
+  ion_factor_at_pH <- function(pH) {
+    if (identical(ionParam, c(-1, 0))) {
+      # Monoprotic base
+      10^(pka[1] - pH)
+    } else if (identical(ionParam, c(-1, 1)) | identical(ionParam, c(1, -1))) {
+      # monoproticBaseMonoproticAcid
+      10^(pka[which(ionParam %in% -1)] - pH) +
+        10^(pH - pka[which(ionParam %in% 1)])
+    } else if (identical(ionParam, c(1, 0))) {
+      # monoprotic acid
+      10^(pH - pka[1])
+    } else {
+      0
+    }
   }
 
-  c("ion_factor_plasma" = X, "ion_factor_cells" = Y)
+  c(
+    "ion_factor_plasma" = ion_factor_at_pH(pH),
+    "ion_factor_cells" = ion_factor_at_pH(pH_cell),
+    "ion_factor_blood_cells" = ion_factor_at_pH(pH_blood_cell)
+  )
 }
 
 # Put a single ionizable group first, so that c("neutral", "base") with
