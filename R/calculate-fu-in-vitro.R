@@ -35,7 +35,8 @@
 #' @param system Incubation system, `"microsomes"` or `"cells"` (for
 #'   example hepatocytes).
 #' @param lipophilicity Lipophilicity of the compound (log units), as logP or
-#'   log membrane affinity.
+#'   log membrane affinity. Always pass logP, not logD: the regressions that
+#'   need logD calculate it from `ionization` and `pka`.
 #' @param ionization Ionization class of up to two ionizable groups, as a
 #'   vector of length 2 with `"acid"`, `"base"` or `"neutral"`, for example
 #'   `c("base", "neutral")`.
@@ -68,6 +69,13 @@
 #' @details
 #' A strong base is a compound whose first ionization class is `"base"` with
 #' a pKa above 7.
+#'
+#' The lipophilicity used by the regressions follows the published methods.
+#' The microsomal Austin (2002) and Hallifax and Houston (2006) regressions use
+#' logP for strong bases and logD at pH 7.4 for acids, weak bases and neutral
+#' compounds (for which logD is logP). The Turner regressions use logP for all
+#' compounds. The hepatocyte Austin (2005) and Kilford regressions use logD for
+#' strong bases and logP for the other compounds.
 #'
 #' `"berezhkovskiy"` and `"berezhkovskiy_fu"` currently give the same results
 #' as `"poulin_theil"` and `"poulin_theil_fu"`.

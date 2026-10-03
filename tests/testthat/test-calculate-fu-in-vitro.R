@@ -119,6 +119,9 @@ test_that("calculate_fu_in_vitro: schmitt, zwitterion (two ionizable groups)", {
   )
 })
 
+# The microsomal Austin and Hallifax regressions use logP for strong bases and
+# logD at pH 7.4 for the other compounds (here a base with pKa 3 is almost
+# neutral at pH 7.4, so logD is 3 - 1e-5).
 test_that("calculate_fu_in_vitro: literature methods, microsomes", {
   expect_equal(
     calculate_fu_in_vitro(
@@ -132,7 +135,7 @@ test_that("calculate_fu_in_vitro: literature methods, microsomes", {
       pka = c(3, 0),
       concentration_microsomes = 1
     ),
-    0.349395372066127,
+    0.349400439815598,
     tolerance = 1e-6
   )
   expect_equal(
@@ -147,7 +150,7 @@ test_that("calculate_fu_in_vitro: literature methods, microsomes", {
       pka = c(3, 0),
       concentration_microsomes = 1
     ),
-    0.654259613707832,
+    0.654264107259219,
     tolerance = 1e-6
   )
   expect_equal(
@@ -385,7 +388,7 @@ test_that("calculate_fu_in_vitro: the regressions do not need the well", {
       pka = c(3, 0),
       concentration_microsomes = 1
     ),
-    0.349395372066127,
+    0.349400439815598,
     tolerance = 1e-6
   )
   expect_equal(
@@ -547,7 +550,7 @@ test_that("calculate_fu_in_vitro: the ionizable group can be in either position"
       pka = c(0, 8),
       concentration_microsomes = 1
     ),
-    0.5689241999032,
+    0.349395372066127,
     tolerance = 1e-6
   )
 })

@@ -46,7 +46,8 @@ use the measured \code{fu_plasma} instead.}
 example hepatocytes).}
 
 \item{lipophilicity}{Lipophilicity of the compound (log units), as logP or
-log membrane affinity.}
+log membrane affinity. Always pass logP, not logD: the regressions that
+need logD calculate it from \code{ionization} and \code{pka}.}
 
 \item{ionization}{Ionization class of up to two ionizable groups, as a
 vector of length 2 with \code{"acid"}, \code{"base"} or \code{"neutral"}, for example
@@ -105,6 +106,13 @@ type and the medium volume.
 \details{
 A strong base is a compound whose first ionization class is \code{"base"} with
 a pKa above 7.
+
+The lipophilicity used by the regressions follows the published methods.
+The microsomal Austin (2002) and Hallifax and Houston (2006) regressions use
+logP for strong bases and logD at pH 7.4 for acids, weak bases and neutral
+compounds (for which logD is logP). The Turner regressions use logP for all
+compounds. The hepatocyte Austin (2005) and Kilford regressions use logD for
+strong bases and logP for the other compounds.
 
 \code{"berezhkovskiy"} and \code{"berezhkovskiy_fu"} currently give the same results
 as \code{"poulin_theil"} and \code{"poulin_theil_fu"}.

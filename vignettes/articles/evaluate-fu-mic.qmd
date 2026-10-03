@@ -11,9 +11,11 @@ Quarto enables you to weave together content and executable code into a finished
 
 Some algorithms are purely empirical regressions
 
+In the regressions below, $\log(P/D)$ is logP for strong bases (pKa \> 7) and logD at pH 7.4 for acids, weak bases and neutral compounds, as in the original methods. Turner uses logP for all compounds. In the package, always pass logP: the Austin and Hallifax regressions calculate logD from the ionization class and the pKa.
+
 #### Austin et al 2002
 
-$$ 
+$$
 fu_{inc} = 1 \cdot C \cdot 10^{0.56 \log \left( \frac{P}{D} \right) - 1.41} + 1 
 $$
 
@@ -74,7 +76,7 @@ The dataset (`inst/extdata/test_fu_microsomes.csv`) comes from Poulin and Haddad
 
 We used the Fu_mic from this dataset to evaluate the predictions
 
-#### alculate Fu_mic for all
+#### Calculate Fu_mic for all
 
 ```{r}
 #| echo: false

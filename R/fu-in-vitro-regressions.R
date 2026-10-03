@@ -3,7 +3,10 @@
 # the inputs. Concentrations are in mg protein/mL (microsomes) and million
 # cells/mL (hepatocytes).
 
-# Lipophilicity used by the regressions: logD for strong bases, logP otherwise.
+# Lipophilicity used by the hepatocyte Austin and Kilford regressions: logD for
+# strong bases, logP otherwise. The convention of these two regressions has not
+# been checked against the papers or published predictions yet, unlike the
+# microsomal one in .microsomal_regression_lipophilicity().
 .regression_lipophilicity <- function(ionization, pka, lipophilicity) {
   if (.is_strong_base(ionization, pka)) {
     ion_factor <- .calculate_ionization_factors(ionization, pka)[[
@@ -12,6 +15,26 @@
     log10(1 / (1 + ion_factor) * 10^lipophilicity)
   } else {
     lipophilicity
+  }
+}
+
+# Lipophilicity used by the microsomal Austin and Hallifax regressions: logP for
+# strong bases and logD at pH 7.4 for acids, weak bases and neutral compounds
+# (for neutral compounds logD is logP). This is the convention of the published
+# regressions (Austin et al 2002, Hallifax and Houston 2006), and reproduces the
+# predictions published in inst/extdata/test_fu_microsomes.csv.
+.microsomal_regression_lipophilicity <- function(
+  ionization,
+  pka,
+  lipophilicity
+) {
+  if (.is_strong_base(ionization, pka)) {
+    lipophilicity
+  } else {
+    ion_factor <- .calculate_ionization_factors(ionization, pka)[[
+      "ion_factor_plasma"
+    ]]
+    log10(10^lipophilicity / (1 + ion_factor))
   }
 }
 
@@ -39,7 +62,11 @@
   lipophilicity,
   concentration_microsomes
 ) {
-  log_partition <- .regression_lipophilicity(ionization, pka, lipophilicity)
+  log_partition <- .microsomal_regression_lipophilicity(
+    ionization,
+    pka,
+    lipophilicity
+  )
   1 /
     (1 +
       concentration_microsomes *
@@ -53,7 +80,11 @@
   lipophilicity,
   concentration_microsomes
 ) {
-  log_partition <- .regression_lipophilicity(ionization, pka, lipophilicity)
+  log_partition <- .microsomal_regression_lipophilicity(
+    ionization,
+    pka,
+    lipophilicity
+  )
   1 / (1 + concentration_microsomes * 10^(0.56 * log_partition - 1.41))
 }
 
